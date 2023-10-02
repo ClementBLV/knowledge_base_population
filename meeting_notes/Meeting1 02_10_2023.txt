@@ -1,0 +1,16 @@
+02/10/2023 : meeting notes 
+subject  : research questions 
+
+----
+the question which are kept are : 
+- Can we address the task of link prediction in a semantic knowledge base to an entailment model ?
+- What are the performances of an entailment model in a zero shot and few shot design on a link prediction task ?
+- Can an entailment task outperform an embedding graph method for link prediction ?
+
+for 10/10/2023
+BENCHMARK ON LINK PREDICTION 
+- find the benchmark used and most suited for this task 
+- find the metric they use
+- find the state of the art performance on which we will have to perform
+
+- make an experiment plan
