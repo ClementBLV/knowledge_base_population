@@ -59,6 +59,7 @@ cover/
 *.pot
 
 # Django stuff:
+
 *.log
 local_settings.py
 db.sqlite3
@@ -80,7 +81,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
+*.ipynb
 # IPython
 profile_default/
 ipython_config.py
