@@ -17,7 +17,7 @@ print("device " ,device)
 
 parser = ArgumentParser()
 
-parser.add_argument("--input_file", type=str, default="/home/clement/Documents/Stage/knowledge_base_population/data/WN18RR/valid_eval.json")
+parser.add_argument("--input_file", type=str, default="./data/WN18RR/valid_eval.json")
 parser.add_argument("--model", type=str, default="MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c")
 
 args = parser.parse_args()
@@ -25,7 +25,7 @@ print("=========== EVALUATION ============")
 
 # Define the file name where you want to save the output and redirect the print
 name = args.model.split("/")[0]
-output_file = f"eval_{name}.txt"
+output_file = f"eval/eval_{name}.txt"
 sys.stdout = open(output_file, "w")
 print("=========== EVALUATION ============")
 
@@ -45,10 +45,11 @@ relation_score = {} # dict with key = True relation and the list of score to eva
 model_name = args.model
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
+model.to(device)
 
 # read json 
 lines = json.load(open(args.input_file, "rt"))
-for line in lines[0:20] :
+for line in lines :
     mnli_data.append(
         MNLIInputFeatures(
             premise = line["premise"],                     # should add the relation to have each hits for each relations 
