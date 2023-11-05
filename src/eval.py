@@ -20,13 +20,17 @@ parser.add_argument("--model", type=str, default="MoritzLaurer/DeBERTa-v3-base-m
 args = parser.parse_args()
 print("=========== EVALUATION ============")
 
+# Initialition 
 @dataclass
 class MNLIInputFeatures:
     premise: str #context
     hypothesis_true:List[str]
     hypothesis_false:List[str]
+    relation:str
 
 mnli_data = []
+relation_score = {} # dict with key = True relation and the list of score to evaluate each realtion independantly
+
 
 # load model
 model_name = args.model
@@ -35,16 +39,25 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
 # read json 
 lines = json.load(open(args.input_file, "rt"))
-for line in lines :
+for line in lines[0:20] :
     mnli_data.append(
         MNLIInputFeatures(
-            premise = line["premise"],
-            hypothesis_true =line["hypothesis_true"],
-            hypothesis_false = line["hypothesis_false"],
+            premise = line["premise"],                     # should add the relation to have each hits for each relations 
+            hypothesis_true =line["hypothesis_true"],      # the true 
+            hypothesis_false = line["hypothesis_false"],  # all the false possible 
+            relation=line["relation"],
         )
     )
+
 # evalute
-def hit_at(mnli_input : MNLIInputFeatures, number_relation =11):
+def rank(mnli_input : MNLIInputFeatures, number_relation:int =11):
+    """ 
+    Method to rank a feature, the entailement probability of the true premise is ranked against all the 
+    other premises probabilities. The output is a list of rank index, the position of the index corresponding to 
+    the rank and the index to the relation. The true relation is the element 0. If the 0 is place at the 
+    position 2 that would mean that the true premise only have the third highest rank. 
+    """
+
     # initialisation 
     premise = mnli_input.premise
     
@@ -67,13 +80,52 @@ def hit_at(mnli_input : MNLIInputFeatures, number_relation =11):
         entailment.append(prediction[0])  # [ proba entail , proba contradiction
 
     # rank the element, ind is the link of index of increasing probabilty    
-    ind = np.array(entailment).argsort()[-number_relation:][::-1]
-    return np.where(ind==0)[0][0]+1 # +1 because the index starts at 0
-            
-hits = []
-for data in tqdm(mnli_data):
-    hits.append(hit_at(data))
+    return  np.array(entailment).argsort()[-number_relation:][::-1]  # pour le truc global mais on va aussi return la relation
 
-count = Counter(hits)
-for elt in count: 
-    print("Hit@"+str(elt)+" = "+str(count[elt]/len(hits)))
+
+def compute_hits_at_k(shots, element=0, k_values=[1,3]):
+    """
+    shots : list of ranked index (the position correspond to the index)
+    element : element in the list we want to compute the hit@
+    k_values : the hit@k_values 
+    """
+    hits = {k: 0 for k in k_values}
+
+    for shot in shots:
+        if element in shot[:k_values[-1]]:
+            for k in k_values:
+                if element in shot[:k]:
+                    hits[k] += 1
+
+    return hits
+
+# Sample ranked lists for each shot
+shots = []
+relation2shots = {}
+for data in tqdm(mnli_data):
+    ranked_relaitions = rank(data)
+    # all the shots to compute the global hit@
+    shots.append(ranked_relaitions)
+    # each relation to ist rank 
+    if data.relation in relation2shots.keys():
+        relation2shots[data.relation].append(ranked_relaitions)
+    else : 
+        relation2shots[data.relation] = [ranked_relaitions]
+
+# Compute Hit at 1 and Hit at 3 for the element across shots
+hits = compute_hits_at_k(shots)
+
+# Display the Global results 
+for k, hit in hits.items():
+    print(f"Global Hit at {k}: {hit/len(shots)}")
+print("------------------------------------")
+
+# Display the results for each relation
+for relation in relation2shots.keys():
+    # Compute Hit at 1 and Hit at 3 for the element across shots
+    hits = compute_hits_at_k(relation2shots[relation])
+
+    # Display the results
+    for k, hit in hits.items():
+        print(f"{relation} Hit at {k}: {hit/len(relation2shots[relation])}")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")

@@ -30,6 +30,7 @@ class MNLIInputFeatures:
     premise: str #context
     hypothesis_true:List[str]
     hypothesis_false:List[str]
+    relation:str
 
 
 parser = ArgumentParser()
@@ -123,8 +124,8 @@ for relation in WN_LABELS: #TACRED_LABELS:
             
 def wn2mnli_eval(
     instance: REInputFeatures,
-    positive_templates,
-    negative_templates,
+    positive_templates:Dict[str, list],
+    negative_templates:Dict[str, list],
 
 ):
     mnli_instances_true = []
@@ -148,7 +149,8 @@ def wn2mnli_eval(
     return MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis_true=mnli_instances_true,
-                hypothesis_false=mnli_instances_false
+                hypothesis_false=mnli_instances_false, 
+                relation=instance.relation,
             )
      
 
