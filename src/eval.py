@@ -7,6 +7,9 @@ from tqdm import tqdm
 import json
 import numpy as np 
 import torch
+import sys 
+
+
 
 ### device 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -18,6 +21,12 @@ parser.add_argument("--input_file", type=str, default="/home/clement/Documents/S
 parser.add_argument("--model", type=str, default="MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c")
 
 args = parser.parse_args()
+print("=========== EVALUATION ============")
+
+# Define the file name where you want to save the output and redirect the print
+name = args.model.split("/")[0]
+output_file = f"eval_{name}.txt"
+sys.stdout = open(output_file, "w")
 print("=========== EVALUATION ============")
 
 # Initialition 
@@ -129,3 +138,6 @@ for relation in relation2shots.keys():
     for k, hit in hits.items():
         print(f"{relation} Hit at {k}: {hit/len(relation2shots[relation])}")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+sys.stdout.close()
+sys.stdout = sys.__stdout__
