@@ -5,7 +5,8 @@ __pycache__/
 
 # Data
 *.json
-*.txt
+src/*.txt
+data/*.txt
 # C extensions
 *.so
 
