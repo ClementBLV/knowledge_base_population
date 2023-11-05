@@ -1,3 +1,4 @@
+#!/bin/bash
 BASE=$(pwd)
 ROOT=$BASE"/data/WN18RR/"
 TRAIN=$ROOT"source/train"
@@ -9,8 +10,8 @@ python3 data_generator.py --train-path $TRAIN".txt" --valid-path $VALID".txt" --
 
 echo "******* TRAIN *******"
 # split the train set
-split_values=(5 10 20)
-for SPLIT in "${split_values[@]}"; do
+#split_values=(5 10 20)
+for SPLIT in 5 10 20; do
         # Split train
         echo "$SPLIT"
 	!(python3 split.py --input_file $TRAIN".json" --percentage $SPLIT --output_file $ROOT"train_"$SPLIT".json")
