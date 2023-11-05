@@ -1,6 +1,7 @@
 import preprocess
 import pandas as pd
 import nltk
+nltk.download('wordnet')
 from nltk.corpus import wordnet as wn
 import argparse
 import json
