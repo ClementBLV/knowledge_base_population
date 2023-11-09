@@ -18,6 +18,7 @@ print("device " ,device)
 parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="./data/WN18RR/valid_eval.json")
+parser.add_argument("--output_file", type=str, default=".eval")
 parser.add_argument("--model", type=str, default="MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c")
 
 args = parser.parse_args()
@@ -25,7 +26,7 @@ print("=========== EVALUATION ============")
 
 # Define the file name where you want to save the output and redirect the print
 name = args.model.split("/")[0]
-output_file = f"eval/eval_{name}.txt"
+output_file = f"{args.output_file}/eval_{name}.txt"
 sys.stdout = open(output_file, "w")
 print("=========== EVALUATION ============")
 
