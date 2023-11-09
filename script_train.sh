@@ -5,7 +5,7 @@ TASK_NAME="MNLI"
 
 start_time=$(date +%s.%N)
 
-echo "******* TRAINING !  *******"
+echo "******* TRAIN *******"
 
 #libs/transformers/examples/pytorch/text-classification/run_glue.py
 python3 "src/run_glue.py" \
@@ -17,7 +17,7 @@ python3 "src/run_glue.py" \
   --test_file "data/WN18RR/test.mnli.json" \
   --validation_file "data/WN18RR/valid.mnli.json" \
   --max_seq_length "128" \
-  --per_gpu_train_batch_size "32" \
+  --per_gpu_train_batch_size "5" \
   --learning_rate "2e-5" \
   --num_train_epochs "3.0" \
   --output_dir "$BASE/tmp/$TASK_NAME/"

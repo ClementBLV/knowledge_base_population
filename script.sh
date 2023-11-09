@@ -7,8 +7,8 @@ VALID=$ROOT"source/valid"
 
 # whoch one to do
 TRAIN_BOOL=true
-TEST_BOOL=false
-VALID_BOOL=false
+TEST_BOOL=true
+VALID_BOOL=true
 
 cd src
 # preprocess the raw dataset
