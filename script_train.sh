@@ -3,17 +3,25 @@ BASE=$(pwd)
 GLUE_DIR=$BASE"/src/"
 TASK_NAME="MNLI"
 
-#libs/transformers/examples/pytorch/text-classification/run_glue.py 
+start_time=$(date +%s.%N)
+
+echo "******* TRAINING !  *******"
+
+#libs/transformers/examples/pytorch/text-classification/run_glue.py
 python3 "src/run_glue.py" \
-  --model_type bert \
-  --model_name_or_path bert-base-cased \
+  --model_name_or_path "microsoft/deberta-v3-base" \
   --task_name $TASK_NAME \
   --do_train \
   --do_eval \
-  --do_lower_case \
-  --data_dir "data/WN18RR/" \
+  --train_file "data/WN18RR/train_1.mnli.json" \
+  --test_file "data/WN18RR/test.mnli.json" \
+  --validation_file "data/WN18RR/valid.mnli.json" \
   --max_seq_length "128" \
   --per_gpu_train_batch_size "32" \
   --learning_rate "2e-5" \
   --num_train_epochs "3.0" \
-  --output_dir /tmp/$TASK_NAME/
+  --output_dir "$BASE/tmp/$TASK_NAME/"
+
+end_time=$(date +%s.%N)
+execution_time=$(echo "$end_time - $start_time" | bc)
+echo "Execution time: $execution_time seconds"
