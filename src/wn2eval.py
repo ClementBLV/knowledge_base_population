@@ -154,8 +154,10 @@ def wn2mnli_eval(
             )
      
 
-
-with open(args.input_file, "rt") as f:
+import os
+# Check if the directory exists, create if not
+path = os.path.join( os.path.dirname(os.getcwd()),args.input_file)
+with open(path, "rt") as f:
     mnli_data = []
 
     for line in json.load(f):
@@ -172,12 +174,12 @@ with open(args.input_file, "rt") as f:
 
         mnli_data.append(mnli_feature)
 
-
-with open(args.output_file, "wt") as f:
+path = os.path.join( os.path.dirname(os.getcwd()),args.output_file)
+with open(path, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
 # save
-json.dump([data.__dict__ for data in mnli_data], open(args.output_file, "w",encoding='utf-8'), indent=4)
+json.dump([data.__dict__ for data in mnli_data], open(path, "w",encoding='utf-8'), indent=4)
 print("saved at location : ", args.output_file)
