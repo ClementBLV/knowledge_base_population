@@ -7,6 +7,9 @@ import json
 import sys
 from pprint import pprint
 import random
+from template import WN_LABELS
+from template import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
+
 
 random.seed(0)
 np.random.seed(0)
@@ -35,77 +38,28 @@ class MNLIInputFeatures:
 parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="data/WN18RR/valid.json")
-# parser.add_argument('--model', type=str, default='microsoft/deberta-v2-xlarge-mnli')
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid.mnli.json")
-#parser.add_argument("--negative_pattern", action="store_true", default=False)
 parser.add_argument("--negn", type=int, default=1)
+parser.add_argument("--direct", type=bool, default=True)
+parser.add_argument("--both", type=bool, default=True)
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")
 print("convert ", args.input_file , " into NLI dataset")
 
 
-WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations 
-    "_hypernym":["{obj} specifies {subj}"],
-    "_derivationally_related_form":[ "{obj} derived from {subj}"],
-    "_instance_hypernym":[ "{obj} is a {subj}"],
-    "_also_see":[ "{obj} is seen in {subj}"],
-    "_member_meronym":[ "{obj} is the family of {subj}" ],
-    "_synset_domain_topic_of":[  "{obj} is a topic of {subj}"],
-    "_has_part":[  "{obj} contains {subj}"],
-    "_member_of_domain_usage":[ "{obj} ?????????? {subj}"],
-    "_member_of_domain_region":[ "{obj} is the domain region of {subj}"],
-    "_verb_group":[  "{obj} is synonym to {subj}"],
-    "_similar_to":[ "{obj} is similar to {subj}"],
-}
-
-WN_LABELS = [
-    "_hypernym",
-    "_derivationally_related_form",
-    "_instance_hypernym",
-    "_also_see",
-    "_member_meronym",
-    "_synset_domain_topic_of",
-    "_has_part",
-    "_member_of_domain_usage",
-    "_member_of_domain_region",
-    "_verb_group",
-    "_similar_to",
-]
-
-templates_direct = [
-    "{obj} specifies {subj}",
-    "{obj} derived from {subj}",
-    "{obj} is a {subj}",
-    "{obj} is seen in {subj}",
-    "{obj} is the family of {subj}",
-    "{obj} is a topic of {subj}",
-    "{obj} contains {subj}",
-    "{obj} ?????????? {subj}",
-    "{obj} is the domain region of {subj}",
-    "{obj} is synonym to {subj}", 
-    "{obj} is similar to {subj}" 
-]
-
-template_indirect = [
-    "{subj} generalize {obj}",
-    "{	X }",
-    "{subj} such as {obj}"
-    "{subj} has 		 {obj}",
-    "{subj} is a member of {obj}"
-    "{subj} is the context of {obj}",
-    "{subj} is a part of {obj}",
-    "{obj} ?????????? 	    {subj}"
-    "{subj} belong to the regieon of {obj}",
-    "{subj} is synonym to {obj}",
-    "{subj} similar to {obj}",
-]
-
 labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 
 positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
 
+templates = []
+if args.direct : 
+    for relations in WN_LABELS: 
+        templates.append(WN_LABEL_TEMPLATES[relation][0]) # the first ones are the direct labels
+else : 
+    for relations in WN_LABELS: 
+        templates.append(WN_LABEL_TEMPLATES[relation][1])
 
 # generate a two dict, 
 # n°1 : positive_templates 
@@ -115,9 +69,9 @@ negative_templates: Dict[str, list] = defaultdict(list)
 for relation in WN_LABELS: #TACRED_LABELS:
     #if not args.negative_pattern and label == "no_relation":
     #    continue
-    for template in templates_direct:
+    for template in templates:
     # for the moment we just look at the direct patterns 
-        if template in WN_LABEL_TEMPLATES[relation  ]:     # si le template correspond au label du template  
+        if template in WN_LABEL_TEMPLATES[relation]:     # si le template correspond au label du template  
             positive_templates[relation].append(template)    # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
         
         else:
