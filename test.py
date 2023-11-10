@@ -6,7 +6,7 @@ import json
 import os
 import pathlib
 
-path = os.path.join( os.getcwd(),'tmp/MNLI/checkpoint-1000' )
+path = os.path.join( os.getcwd(),'tmp/MNLI/checkpoint-9000' )
 print(path)
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
