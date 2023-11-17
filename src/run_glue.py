@@ -301,7 +301,15 @@ def main():
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
+    logger.info(f"!!!!!!{data_args.task_name}")
+
+    logger.info(f"!!!!!! dataset name {data_args.dataset_name}")
+    logger.info(f"!!!!!! dataset name {data_args.train_file}")
+    a = data_args.train_file.endswith(".json")
+    logger.info(f"!!!!!!!!! {a}")
     if data_args.task_name is not None:
+        logger.info(f"!!!!!!Loop 1")
+
         # Downloading and loading a dataset from the hub.
         raw_datasets = load_dataset(
             "glue",
@@ -311,13 +319,18 @@ def main():
         )
     elif data_args.dataset_name is not None:
         # Downloading and loading a dataset from the hub.
+        logger.info(f"!!!!!!Loop 2")
+
         raw_datasets = load_dataset(
             data_args.dataset_name,
             data_args.dataset_config_name,
             cache_dir=model_args.cache_dir,
             token=model_args.token,
         )
+    
     else:
+        logger.info(f"!!!!!!Loop 3")
+
         # Loading a dataset from your local files.
         # CSV/JSON training and evaluation files are needed.
         data_files = {"train": data_args.train_file, "validation": data_args.validation_file}
@@ -326,6 +339,7 @@ def main():
         # when you use `do_predict` without specifying a GLUE benchmark task.
         if training_args.do_predict:
             if data_args.test_file is not None:
+                logger.info(f"test file {data_args.test_file}")  
                 train_extension = data_args.train_file.split(".")[-1]
                 test_extension = data_args.test_file.split(".")[-1]
                 assert (
@@ -354,6 +368,8 @@ def main():
                 cache_dir=model_args.cache_dir,
                 token=model_args.token,
             )
+            logger.info(f"!!!!!!!!!!!{raw_datasets}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     # See more about loading any type of standard or custom dataset at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -363,6 +379,7 @@ def main():
         if not is_regression:
             label_list = raw_datasets["train"].features["label"].names
             num_labels = len(label_list)
+            logger.info(f"!!!!!!!!!!!!!!!!!!!!!!!!!!{num_labels}")
         else:
             num_labels = 1
     else:
