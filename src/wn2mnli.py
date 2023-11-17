@@ -7,8 +7,7 @@ import json
 import sys
 from pprint import pprint
 import random
-from template import WN_LABELS
-from template import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
+from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
 
 
 random.seed(0)
@@ -32,7 +31,7 @@ class REInputFeatures:
 class MNLIInputFeatures:
     premise: str #context
     hypothesis: str #relation 
-    relation: int
+    label: int
 
 
 parser = ArgumentParser()
@@ -56,10 +55,10 @@ negative_templates: Dict[str, list] = defaultdict(list)
 templates = []
 if args.direct : 
     for relations in WN_LABELS: 
-        templates.append(WN_LABEL_TEMPLATES[relation][0]) # the first ones are the direct labels
+        templates.append(WN_LABEL_TEMPLATES[relations][0]) # the first ones are the direct labels
 else : 
     for relations in WN_LABELS: 
-        templates.append(WN_LABEL_TEMPLATES[relation][1])
+        templates.append(WN_LABEL_TEMPLATES[relations][1])
 
 # generate a two dict, 
 # n°1 : positive_templates 
@@ -95,7 +94,7 @@ def wn2mnli_with_negative_pattern(
             MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                relation=labels2id["entailment"],
+                label=labels2id["entailment"],
             )
             for t in positive_template
         ]
@@ -110,7 +109,7 @@ def wn2mnli_with_negative_pattern(
             MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                relation=labels2id["contradiction"], # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
+                label=labels2id["contradiction"], # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
             )
             for t in negative_template
         ]
@@ -143,12 +142,13 @@ with open(args.input_file, "rt") as f:
         relations.append(line["relation"])
         stats.append(line["relation"] != "no_relation")
 
+## cf wn2eval pour corriger le bug
 with open(args.output_file, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
-    json.dump([data.__dict__ for data in mnli_data], f, indent=2)
+    #json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
-count = Counter([data.relation for data in mnli_data])
+count = Counter([data.label for data in mnli_data])
 print("Number of links : ", count)
 count = Counter(relations)
 pprint(dict(count))

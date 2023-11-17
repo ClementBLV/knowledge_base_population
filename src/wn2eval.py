@@ -7,7 +7,7 @@ import json
 import sys
 from pprint import pprint
 import random
-from template import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
+from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
 
 random.seed(0)
 np.random.seed(0)
@@ -128,7 +128,7 @@ path = os.path.join( os.path.dirname(os.getcwd()),args.output_file)
 with open(path, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
-    json.dump([data.__dict__ for data in mnli_data], f, indent=2)
+    #json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
 # save
 json.dump([data.__dict__ for data in mnli_data], open(path, "w",encoding='utf-8'), indent=4)
