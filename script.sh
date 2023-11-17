@@ -7,8 +7,8 @@ VALID=$ROOT"source/valid"
 
 # whoch one to do
 TRAIN_BOOL=true
-TEST_BOOL=true
-VALID_BOOL=true
+TEST_BOOL=false
+VALID_BOOL=false
 
 cd src
 # preprocess the raw dataset
@@ -21,9 +21,9 @@ echo "******* TRAIN *******"
 #split_values=(5 10 20)
 
 if $TRAIN_BOOL; then
-	for SPLIT in 1; do
-			# Split train
-			echo "$SPLIT"
+	for SPLIT in 10 20; do
+		# Split train
+		echo "$SPLIT"
 		!(python3 split.py --input_file $TRAIN".json" --percentage $SPLIT --output_file $ROOT"train_"$SPLIT".json")
 		# convert to mnli format
 		!(python3 wn2mnli.py --input_file $ROOT"train_"$SPLIT".json" --output_file $ROOT"train_"$SPLIT".mnli.json")
