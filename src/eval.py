@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from collections import Counter
 from dataclasses import dataclass
 from typing import List
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, DebertaForSequenceClassification
 from tqdm import tqdm
 import json
 import numpy as np 
@@ -19,14 +19,19 @@ parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="data/WN18RR/valid_eval.json")
 parser.add_argument("--output_file", type=str, default="eval")
-parser.add_argument("--model", type=str, default="MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c")
+parser.add_argument("--model", type=str, default="")
+parser.add_argument("--source_model", type=str, default="")
+parser.add_argument("--name", type=str, default=None)
 
 args = parser.parse_args()
 print("=========== EVALUATION ============")
 
 # Define the file name where you want to save the output and redirect the print
-name = args.model.split("/")[0]
-output_file = f"{os.path.join( os.getcwd(),args.output_file)}/eval_{name}.txt"
+if args.name is None : 
+    name = args.model.split("/")[-1]
+else : 
+    name = args.name
+output_file = f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
 sys.stdout = open(output_file, "w")
 print("=========== EVALUATION ============")
 
@@ -43,13 +48,15 @@ relation_score = {} # dict with key = True relation and the list of score to eva
 
 
 # load model
-model_name = args.model
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
+path = args.model
+tokenizer = AutoTokenizer.from_pretrained(args.source_model)
+#model = AutoModelForSequenceClassification.from_pretrained(model_name)
+model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
+
 model.to(device)
 
 # read json 
-lines = json.load(open(os.path.join( os.getcwd(),args.input_file), "rt"))
+lines = json.load(open(args.input_file, "rt"))
 for line in lines :
     mnli_data.append(
         MNLIInputFeatures(
@@ -73,6 +80,7 @@ def rank(mnli_input : MNLIInputFeatures, number_relation:int =11):
     premise = mnli_input.premise
     
     # entail the true 
+
     input = tokenizer(premise,mnli_input.hypothesis_true[0], truncation=True, return_tensors="pt")
     output = model(input["input_ids"].to(device))  # device = "cuda:0" or "cpu"
     prediction = torch.softmax(output["logits"][0], -1).tolist()
@@ -114,14 +122,15 @@ def compute_hits_at_k(shots, element=0, k_values=[1,3]):
 shots = []
 relation2shots = {}
 for data in tqdm(mnli_data):
-    ranked_relaitions = rank(data)
-    # all the shots to compute the global hit@
-    shots.append(ranked_relaitions)
-    # each relation to ist rank 
-    if data.relation in relation2shots.keys():
-        relation2shots[data.relation].append(ranked_relaitions)
-    else : 
-        relation2shots[data.relation] = [ranked_relaitions]
+    if len(data.hypothesis_true)>0: # TODO remove that in the future
+        ranked_relaitions = rank(data)
+        # all the shots to compute the global hit@
+        shots.append(ranked_relaitions)
+        # each relation to ist rank 
+        if data.relation in relation2shots.keys():
+            relation2shots[data.relation].append(ranked_relaitions)
+        else : 
+            relation2shots[data.relation] = [ranked_relaitions]
 
 # Compute Hit at 1 and Hit at 3 for the element across shots
 hits = compute_hits_at_k(shots)
