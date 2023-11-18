@@ -97,12 +97,12 @@ else :
                 mnli_data.extend(random.choices(relation2data[rel], k=args.threshold_effectif))
             # else the class is disgad
         # shuffle the final output
-        if args.percentage ==7:
+        if args.percentage ==0:
             # 0 means all so just suffle  
             random.shuffle(mnli_data)
 
         else : 
-            mnli_data = random.choices(lines, k=round(len(mnli_data)*args.percentage/100))
+            mnli_data = random.choices(mnli_data, k=round(len(lines)*args.percentage/100))
 print(len(mnli_data))
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")        
 
