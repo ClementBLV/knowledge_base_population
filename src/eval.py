@@ -2,14 +2,14 @@ from argparse import ArgumentParser
 from collections import Counter
 from dataclasses import dataclass
 from typing import List
-from transformers import AutoTokenizer, DebertaForSequenceClassification
+from transformers import AutoTokenizer, DebertaForSequenceClassification, AutoModelForSequenceClassification
 from tqdm import tqdm
 import json
 import numpy as np 
 import torch
 import sys 
 import os 
-
+from pprint import pprint
 
 ### device 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -44,16 +44,22 @@ class MNLIInputFeatures:
     relation:str
 
 mnli_data = []
-relation_score = {} # dict with key = True relation and the list of score to evaluate each realtion independantly
+# dict with key = True relation and the list of score to evaluate each realtion independantly
+relation_score = {} 
 
 
 # load model
 path = args.model
+""" With the below writing some weight where randomly initialised
 tokenizer = AutoTokenizer.from_pretrained(args.source_model)
-#model = AutoModelForSequenceClassification.from_pretrained(model_name)
 model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
+model.to(device)"""
 
+#model_name = "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
+tokenizer = AutoTokenizer.from_pretrained(path)
+model = AutoModelForSequenceClassification.from_pretrained(path)
 model.to(device)
+
 
 # read json 
 lines = json.load(open(args.input_file, "rt"))
@@ -81,11 +87,15 @@ def rank(mnli_input : MNLIInputFeatures, number_relation:int =11):
     
     # entail the true 
 
-    input = tokenizer(premise,mnli_input.hypothesis_true[0], truncation=True, return_tensors="pt")
+    input = tokenizer(
+                premise,
+                mnli_input.hypothesis_true[0], 
+                truncation=True, 
+                return_tensors="pt"
+                )
     output = model(input["input_ids"].to(device))  # device = "cuda:0" or "cpu"
     prediction = torch.softmax(output["logits"][0], -1).tolist()
     entailment = [prediction[0]]  # the True element is at index 0
-    
     # entail the false 
     for hf in mnli_input.hypothesis_false:
         input = tokenizer(
@@ -97,7 +107,6 @@ def rank(mnli_input : MNLIInputFeatures, number_relation:int =11):
         output = model(input["input_ids"].to(device))  # device = "cuda:0" or "cpu"
         prediction = torch.softmax(output["logits"][0], -1).tolist()
         entailment.append(prediction[0])  # [ proba entail , proba contradiction
-
     # rank the element, ind is the link of index of increasing probabilty    
     return  np.array(entailment).argsort()[-number_relation:][::-1]  # pour le truc global mais on va aussi return la relation
 
@@ -123,21 +132,21 @@ shots = []
 relation2shots = {}
 for data in tqdm(mnli_data):
     if len(data.hypothesis_true)>0: # TODO remove that in the future
-        ranked_relaitions = rank(data)
+        ranked_relations = rank(data)
         # all the shots to compute the global hit@
-        shots.append(ranked_relaitions)
+        shots.append(ranked_relations)
         # each relation to ist rank 
         if data.relation in relation2shots.keys():
-            relation2shots[data.relation].append(ranked_relaitions)
+            relation2shots[data.relation].append(ranked_relations)
         else : 
-            relation2shots[data.relation] = [ranked_relaitions]
+            relation2shots[data.relation] = [ranked_relations]
 
 # Compute Hit at 1 and Hit at 3 for the element across shots
 hits = compute_hits_at_k(shots)
 
 # Display the Global results 
 for k, hit in hits.items():
-    print(f"Global Hit at {k}: {hit/len(shots)}")
+    print(f"Global Hit_at_{k}: {hit/len(shots)}")
 print("------------------------------------")
 
 # Display the results for each relation
@@ -147,7 +156,7 @@ for relation in relation2shots.keys():
 
     # Display the results
     for k, hit in hits.items():
-        print(f"{relation} Hit at {k}: {hit/len(relation2shots[relation])}")
+        print(f"{relation} Hit_at_{k}: {hit/len(relation2shots[relation])}")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 sys.stdout.close()
