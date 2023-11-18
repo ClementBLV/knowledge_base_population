@@ -20,7 +20,7 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
     ],
     "_derivationally_related_form":[
         "{obj} derived from {subj}", 
-        "X",
+        "{subj} derived from {obj}",
     ],
     "_instance_hypernym":[
         "{obj} is a {subj}",
@@ -43,7 +43,7 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
         "{subj} is a part of {obj}",
     ],
     "_member_of_domain_usage":[ 
-        "X",
+        "{obj} is a domain usage of {subj}",
         "X",
     ],
     "_member_of_domain_region":[ 
@@ -60,6 +60,27 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
     ],
 }
 
+
+FORBIDDEN_MIX = {
+    "_hypernym":[
+        "{obj} derived from {subj}",
+        "{subj} derived from {obj}",        
+        "{obj} is a {subj}", 
+        "{subj} such as {obj}",
+        ],
+    "_derivationally_related_form":[
+        "{obj} specifies {subj}", 
+        "{subj} generalize {obj}",
+        "{obj} is a {subj}", 
+        "{subj} such as {obj}",
+        ],
+    "_instance_hypernym":[
+        "{obj} specifies {subj}", 
+        "{subj} generalize {obj}",
+        "{obj} derived from {subj}",
+        "{subj} derived from {obj}",    
+    ],
+}
 
 templates_direct = [
     "{obj} specifies {subj}",
