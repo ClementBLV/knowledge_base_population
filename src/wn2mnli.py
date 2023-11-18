@@ -7,7 +7,7 @@ import json
 import sys
 from pprint import pprint
 import random
-from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect
+from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect, FORBIDDEN_MIX
 
 
 random.seed(0)
@@ -65,17 +65,24 @@ else :
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
 # n°2 : negative_templates
 #   {label of the relation in the dataset: "all the other pattern not related to this label, eg contradiction"}
-for relation in WN_LABELS: #TACRED_LABELS:
+for relation in WN_LABELS: 
     #if not args.negative_pattern and label == "no_relation":
     #    continue
     for template in templates:
     # for the moment we just look at the direct patterns 
-        if template in WN_LABEL_TEMPLATES[relation]:     # si le template correspond au label du template  
+        if template in WN_LABEL_TEMPLATES[relation]:     
+        # if the template is realy the one corresponding to the relation 
             positive_templates[relation].append(template)    # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
         
         else:
-            negative_templates[relation].append(template)
+            if relation not in FORBIDDEN_MIX.keys():
+            # not a relations with issues of similarity 
+                negative_templates[relation].append(template)
 
+            else :
+            # relation wich need to can't be label as negative as hypernym and instance_hypernym
+                if template not in FORBIDDEN_MIX[relation]: # avoidthe template to wich this relation is too close 
+                    negative_templates[relation].append(template)
             
 def wn2mnli_with_negative_pattern(
     instance: REInputFeatures,
