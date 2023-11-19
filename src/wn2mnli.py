@@ -8,7 +8,7 @@ import sys
 from pprint import pprint
 import random
 from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect, FORBIDDEN_MIX
-
+import os 
 
 random.seed(0)
 np.random.seed(0)
@@ -20,6 +20,8 @@ sys.path.append("./")
 
 @dataclass
 class REInputFeatures:
+    head_id:str
+    tail_id:str
     subj: str
     obj: str
     context: str
@@ -83,7 +85,11 @@ for relation in WN_LABELS:
             # relation wich need to can't be label as negative as hypernym and instance_hypernym
                 if template not in FORBIDDEN_MIX[relation]: # avoidthe template to wich this relation is too close 
                     negative_templates[relation].append(template)
-            
+
+# load the forbidden couples 
+with open(os.path.join( os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"), "rt") as f:
+    id2forbidden = json.load(f)  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+
 def wn2mnli_with_negative_pattern(
     instance: REInputFeatures,
     positive_templates,
@@ -110,7 +116,28 @@ def wn2mnli_with_negative_pattern(
     # Generate the negative templates
     # random pick up in the negative templates here 1 , 
     # hense for each positive element there is a random negative one
-    negative_template = random.choices(negative_templates[instance.relation], k=negn) 
+    
+    # while it is a forbidden couple : choose an other one :
+    # init the neg template 
+    negative_template = random.choices(negative_templates[instance.relation], k=negn)
+    #print(instance.head_id  id2forbidden[0].keys())
+    if str(instance.head_id) in id2forbidden[0].keys(): 
+        # this entity as forbidden couples (else keep the random chossen no risk)
+        if str(instance.tail_id) in id2forbidden[0][str(instance.head_id)].keys():
+        # check if the tail of this head is present, which mean there are several relation between 
+        # this head and this tail and we need to check, else no pb the issues is with another tail
+            n = 0
+            # generate the forbidden template 
+            forbidden_templates = []
+            for relation in id2forbidden[0][str(instance.head_id)][str(instance.tail_id)]:
+                # for each relations in the forbidden mix we add the template
+                forbidden_templates.extend(WN_LABEL_TEMPLATES[relation]) 
+                print(forbidden_templates)
+            # check it 
+            while negative_template in forbidden_templates and n<10:
+                negative_template = random.choices(negative_templates[instance.relation], k=negn)
+                n+=1
+
     mnli_instances.extend(
         [
             MNLIInputFeatures(
@@ -135,6 +162,8 @@ with open(args.input_file, "rt") as f:
     for line in json.load(f):
         mnli_instance = wn2mnli(
             REInputFeatures(
+                head_id = line["head_id"],
+                tail_id = line ["tail_id"],
                 subj=line["subj"],
                 obj=line["obj"],
                 context=line["context"],

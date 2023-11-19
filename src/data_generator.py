@@ -35,6 +35,8 @@ def generate_nli_data(path):
         l_head = " or ".join([ lemma.name().replace('_' , ' ').strip() for lemma in s_head.lemmas()][0:2])
         l_tail = " or ".join([ lemma.name().replace('_' , ' ').strip() for lemma in s_tail.lemmas()][0:2])
 
+        hypo2premise["head_id"] =triplet["head_id"]
+        hypo2premise["tail_id"] =triplet["tail_id"]
         hypo2premise["context"] = l_head + " means " + s_head.definition() + ". " + l_tail + " means " + s_tail.definition()
         hypo2premise["premise"] = l_head + " <" + str( triplet["relation"]) + "> " + l_tail
         hypo2premise["subj"]=l_tail

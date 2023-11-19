@@ -22,6 +22,8 @@ print("Percetage kept : ", args.percentage , "%")
 
 @dataclass
 class REInputFeatures:
+    head_id:str
+    tail_id:str
     premise:str
     subj: str
     obj: str
@@ -41,6 +43,8 @@ if args.threshold_effectif is None :
 
             mnli_data.append(
                 REInputFeatures(
+                    head_id = line["head_id"],
+                    tail_id = line ["tail_id"],
                     premise=  line["premise"],
                     subj =  line["subj"],
                     obj =  line["obj"],
@@ -65,6 +69,8 @@ else :
             if line["relation"] in relation2data: 
                 relation2data[line["relation"]].append(
                     REInputFeatures(
+                        head_id = line["head_id"],
+                        tail_id = line ["tail_id"],
                         premise=  line["premise"],
                         subj =  line["subj"],
                         obj =  line["obj"],
@@ -75,6 +81,8 @@ else :
             else : 
                 relation2data[line["relation"]] = [
                     REInputFeatures(
+                        head_id = line["head_id"],
+                        tail_id = line ["tail_id"],
                         premise=  line["premise"],
                         subj =  line["subj"],
                         obj =  line["obj"],
