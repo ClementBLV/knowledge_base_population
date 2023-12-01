@@ -36,8 +36,8 @@ class MNLIInputFeatures:
 
 parser = ArgumentParser()
 
-parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
-parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
+parser.add_argument("--input_file", type=str, default="data/WN18RR/source/test.json")
+parser.add_argument("--output_file", type=str, default="data/WN18RR/test_eval.json")
 parser.add_argument("--direct", type=bool, default=True)
 
 args = parser.parse_args()
@@ -45,7 +45,8 @@ print("=========== CONVERTION ============")
 print("convert ", args.input_file , " into NLI dataset")
 
 
-labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
+#labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
+labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 
 positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
