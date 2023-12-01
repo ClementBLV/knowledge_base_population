@@ -30,7 +30,7 @@ class REInputFeatures:
     context: str
     relation: str = None
 
-if args.threshold_effectif is None : 
+if args.threshold_effectif is None or args.bias == True : 
     # random pickup 
     with open(args.input_file, "rt") as f:
         mnli_data = []
@@ -111,11 +111,12 @@ else :
 
         else : 
             mnli_data = random.choices(mnli_data, k=round(len(lines)*args.percentage/100))
-print(len(mnli_data))
-print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")        
+print("dataset size", len(mnli_data))
 
 
 # save
 json.dump([data.__dict__ for data in mnli_data], open(args.output_file, "w",encoding='utf-8'), indent=4)
 print("saved at location : ", args.output_file)
+
+
 
