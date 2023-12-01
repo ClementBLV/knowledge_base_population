@@ -31,7 +31,7 @@ class REInputFeatures:
 
 @dataclass
 class MNLIInputFeatures:
-    premise: str #context
+    premise : str #context
     hypothesis: str #relation 
     label: int
 
@@ -49,7 +49,9 @@ print("=========== CONVERTION ============")
 print("convert ", args.input_file , " into NLI dataset")
 
 
-labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
+#labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
+# to correspond to the config of pretrained model 
+labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 
 positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
@@ -183,6 +185,8 @@ with open(args.output_file, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     #json.dump([data.__dict__ for data in mnli_data], f, indent=2)
+
+
 
 count = Counter([data.label for data in mnli_data])
 print("Number of links : ", count)
