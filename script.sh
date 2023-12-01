@@ -10,23 +10,46 @@ TRAIN_BOOL=true
 TEST_BOOL=false
 VALID_BOOL=false
 
+# Parse command-line arguments
+while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+        --splits)
+        SPLIT_VALUES="$2"
+        shift # past argument
+        shift # past value
+        ;;
+        *)    # unknown option
+        echo "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+done
+
 cd src
 # preprocess the raw dataset
 python3 data_generator.py --train-path $TRAIN".txt" --valid-path $VALID".txt" --test-path $TEST".txt"
 
+# Path 
+#P_FILE=$ROOT
+P_FILE="/users/local/c20beliv/"
 
-
-echo "******* TRAIN *******"
-# split the train set
-#split_values=(5 10 20)
 
 if $TRAIN_BOOL; then
-	for SPLIT in 10 20; do
+	#IFS=', ' read -r -a SPLIT_ARRAY <<< "$SPLIT_VALUES"
+    for SPLIT in $SPLIT_VALUES ; do #"${SPLIT_ARRAY[@]}"
 		# Split train
-		echo "$SPLIT"
-		!(python3 split.py --input_file $TRAIN".json" --percentage $SPLIT --output_file $ROOT"train_"$SPLIT".json")
+		echo "split $SPLIT %"
+		!(python3 split.py \
+			--input_file $TRAIN".json" \
+			--percentage $SPLIT \
+			--bias "True"\
+			--threshold_effectif "923"\
+			--output_file $P_FILE"train_"$SPLIT".json")
 		# convert to mnli format
-		!(python3 wn2mnli.py --input_file $ROOT"train_"$SPLIT".json" --output_file $ROOT"train_"$SPLIT".mnli.json")
+		!(python3 wn2mnli.py --input_file $P_FILE"train_"$SPLIT".json" --output_file $P_FILE"train_"$SPLIT".mnli.json")
+		rm -rf $P_FILE"train_"$SPLIT".json"
 	done
 fi
 
