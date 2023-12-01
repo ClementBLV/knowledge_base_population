@@ -47,6 +47,15 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
+#wandb
+import wandb
+
+wandb.init()
+
+wandb.config.batch_size = 1  # Original batch size
+wandb.config.gradient_accumulation_steps = 32  # Your gradient accumulation steps
+wandb.config.effective_batch_size = wandb.config.batch_size * wandb.config.gradient_accumulation_steps
+
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.35.0")
@@ -301,14 +310,16 @@ def main():
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
-    logger.info(f"!!!!!!{data_args.task_name}")
+    
+
+    #logger.info(f"!!!!!!{data_args.task_name}")
 
     logger.info(f"!!!!!! dataset name {data_args.dataset_name}")
     logger.info(f"!!!!!! dataset name {data_args.train_file}")
     a = data_args.train_file.endswith(".json")
-    logger.info(f"!!!!!!!!! {a}")
+    #logger.info(f"!!!!!!!!! {a}")
     if data_args.task_name is not None:
-        logger.info(f"!!!!!!Loop 1")
+        #logger.info(f"!!!!!!Loop 1")
 
         # Downloading and loading a dataset from the hub.
         raw_datasets = load_dataset(
@@ -319,7 +330,7 @@ def main():
         )
     elif data_args.dataset_name is not None:
         # Downloading and loading a dataset from the hub.
-        logger.info(f"!!!!!!Loop 2")
+        #logger.info(f"!!!!!!Loop 2")
 
         raw_datasets = load_dataset(
             data_args.dataset_name,
@@ -329,7 +340,7 @@ def main():
         )
     
     else:
-        logger.info(f"!!!!!!Loop 3")
+        #logger.info(f"!!!!!!Loop 3")
 
         # Loading a dataset from your local files.
         # CSV/JSON training and evaluation files are needed.
@@ -393,6 +404,7 @@ def main():
             label_list = raw_datasets["train"].unique("label")
             label_list.sort()  # Let's sort it for determinism
             num_labels = len(label_list)
+            logger.info(f"num label !!!!!!!!!!!!!!!!!!!!!!!!!!{num_labels}")
 
     # Load pretrained model and tokenizer
     #
@@ -428,17 +440,28 @@ def main():
 
     # Preprocessing the raw_datasets
     if data_args.task_name is not None:
-        sentence1_key, sentence2_key = task_to_keys[data_args.task_name]
+        sentence1_key, sentence2_key = task_to_keys[data_args.task_name]  #########
     else:
         # Again, we try to have some nice defaults but don't hesitate to tweak to your use case.
         non_label_column_names = [name for name in raw_datasets["train"].column_names if name != "label"]
+        if "premise" in non_label_column_names and "hypothesis" in non_label_column_names:
+            sentence1_key, sentence2_key = "premise", "hypothesis"
+        
         if "sentence1" in non_label_column_names and "sentence2" in non_label_column_names:
             sentence1_key, sentence2_key = "sentence1", "sentence2"
+
+        if "text1" in non_label_column_names and "text2" in non_label_column_names:
+            sentence1_key, sentence2_key = "text1", "text2"
         else:
             if len(non_label_column_names) >= 2:
                 sentence1_key, sentence2_key = non_label_column_names[:2]
             else:
                 sentence1_key, sentence2_key = non_label_column_names[0], None
+    non_label_column_names
+    #logger.info(f"!!!!!!!!! {non_label_column_names}")
+
+    #logger.info(f"!!!!!!!!! {sentence1_key, sentence2_key}")
+    #logger.info(f"!!!!!!!!!********************************************************")
 
     # Padding strategy
     if data_args.pad_to_max_length:
@@ -587,6 +610,19 @@ def main():
         trainer.save_metrics("train", metrics)
         trainer.save_state()
 
+        ## wandb #### 
+        # Get the metrics
+        train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        metrics = train_result.metrics
+        train_loss = metrics["train_loss"]
+        try : 
+            learning_rate = trainer.optimizer.lr_scheduler.get_last_lr()[0]
+        except : 
+            learning_rate = trainer.optimizer.param_groups[0]['lr']
+
+        # Log training metrics to WandB
+        wandb.log({"train_loss": train_loss, "learning_rate": learning_rate})
+
     # Evaluation
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
@@ -619,6 +655,16 @@ def main():
             trainer.log_metrics("eval", metrics)
             trainer.save_metrics("eval", combined if task is not None and "mnli" in task else metrics)
 
+
+        ## wandb ### 
+        # Get the metrics 
+        metrics = trainer.evaluate(eval_dataset=eval_dataset)
+        eval_loss = metrics["eval_loss"]
+        eval_accuracy = metrics["eval_accuracy"]
+        # Log evaluation metrics to WandB
+        wandb.log({"eval_loss": eval_loss, "eval_accuracy": eval_accuracy})
+
+
     if training_args.do_predict:
         logger.info("*** Predict ***")
 
@@ -646,6 +692,10 @@ def main():
                         else:
                             item = label_list[item]
                             writer.write(f"{index}\t{item}\n")
+        
+        # Log additional information to WandB during prediction
+        if trainer.is_world_process_zero():
+            wandb.log({"predictions": predictions})
 
     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-classification"}
     if data_args.task_name is not None:
