@@ -146,8 +146,9 @@ hits = compute_hits_at_k(shots)
 
 # Display the Global results 
 for k, hit in hits.items():
-    print(f"Global Hit_at_{k}: {hit/len(shots)}")
-print("------------------------------------")
+    #print(f"Global Hit_at_{k}: {hit/len(shots)}")
+    print(f"Hit_at_{k};Global;{hit/len(shots)}")
+#print("------------------------------------")
 
 # Display the results for each relation
 for relation in relation2shots.keys():
@@ -156,8 +157,9 @@ for relation in relation2shots.keys():
 
     # Display the results
     for k, hit in hits.items():
-        print(f"{relation} Hit_at_{k}: {hit/len(relation2shots[relation])}")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        #print(f"{relation} Hit_at_{k}: {hit/len(relation2shots[relation])}")
+        print(f"Hit_at_{k};{relation};{hit/len(relation2shots[relation])}")
+    #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 sys.stdout.close()
 sys.stdout = sys.__stdout__
