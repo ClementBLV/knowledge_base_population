@@ -63,18 +63,24 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
 
 FORBIDDEN_MIX = {
     "_hypernym":[
+        "{obj} specifies {subj}", 
+        "{subj} generalize {obj}",        
         "{obj} derived from {subj}",
         "{subj} derived from {obj}",        
         "{obj} is a {subj}", 
         "{subj} such as {obj}",
         ],
     "_derivationally_related_form":[
+        "{obj} derived from {subj}", 
+        "{subj} derived from {obj}",
         "{obj} specifies {subj}", 
         "{subj} generalize {obj}",
         "{obj} is a {subj}", 
         "{subj} such as {obj}",
         ],
     "_instance_hypernym":[
+        "{obj} is a {subj}",
+        "{subj} such as {obj}",
         "{obj} specifies {subj}", 
         "{subj} generalize {obj}",
         "{obj} derived from {subj}",

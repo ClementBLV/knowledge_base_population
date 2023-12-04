@@ -57,13 +57,16 @@ positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
 
 templates = []
-if args.direct : 
+if args.direct and not(args.both): 
     for relations in WN_LABELS: 
         templates.append(WN_LABEL_TEMPLATES[relations][0]) # the first ones are the direct labels
 else : 
     for relations in WN_LABELS: 
         templates.append(WN_LABEL_TEMPLATES[relations][1])
-
+if args.both : 
+    for relations in WN_LABELS: 
+        # this time we add both the direct and indirect 
+        templates.extend(WN_LABEL_TEMPLATES[relations])
 # generate a two dict, 
 # n°1 : positive_templates 
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
@@ -77,7 +80,8 @@ for relation in WN_LABELS:
         if template in WN_LABEL_TEMPLATES[relation]:     
         # if the template is realy the one corresponding to the relation 
             positive_templates[relation].append(template)    # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
-        
+            # if not both only 1 relation is added 
+            # else the direct and indirect aire added 
         else:
             if relation not in FORBIDDEN_MIX.keys():
             # not a relations with issues of similarity 
@@ -87,7 +91,8 @@ for relation in WN_LABELS:
             # relation wich need to can't be label as negative as hypernym and instance_hypernym
                 if template not in FORBIDDEN_MIX[relation]: # avoidthe template to wich this relation is too close 
                     negative_templates[relation].append(template)
-
+pprint(positive_templates)
+pprint(negative_templates)
 # load the forbidden couples 
 with open(os.path.join( os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"), "rt") as f:
     id2forbidden = json.load(f)  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
@@ -97,13 +102,19 @@ def wn2mnli_with_negative_pattern(
     positive_templates,
     negative_templates,
     templates,
-    negn=1,
+    negn,
     posn=1,
 ):
+    if args.both: 
+        negn , posn = 2, 2 # cause to examples for direct and indirect 
     mnli_instances = []
     # Generate the positive examples
+    if posn < len(positive_templates[instance.relation]):
+        positive_template = random.choices(positive_templates[instance.relation], k=posn)
+    else : # no need to randomly pick up examples as all of them must be picked up 
+        positive_template = positive_templates[instance.relation]
 
-    positive_template = random.choices(positive_templates[instance.relation], k=posn)
+    # add the templates to the relation 
     mnli_instances.extend(
         [
             MNLIInputFeatures(
