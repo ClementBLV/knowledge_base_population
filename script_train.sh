@@ -9,10 +9,10 @@ MY_PROJECT_NAME="knowledge-base"
 
 # Models possible 
 MODEL="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
-#MODEL="microsoft/deberta-v3-base"
-for i in 1; do
-  for SPLIT in 100; do
-    
+#MODEL="microsoft/deberta-v3-base" 
+
+for i in 6; do
+  for SPLIT in 20; do
     ## TO MODIFY 
     SAVE_NAME="trained_derbertabase_biased_split"$SPLIT"_v$i"
 
@@ -22,7 +22,9 @@ for i in 1; do
 
     ## wandb directory 
     export WANDB_DIR="/users/local/c20beliv/"
-
+    # Set the run name using the WandB command line tool
+    export WANDB_RUN_NAME="Deberta-mnli-$SPLIT-v$i"
+    
     # remove the old datasets 
     echo "remove old files" 
     rm $P_FILE"/train_"$SPLIT".json"
@@ -36,6 +38,7 @@ for i in 1; do
     echo "=========== TRAIN ============"
 
     WANDB_API_KEY=$MY_KEY WANDB_PROJECT=$MY_PROJECT_NAME python3 "src/run_glue.py" \
+      --split $SPLIT\
       --model_name_or_path "$MODEL" \
       --do_train \
       --do_eval \
@@ -43,6 +46,7 @@ for i in 1; do
       --train_file $P_FILE"/train_$SPLIT.mnli.json" \
       --test_file $BASE"/data/WN18RR/test.mnli.json" \
       --validation_file $BASE"/data/WN18RR/valid.mnli.json" \
+      --cache_dir "False" \
       --max_seq_length "128" \
       --per_device_train_batch_size "1" \
       --gradient_accumulation_steps "32" \
@@ -86,5 +90,10 @@ for i in 1; do
     rm "/users/local/c20beliv/train.log"
     rm $P_FILE"/train_"$SPLIT".json"
     rm $P_FILE"/train_"$SPLIT".mnli.json"
+
+    # remove every thing in the folder containing the model which is not a folder eg we only keep the checkpoints
+    # at the end only the last checkpoint remains  
+    find //users/local/c20beliv/model/$SAVE_NAME/MNLI/ -type f -delete
+
   done
 done
