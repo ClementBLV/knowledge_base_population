@@ -33,7 +33,7 @@ else :
     name = args.name
 output_file = f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
 sys.stdout = open(output_file, "w")
-print("=========== EVALUATION ============")
+#print("=========== EVALUATION ============")
 
 # Initialition 
 @dataclass
