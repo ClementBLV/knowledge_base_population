@@ -37,8 +37,8 @@ class MNLIInputFeatures:
 parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="data/WN18RR/source/test.json")
-parser.add_argument("--output_file", type=str, default="data/WN18RR/test_eval.json")
-parser.add_argument("--direct", type=bool, default=True)
+parser.add_argument("--output_file", type=str, default="data/WN18RR/test_eval_indirect.json")
+parser.add_argument("--direct", type=bool, default=False)
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")
@@ -54,7 +54,7 @@ negative_templates: Dict[str, list] = defaultdict(list)
 if args.direct : 
     templates = templates_direct
 else : 
-    template= template_indirect
+    templates= template_indirect
 
 # generate a two dict, 
 # n°1 : positive_templates 
