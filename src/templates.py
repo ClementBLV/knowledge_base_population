@@ -28,7 +28,7 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
     ],
     "_also_see":[
         "{obj} is seen in {subj}",
-        "{subj} has 		 {obj}",
+        "{subj} has {obj}",
     ],
     "_member_meronym":[ 
         "{obj} is the family of {subj}",
@@ -96,7 +96,7 @@ templates_direct = [
     "{obj} is the family of {subj}",
     "{obj} is a topic of {subj}",
     "{obj} contains {subj}",
-    "{obj} ?????????? {subj}",
+    "{obj} is a domain usage of {subj}",
     "{obj} is the domain region of {subj}",
     "{obj} is synonym to {subj}", 
     "{obj} is similar to {subj}" 
@@ -104,13 +104,13 @@ templates_direct = [
 
 template_indirect = [
     "{subj} generalize {obj}",
-    "{	X }",
+    "{subj} derived from {obj}",
     "{subj} such as {obj}",
-    "{subj} has 		 {obj}",
+    "{subj} has {obj}",
     "{subj} is a member of {obj}",
     "{subj} is the context of {obj}",
     "{subj} is a part of {obj}",
-    "{obj} ?????????? 	    {subj}"
+    "{subj} is a domain usage of {obj}",
     "{subj} belong to the regieon of {obj}",
     "{subj} is synonym to {obj}",
     "{subj} similar to {obj}",
