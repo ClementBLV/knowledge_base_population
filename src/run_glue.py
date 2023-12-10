@@ -86,7 +86,10 @@ class DataTrainingArguments:
     into argparse arguments to be able to specify them on
     the command line.
     """
-
+    split: Optional[str] = field(
+        default=None,
+        metadata={"help": "The split : " + ", ".join(task_to_keys.keys())},
+    )
     task_name: Optional[str] = field(
         default=None,
         metadata={"help": "The name of the task to train on: " + ", ".join(task_to_keys.keys())},
@@ -311,6 +314,8 @@ def main():
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
     
+    # wandb split 
+    wandb.config.update({"split_percentage":int(data_args.split)})
 
     #logger.info(f"!!!!!!{data_args.task_name}")
 
