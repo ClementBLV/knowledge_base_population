@@ -163,7 +163,7 @@ def wn2mnli_with_negative_pattern(
             for t in negative_template
         ]
     )
-    
+    # make some examples where subj and obj are inverted
     return mnli_instances
 
 
