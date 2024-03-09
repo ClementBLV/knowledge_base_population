@@ -6,15 +6,10 @@ Official code repository for ESWC 2024 paper
 
 The paper is available at [https:/lien .pdf](https://.pdf).
 
-[IMT Atlantique](https://www.imt-atlantique.fr/en) 
-
-Clément BELIVEAU
-
-
-[Exper.ai](https://www.expert.ai)
+Clément BELIVEAU - [IMT Atlantique](https://www.imt-atlantique.fr/en) 
 
 [Guillermo Echegoyen Blanco]() and
-[José Manuel Gómez-Pérez](https://scholar.google.com/citations?user=P3B2MmwAAAAJ&hl=fr&oi=ao)
+[José Manuel Gómez-Pérez](https://scholar.google.com/citations?user=P3B2MmwAAAAJ&hl=fr&oi=ao) - [Exper.ai](https://www.expert.ai)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
@@ -46,10 +41,10 @@ Presentation of the paper
 ### Conda env 
 
 ```[bash]
-   git clone https://github.com/expertailab/.git
+   git clone 
    cd 
-   conda create -n Ficus python=3.9
-   conda activate Ficus
+   conda create -n KBentail python=3.9
+   conda activate KBentail
    pip install -r requirement.txt
 ```
 ### Pipeline 
@@ -60,33 +55,33 @@ import pipeline image
 
 ### Dataset 
 
-For all our experiments we have used three datasets  : WR18RR dataset, available in the `data` file. The code to preprocess of the data was heavily inspired from the code of the official repo of [SimCKG](https://github.com/intfloat/SimKGC) paper. 
+For all our experiments we have used three datasets: WR18RR dataset, available in the `data` file. The code to preprocess the data was heavily inspired by the code of the official repo of [SimCKG](https://github.com/intfloat/SimKGC) paper. 
 ### Models 
 
-We have used `deberta-dase-v3` as our model. 
+We have used `deberta-dase-v3` as our model, all models used are available on hugging face. We have two pre-trained models, one with prior training on entailment task name `"MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"` ([here]()) and another one without `"microsoft/deberta-v3-base"` ([here]())
 
-### Train the model 
+### Run scipts 
+- *Run training*
 
+All the training was done on GTXForce 1060, the hyperparameters are available in the section hyperparameters of the appendix ([here]()). To train our model we have adapted the script `run_glue`. given by hugging face. Before running the scripts, you can either activate your conda environment with the command: `conda activate KBentail`, or you can directly precise the path of your venv in the second line of the scripts `source //PATH_TO_YOUR_VENV/YOUR_VENV/bin/activate`
 
-### Run inference
-
-- To run the evaluations  
 ```[bash]
-sh run.sh -dataset "cub"
-```
-- To run deep spectral method on un image
-```[bash]
-
+	source script_train.sh 
 ```
 
+- *Run inference*
 
+```[bash]
+	source script_eval.sh 
+```
 
-- To run prompted sam on an image
+- *Run evaluations*
+
 ```[bash]
 
 ```
 
-### Results : 
+### Expected results : 
 
 give the results from the appendix 
 give the appendix en pdf sur le github
