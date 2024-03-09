@@ -13,8 +13,8 @@ Clément BELIVEAU
 
 [Exper.ai](https://www.expert.ai)
 
-Guillermo Echegoyen Blanco and
-José Manuel Gómez-Pérez
+[Guillermo Echegoyen Blanco]() and
+[José Manuel Gómez-Pérez](https://scholar.google.com/citations?user=P3B2MmwAAAAJ&hl=fr&oi=ao)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
@@ -22,15 +22,6 @@ José Manuel Gómez-Pérez
 
 
 <html> 
-	<head> 
-		<style> .image-container { 
-			display: flex;
-			 justify-content: center; 
-			 } 
-			 .image-container img { 
-			 margin: 0 10px; /* Adjust the margin as needed */ height: 200px; /* Set the height, width will scale proportionally */ }
-         </style> 
-	</head>
 <body> 
 	<div class="image-container"> 
 		<img src="https://www.pole-emc2.fr/app/uploads/logos_adherents/91fff3f6-c993-67c6-68ae-53957c2f623d-768x522.png" alt="Image 1" height="200">
@@ -39,8 +30,8 @@ José Manuel Gómez-Pérez
 </body>
 </html>
 
+Presentation of the paper 
 
-This repository contains the code for out of the box ready to use few-shot classifier for ambiguous images. In this paper we have shown that removing the ambiguity from the the query during few shot classification improves performances. To do so we use a combination of foundation models and spectral methods. 
 ## Installation 🛠 
 
 ### Conda venv
@@ -61,18 +52,21 @@ This repository contains the code for out of the box ready to use few-shot class
    conda activate Ficus
    pip install -r requirement.txt
 ```
-## Pipeline 
+### Pipeline 
 
-
+import pipeline image 
 
 ## Get started 🚀
 
 ### Dataset 
 
-For all our experiments we have used three datasets  : WR18RR dataset, available in the `dataset` file
+For all our experiments we have used three datasets  : WR18RR dataset, available in the `data` file. The code to preprocess of the data was heavily inspired from the code of the official repo of [SimCKG](https://github.com/intfloat/SimKGC) paper. 
 ### Models 
 
 We have used `deberta-dase-v3` as our model. 
+
+### Train the model 
+
 
 ### Run inference
 
@@ -91,6 +85,11 @@ sh run.sh -dataset "cub"
 ```[bash]
 
 ```
+
+### Results : 
+
+give the results from the appendix 
+give the appendix en pdf sur le github
 
 
 ## Citation
