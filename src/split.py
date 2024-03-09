@@ -7,7 +7,7 @@ parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str)
 parser.add_argument("--output_file", type=str)
-parser.add_argument("--bias", type=bool,  help="If true the output will be biased else it will not be")
+parser.add_argument("--bias",  help="If true the output will be biased else it will not be")
 parser.add_argument("--percentage", type=int, default=5, 
                     help= "The percentage 5 for 5% , 10 for 10%, correponding to the number of lines kept")
 parser.add_argument("--threshold_effectif", type=int,  help="Minimal number of relation")
@@ -19,6 +19,12 @@ print("=========== SPLIT ============")
 print("File : ", args.input_file)
 print("Percetage kept : ", args.percentage , "%")
 
+print(args.bias, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print(type(args.bias))
+if args.bias == "false":
+    bias = False
+else : 
+    bias = True
 
 @dataclass
 class REInputFeatures:
@@ -29,8 +35,9 @@ class REInputFeatures:
     obj: str
     context: str
     relation: str = None
-
-if args.threshold_effectif is None or args.bias == True : 
+    
+if args.threshold_effectif is None or bias == True : 
+    print(" Bias !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     # random pickup 
     with open(args.input_file, "rt") as f:
         mnli_data = []

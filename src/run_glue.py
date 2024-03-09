@@ -51,6 +51,7 @@ from transformers.utils.versions import require_version
 import wandb
 
 wandb.init()
+wandb.init(project='patate', entity='clementblv')
 
 wandb.config.batch_size = 1  # Original batch size
 wandb.config.gradient_accumulation_steps = 32  # Your gradient accumulation steps

@@ -36,9 +36,9 @@ class MNLIInputFeatures:
 
 parser = ArgumentParser()
 
-parser.add_argument("--input_file", type=str, default="data/WN18RR/source/test.json")
-parser.add_argument("--output_file", type=str, default="data/WN18RR/test_eval_indirect.json")
-parser.add_argument("--direct", type=bool, default=False)
+parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
+parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
+parser.add_argument("--direct", type=bool, default=True)
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")

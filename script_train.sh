@@ -1,43 +1,85 @@
 #!/bin/bash
+source //users/local/c20beliv/myvenv/bin/activate
 BASE=$(pwd)
 GLUE_DIR=$BASE"/src/"
 TASK_NAME="MNLI"
 
 # wandb
 MY_KEY="d454d24f48a094d782b4f38707b2134a3dee9c40"
-MY_PROJECT_NAME="knowledge-base"
+MY_PROJECT_NAME="knowledge-base-v5"
+ENTITY="clementblv"
+export WANDB_ENTITY=$ENTITY
+export WANDB_PROJECT=$MY_PROJECT_NAME
+export WANDB_DIR="/users/local/c20beliv/"
+export WANDB_CACHE_DIR="/users/local/c20beliv/"
 
-# Models possible 
-MODEL="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
-#MODEL="microsoft/deberta-v3-base" 
+# hugging face
+export HF_HOME="/users/local/c20beliv/hf/"
+export HF_DATASETS_CACHE="/users/local/c20beliv/hf/datasets"
+export TRANSFORMERS_CACHE="/users/local/c20beliv/hf/models"
 
-for i in 6; do
-  for SPLIT in 20; do
-    ## TO MODIFY 
-    SAVE_NAME="trained_derbertabase_biased_split"$SPLIT"_v$i"
 
-    # PATH of the data 
+# Models possible
+#MODEL="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
+MODEL="microsoft/deberta-v3-base"
+#MODEL="//users/local/c20beliv/model/untrained_derbertabase_biased_split20_v1/MNLI/checkpoint-1500"
+
+BIAS=true
+BOTH=false
+echo $BIAS
+for i in 9 10 ; do
+  for SPLIT in 7; do
+    ## TO MODIFY
+    if ! $BIAS; then 
+      echo $BIAS
+      if [[ "$MODEL" == 'microsoft/deberta-v3-base' ]]; then 
+        echo "UNTRAINED + UNBIAS!!" 
+        SAVE_NAME="untrained_2w_derbertabase_unbiased_split"$SPLIT"_v$i"
+        export WANDB_RUN_NAME="Deberta-naive-2w-UnB-$SPLIT-v$i"
+
+      fi
+      if [[ "$MODEL" == 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli' ]]; then 
+        echo "TRAINED + UNBIAS!!" 
+        SAVE_NAME="trained_2w_derbertabase_unbiased_split"$SPLIT"_v$i"
+        export WANDB_RUN_NAME="Deberta-mnli-2w-UnB-$SPLIT-v$i"
+
+      fi
+    fi
+    if $BIAS; then 
+      if [[ "$MODEL" == 'microsoft/deberta-v3-base' ]]; then 
+        echo "UNTRAINED + BIAS!!" 
+        SAVE_NAME="untrained_2w_derbertabase_biased_split"$SPLIT"_v$i"
+        export WANDB_RUN_NAME="Deberta-naive-2w-B-$SPLIT-v$i"
+
+      fi
+      if [[ "$MODEL" == 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli' ]]; then 
+        echo "TRAINED + BIAS!!" 
+        SAVE_NAME="trained_2w_derbertabase_biased_split"$SPLIT"_v$i"
+        export WANDB_RUN_NAME="Deberta-mnli-2w-B-$SPLIT-v$i"
+
+      fi
+    fi
+    # PATH of the data
     #P_FILE=$BASE"/data/WN18RR"
     P_FILE="/users/local/c20beliv/"
 
-    ## wandb directory 
-    export WANDB_DIR="/users/local/c20beliv/"
-    # Set the run name using the WandB command line tool
-    export WANDB_RUN_NAME="Deberta-mnli-$SPLIT-v$i"
-    
-    # remove the old datasets 
-    echo "remove old files" 
-    rm $P_FILE"/train_"$SPLIT".json"
-    rm $P_FILE"/train_"$SPLIT".mnli.json"
+    ## wandb directory
 
-    # generate a new dataset which will contain new triplets 
-    sh "script.sh" --splits $SPLIT
+    # Set the run name using the WandB command line tool
+    #export WANDB_RUN_NAME="Deberta-naive-2w-$SPLIT-v$i"
+
+    # remove the old datasets
+    echo "remove old files"
+    rm -rf $P_FILE"/train_"$SPLIT".json"
+    rm -rf $P_FILE"/train_"$SPLIT".mnli.json"
+
+    # generate a new dataset which will contain new triplets
+    sh "script.sh" --splits $SPLIT --both $BOTH --bias $BIAS
 
     start_time=$(date +%s.%N)
     touch "/users/local/c20beliv/train.log" #create log file
     echo "=========== TRAIN ============"
-
-    WANDB_API_KEY=$MY_KEY WANDB_PROJECT=$MY_PROJECT_NAME python3 "src/run_glue.py" \
+    WANDB_API_KEY=$MY_KEY WANDB_PROJECT=$MY_PROJECT_NAME WANDB_ENTITY=$ENTITY python3 "src/run_glue.py" \
       --split $SPLIT\
       --model_name_or_path "$MODEL" \
       --do_train \
@@ -46,7 +88,6 @@ for i in 6; do
       --train_file $P_FILE"/train_$SPLIT.mnli.json" \
       --test_file $BASE"/data/WN18RR/test.mnli.json" \
       --validation_file $BASE"/data/WN18RR/valid.mnli.json" \
-      --cache_dir "False" \
       --max_seq_length "128" \
       --per_device_train_batch_size "1" \
       --gradient_accumulation_steps "32" \
@@ -76,24 +117,24 @@ for i in 6; do
     echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
 
 
-    # save 
+    # save
     echo "******* SAVE *******"
     NEW_FILE="/users/local/c20beliv/model/$SAVE_NAME"
-    mkdir "/users/local/c20beliv/model/"  # in case it doesn't exit 
+    mkdir "/users/local/c20beliv/model/"  # in case it doesn't exit
     mkdir $NEW_FILE
-    
+
     mv "/users/local/c20beliv/tmp/$TASK_NAME" $NEW_FILE
     mv "/users/local/c20beliv/train.log" $NEW_FILE"/train.log"
 
-    # remove the generated datasets 
-    echo "remove generated files" 
-    rm "/users/local/c20beliv/train.log"
-    rm $P_FILE"/train_"$SPLIT".json"
-    rm $P_FILE"/train_"$SPLIT".mnli.json"
+    # remove the generated datasets
+    echo "remove generated files"
+    rm -rf "/users/local/c20beliv/train.log"
+    rm -rf $P_FILE"/train_"$SPLIT".json"
+    rm -rf $P_FILE"/train_"$SPLIT".mnli.json"
 
     # remove every thing in the folder containing the model which is not a folder eg we only keep the checkpoints
-    # at the end only the last checkpoint remains  
-    find //users/local/c20beliv/model/$SAVE_NAME/MNLI/ -type f -delete
+    # at the end only the last checkpoint remains
+    #find //users/local/c20beliv/model/$SAVE_NAME/MNLI/ -type f -delete
 
   done
 done
