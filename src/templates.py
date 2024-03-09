@@ -13,48 +13,48 @@ WN_LABELS = [
 ]
 
 
-WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations 
-    "_hypernym":[
-        "{obj} specifies {subj}", 
+WN_LABEL_TEMPLATES = {  # in the future we will add the indirect relations
+    "_hypernym": [
+        "{obj} specifies {subj}",
         "{subj} generalize {obj}",
     ],
-    "_derivationally_related_form":[
-        "{obj} derived from {subj}", 
+    "_derivationally_related_form": [
+        "{obj} derived from {subj}",
         "{subj} derived from {obj}",
     ],
-    "_instance_hypernym":[
+    "_instance_hypernym": [
         "{obj} is a {subj}",
         "{subj} such as {obj}",
     ],
-    "_also_see":[
+    "_also_see": [
         "{obj} is seen in {subj}",
         "{subj} has {obj}",
     ],
-    "_member_meronym":[ 
+    "_member_meronym": [
         "{obj} is the family of {subj}",
         "{subj} is a member of {obj}",
     ],
-    "_synset_domain_topic_of":[
+    "_synset_domain_topic_of": [
         "{obj} is a topic of {subj}",
         "{subj} is the context of {obj}",
     ],
-    "_has_part":[  
+    "_has_part": [
         "{obj} contains {subj}",
         "{subj} is a part of {obj}",
     ],
-    "_member_of_domain_usage":[ 
+    "_member_of_domain_usage": [
         "{obj} is a domain usage of {subj}",
         "X",
     ],
-    "_member_of_domain_region":[ 
+    "_member_of_domain_region": [
         "{obj} is the domain region of {subj}",
         "{subj} belong to the regieon of {obj}",
     ],
-    "_verb_group":[  
+    "_verb_group": [
         "{obj} is synonym to {subj}",
         "{subj} is synonym to {obj}",
     ],
-    "_similar_to":[ 
+    "_similar_to": [
         "{obj} is similar to {subj}",
         "{subj} similar to {obj}",
     ],
@@ -62,29 +62,29 @@ WN_LABEL_TEMPLATES = { # in the future we will add the indirect relations
 
 
 FORBIDDEN_MIX = {
-    "_hypernym":[
-        "{obj} specifies {subj}", 
-        "{subj} generalize {obj}",        
-        "{obj} derived from {subj}",
-        "{subj} derived from {obj}",        
-        "{obj} is a {subj}", 
-        "{subj} such as {obj}",
-        ],
-    "_derivationally_related_form":[
-        "{obj} derived from {subj}", 
-        "{subj} derived from {obj}",
-        "{obj} specifies {subj}", 
+    "_hypernym": [
+        "{obj} specifies {subj}",
         "{subj} generalize {obj}",
-        "{obj} is a {subj}", 
-        "{subj} such as {obj}",
-        ],
-    "_instance_hypernym":[
+        "{obj} derived from {subj}",
+        "{subj} derived from {obj}",
         "{obj} is a {subj}",
         "{subj} such as {obj}",
-        "{obj} specifies {subj}", 
+    ],
+    "_derivationally_related_form": [
+        "{obj} derived from {subj}",
+        "{subj} derived from {obj}",
+        "{obj} specifies {subj}",
+        "{subj} generalize {obj}",
+        "{obj} is a {subj}",
+        "{subj} such as {obj}",
+    ],
+    "_instance_hypernym": [
+        "{obj} is a {subj}",
+        "{subj} such as {obj}",
+        "{obj} specifies {subj}",
         "{subj} generalize {obj}",
         "{obj} derived from {subj}",
-        "{subj} derived from {obj}",    
+        "{subj} derived from {obj}",
     ],
 }
 
@@ -98,8 +98,8 @@ templates_direct = [
     "{obj} contains {subj}",
     "{obj} is a domain usage of {subj}",
     "{obj} is the domain region of {subj}",
-    "{obj} is synonym to {subj}", 
-    "{obj} is similar to {subj}" 
+    "{obj} is synonym to {subj}",
+    "{obj} is similar to {subj}",
 ]
 
 template_indirect = [
