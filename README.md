@@ -29,28 +29,35 @@ This repo contains the official code of the paper Textual Entailment for Link Pr
 
 ## Installation 🛠 
 
+Prerequisite: python installed, ssh key of your GitHub account configured. 
+
 ### Conda venv
 
 ```[bash]
-   git clone https://github.com/expertailab/.git
-   cd 
-   python3 -m venv ~//venvFicus
+   git clone git@github.com:ClementBLV/knowledge_base_population.git
+   cd /knowledge_base_population
+   python3 -m venv ~/ venvFicus
    source ~/venvFicus/bin/activate
    pip install -r requirement.txt
 ```
 ### Conda env 
 
 ```[bash]
-   git clone 
-   cd 
+   git clone git@github.com:ClementBLV/knowledge_base_population.git
+   cd /knowledge_base_population
    conda create -n KBentail python=3.9
    conda activate KBentail
    pip install -r requirement.txt
 ```
 ### Pipeline 
 
-import pipeline image 
-
+<html> 
+<body> 
+	<div class="image-container"> 
+		<img src="https://github.com/ClementBLV/knowledge_base_population/doc/blob/schéma_entailement.jpg" alt="Image 1" height="200">
+	</div> 
+</body>
+</html>
 ## Get started 🚀
 
 ### Dataset 
@@ -83,7 +90,7 @@ All the training was done on GTXForce 1060, the hyperparameters are available in
 
 ### Expected results : 
 
-give the results from the appendix [here](https://github.com/ClementBLV/knowledge_base_population/blob/main/Entailement_Paper___appendix.pdf)
+give the results from the appendix [here](https://github.com/ClementBLV/knowledge_base_population/doc/blob/main/Entailement_Paper___appendix.pdf)
 give the appendix en pdf sur le github
 
 
