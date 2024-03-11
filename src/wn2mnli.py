@@ -7,21 +7,27 @@ import json
 import sys
 from pprint import pprint
 import random
-from templates import WN_LABELS, WN_LABEL_TEMPLATES , templates_direct, template_indirect, FORBIDDEN_MIX
-import os 
+from templates import (
+    WN_LABELS,
+    WN_LABEL_TEMPLATES,
+    templates_direct,
+    template_indirect,
+    FORBIDDEN_MIX,
+)
+import os
 
 random.seed(0)
 np.random.seed(0)
 
 sys.path.append("./")
-#directly express in the code for WN
-#from a2t.relation_classification.tacred import TACRED_LABEL_TEMPLATES, TACRED_LABELS
+# directly express in the code for WN
+# from a2t.relation_classification.tacred import TACRED_LABEL_TEMPLATES, TACRED_LABELS
 
 
 @dataclass
 class REInputFeatures:
-    head_id:str
-    tail_id:str
+    head_id: str
+    tail_id: str
     subj: str
     obj: str
     context: str
@@ -31,8 +37,8 @@ class REInputFeatures:
 
 @dataclass
 class MNLIInputFeatures:
-    premise : str #context
-    hypothesis: str #relation 
+    premise: str  # context
+    hypothesis: str  # relation
     label: int
 
 
@@ -42,60 +48,76 @@ parser.add_argument("--input_file", type=str, default="data/WN18RR/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid.mnli.json")
 parser.add_argument("--negn", type=int, default=1)
 parser.add_argument("--direct", type=bool, default=True)
-parser.add_argument("--both", type=bool, default=True)
+parser.add_argument("--both", type=bool, default=False)
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")
-print("convert ", args.input_file , " into NLI dataset")
+print("convert ", args.input_file, " into NLI dataset")
 
 
-#labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
-# to correspond to the config of pretrained model 
+# labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
+# to correspond to the config of pretrained model
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 
 positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
 
 templates = []
-if args.direct and not(args.both): 
-    for relations in WN_LABELS: 
-        templates.append(WN_LABEL_TEMPLATES[relations][0]) # the first ones are the direct labels
-else : 
-    for relations in WN_LABELS: 
+if args.direct and not (args.both):
+    # direct case
+    for relations in WN_LABELS:
+        templates.append(
+            WN_LABEL_TEMPLATES[relations][0]
+        )  # the first ones are the direct labels
+if not (args.direct) and not (args.both):
+    # indirect case
+    for relations in WN_LABELS:
         templates.append(WN_LABEL_TEMPLATES[relations][1])
-if args.both : 
-    for relations in WN_LABELS: 
-        # this time we add both the direct and indirect 
+if args.both:
+    for relations in WN_LABELS:
+        # this time we add both the direct and indirect
         templates.extend(WN_LABEL_TEMPLATES[relations])
-# generate a two dict, 
-# n°1 : positive_templates 
+# generate a two dict,
+# n°1 : positive_templates
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
 # n°2 : negative_templates
 #   {label of the relation in the dataset: "all the other pattern not related to this label, eg contradiction"}
-for relation in WN_LABELS: 
-    #if not args.negative_pattern and label == "no_relation":
+for relation in WN_LABELS:
+    # if not args.negative_pattern and label == "no_relation":
     #    continue
     for template in templates:
-    # for the moment we just look at the direct patterns 
-        if template in WN_LABEL_TEMPLATES[relation]:     
-        # if the template is realy the one corresponding to the relation 
-            positive_templates[relation].append(template)    # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
-            # if not both only 1 relation is added 
-            # else the direct and indirect aire added 
+        # for the moment we just look at the direct patterns
+        if template in WN_LABEL_TEMPLATES[relation]:
+            # if the template is realy the one corresponding to the relation
+            positive_templates[relation].append(
+                template
+            )  # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
+            # if not both only 1 relation is added
+            # else the direct and indirect aire added
         else:
             if relation not in FORBIDDEN_MIX.keys():
-            # not a relations with issues of similarity 
+                # not a relations with issues of similarity
                 negative_templates[relation].append(template)
 
-            else :
-            # relation wich need to can't be label as negative as hypernym and instance_hypernym
-                if template not in FORBIDDEN_MIX[relation]: # avoidthe template to wich this relation is too close 
+            else:
+                # relation wich need to can't be label as negative as hypernym and instance_hypernym
+                if (
+                    template not in FORBIDDEN_MIX[relation]
+                ):  # avoidthe template to wich this relation is too close
                     negative_templates[relation].append(template)
-pprint(positive_templates)
-pprint(negative_templates)
-# load the forbidden couples 
-with open(os.path.join( os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"), "rt") as f:
-    id2forbidden = json.load(f)  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+# pprint(positive_templates)
+# pprint(negative_templates)
+# load the forbidden couples
+with open(
+    os.path.join(
+        os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"
+    ),
+    "rt",
+) as f:
+    id2forbidden = json.load(
+        f
+    )  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+
 
 def wn2mnli_with_negative_pattern(
     instance: REInputFeatures,
@@ -105,16 +127,19 @@ def wn2mnli_with_negative_pattern(
     negn,
     posn=1,
 ):
-    if args.both: 
-        negn , posn = 2, 2 # cause to examples for direct and indirect 
+    if args.both:
+        negn, posn = 2, 2  # cause to examples for direct and indirect
     mnli_instances = []
     # Generate the positive examples
     if posn < len(positive_templates[instance.relation]):
-        positive_template = random.choices(positive_templates[instance.relation], k=posn)
-    else : # no need to randomly pick up examples as all of them must be picked up 
+        positive_template = random.choices(
+            positive_templates[instance.relation], k=posn
+        )
+    else:  # no need to randomly pick up examples as all of them must be picked up
         positive_template = positive_templates[instance.relation]
+    # print(positive_template)
 
-    # add the templates to the relation 
+    # add the templates to the relation
     mnli_instances.extend(
         [
             MNLIInputFeatures(
@@ -127,56 +152,62 @@ def wn2mnli_with_negative_pattern(
     )
 
     # Generate the negative templates
-    # random pick up in the negative templates here 1 , 
+    # random pick up in the negative templates here 1 ,
     # hense for each positive element there is a random negative one
-    
+
     # while it is a forbidden couple : choose an other one :
-    # init the neg template 
+    # init the neg template
     negative_template = random.choices(negative_templates[instance.relation], k=negn)
-    #print(instance.head_id  id2forbidden[0].keys())
-    if str(instance.head_id) in id2forbidden[0].keys(): 
+    # print(instance.head_id  id2forbidden[0].keys())
+    if str(instance.head_id) in id2forbidden[0].keys():
         # this entity as forbidden couples (else keep the random chossen no risk)
         if str(instance.tail_id) in id2forbidden[0][str(instance.head_id)].keys():
-        # check if the tail of this head is present, which mean there are several relation between 
-        # this head and this tail and we need to check, else no pb the issues is with another tail
+            # check if the tail of this head is present, which mean there are several relation between
+            # this head and this tail and we need to check, else no pb the issues is with another tail
             n = 0
-            # generate the forbidden template 
+            # generate the forbidden template
             forbidden_templates = []
-            for relation in id2forbidden[0][str(instance.head_id)][str(instance.tail_id)]:
+            for relation in id2forbidden[0][str(instance.head_id)][
+                str(instance.tail_id)
+            ]:
                 # for each relations in the forbidden mix we add the template
-                forbidden_templates.extend(WN_LABEL_TEMPLATES[relation]) 
+                forbidden_templates.extend(WN_LABEL_TEMPLATES[relation])
                 print(forbidden_templates)
-            # check it 
-            while negative_template in forbidden_templates and n<10:
-                negative_template = random.choices(negative_templates[instance.relation], k=negn)
-                n+=1
+            # check it
+            while negative_template in forbidden_templates and n < 10:
+                negative_template = random.choices(
+                    negative_templates[instance.relation], k=negn
+                )
+                n += 1
 
     mnli_instances.extend(
         [
             MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                label=labels2id["contradiction"], # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
+                label=labels2id[
+                    "contradiction"
+                ],  # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
             )
             for t in negative_template
         ]
     )
-    
+    # make some examples where subj and obj are inverted
     return mnli_instances
 
 
-wn2mnli = wn2mnli_with_negative_pattern #if args.negative_pattern else tacred2mnli
+wn2mnli = wn2mnli_with_negative_pattern  # if args.negative_pattern else tacred2mnli
 
 
 with open(args.input_file, "rt") as f:
     mnli_data = []
     stats = []
-    relations =[]
+    relations = []
     for line in json.load(f):
         mnli_instance = wn2mnli(
             REInputFeatures(
-                head_id = line["head_id"],
-                tail_id = line ["tail_id"],
+                head_id=line["head_id"],
+                tail_id=line["tail_id"],
                 subj=line["subj"],
                 obj=line["obj"],
                 context=line["context"],
@@ -195,8 +226,7 @@ with open(args.input_file, "rt") as f:
 with open(args.output_file, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
-    #json.dump([data.__dict__ for data in mnli_data], f, indent=2)
-
+    # json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
 
 count = Counter([data.label for data in mnli_data])
