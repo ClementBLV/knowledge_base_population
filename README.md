@@ -25,7 +25,7 @@ Clément BELIVEAU - [IMT Atlantique](https://www.imt-atlantique.fr/en)
 </body>
 </html>
 
-This repo contains the official code of the paper Textual Entailment for Link Prediction in WordNet, in this paper we have tackled the task of link prediction within a knowledge base and more precisely within WN18RR. To do so we are employing an entailment approach, leveraging the abstraction capacities of Large Language Models (LLMs). More precisely, we have achieved state-of-the-art performances with only a base-size model, hence demonstrating the effectiveness of our approach. 
+This repository contains the official code of the paper Textual Entailment for Link Prediction in WordNet, in this paper we have tackled the task of link prediction within a knowledge base and more precisely within WN18RR. To do so we are employing an entailment approach, leveraging the abstraction capacities of Large Language Models (LLMs). More precisely, we have achieved state-of-the-art performances with only a base-size model, hence demonstrating the effectiveness of our approach. 
 
 ## Installation 🛠 
 
@@ -51,13 +51,12 @@ Prerequisite: python installed, ssh key of your GitHub account configured.
 ```
 ### Pipeline 
 
-<html> 
-<body> 
-	<div class="image-container"> 
-		<img src="https://github.com/ClementBLV/knowledge_base_population/doc/blob/schéma_entailement.jpg" alt="Image 1" height="200">
-	</div> 
-</body>
-</html>
+<CENTER>
+<img
+src="https://github.com/ClementBLV/knowledge_base_population/blob/main/doc/sch%C3%A9ma_entailement.jpg"
+WIDTH=100%>
+</CENTER>
+
 ## Get started 🚀
 
 ### Dataset 
@@ -90,8 +89,8 @@ All the training was done on GTXForce 1060, the hyperparameters are available in
 
 ### Expected results : 
 
-give the results from the appendix [here](https://github.com/ClementBLV/knowledge_base_population/doc/blob/main/Entailement_Paper___appendix.pdf)
-give the appendix en pdf sur le github
+The expected results are given in the paper and detailed in the appendix available [here](https://github.com/ClementBLV/knowledge_base_population/doc/blob/main/Entailement_Paper___appendix.pdf)
+
 
 
 ## Citation
