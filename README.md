@@ -83,7 +83,7 @@ All the training was done on GTXForce 1060, the hyperparameters are available in
 
 ### Expected results : 
 
-give the results from the appendix [here](https://github.com/ClementBLV/knowledge_base_population/)
+give the results from the appendix [here](https://github.com/ClementBLV/knowledge_base_population/Entailement_Paper___appendix.pdf)
 give the appendix en pdf sur le github
 
 
