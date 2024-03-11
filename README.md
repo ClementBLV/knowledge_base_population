@@ -25,7 +25,7 @@ Clément BELIVEAU - [IMT Atlantique](https://www.imt-atlantique.fr/en)
 </body>
 </html>
 
-Presentation of the paper 
+This repo contains the official code of the paper Textual Entailment for Link Prediction in WordNet, in this paper we have tackled the task of link prediction within a knowledge base and more precisely within WN18RR. To do so we are employing an entailment approach, leveraging the abstraction capacities of Large Language Models (LLMs). More precisely, we have achieved state-of-the-art performances with only a base-size model, hence demonstrating the effectiveness of our approach. 
 
 ## Installation 🛠 
 
@@ -58,7 +58,7 @@ import pipeline image
 For all our experiments we have used three datasets: WR18RR dataset, available in the `data` file. The code to preprocess the data was heavily inspired by the code of the official repo of [SimCKG](https://github.com/intfloat/SimKGC) paper. 
 ### Models 
 
-We have used `deberta-dase-v3` as our model, all models used are available on hugging face. We have two pre-trained models, one with prior training on entailment task name `"MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"` ([here]()) and another one without `"microsoft/deberta-v3-base"` ([here]())
+We have used `deberta-dase-v3` as our model, all models used are available on hugging face. We have two pre-trained models, one with prior training on entailment task name `"MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"` ([here](https://huggingface.co/MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli)) and another one without `"microsoft/deberta-v3-base"` ([here](https://huggingface.co/microsoft/deberta-v3-base))
 
 ### Run scipts 
 - *Run training*
@@ -72,13 +72,13 @@ All the training was done on GTXForce 1060, the hyperparameters are available in
 - *Run inference*
 
 ```[bash]
-	source script_eval.sh 
+	
 ```
 
 - *Run evaluations*
 
 ```[bash]
-
+	source script_eval.sh 
 ```
 
 ### Expected results : 
