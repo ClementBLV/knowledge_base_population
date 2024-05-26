@@ -39,8 +39,8 @@ done
 
 cd src
 # preprocess the raw dataset
-python3 data_generator.py --train-path $TRAIN".txt" --valid-path $VALID".txt" --test-path $TEST".txt"
-echo "!"
+python3 data_generator.py --task "wn" --train-path $TRAIN".txt" --valid-path $VALID".txt" --test-path $TEST".txt"
+
 echo $BIAS
 # Path 
 #P_FILE=$ROOT
