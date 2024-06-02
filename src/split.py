@@ -1,8 +1,10 @@
+import os
 import random
 import json
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from pprint import pprint
+from tqdm import tqdm
 
 parser = ArgumentParser()
 
@@ -26,8 +28,6 @@ print("=========== SPLIT ============")
 print("File : ", args.input_file)
 print("Percetage kept : ", args.percentage, "%")
 
-print(args.bias, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-print(type(args.bias))
 if args.bias == "false":
     bias = False
 else:
@@ -46,7 +46,7 @@ class REInputFeatures:
 
 
 if args.threshold_effectif is None or bias == True:
-    print(" Bias !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("The dataset will be biased")
     # random pickup
     with open(args.input_file, "rt") as f:
         mnli_data = []
@@ -55,7 +55,7 @@ if args.threshold_effectif is None or bias == True:
         print("Number of inputs : ", len(lines))
         print("Number of ouputs : ", round(len(lines) * args.percentage / 100))
 
-        for line in random.choices(lines, k=round(len(lines) * args.percentage / 100)):
+        for line in tqdm(random.choices(lines, k=round(len(lines) * args.percentage / 100))):
 
             mnli_data.append(
                 REInputFeatures(
@@ -72,6 +72,7 @@ if args.threshold_effectif is None or bias == True:
         print("Real percentage : ", len(mnli_data) / len(lines))
 
 else:
+    print("Homogeneous dataset")
     # homogeneous random picking throuout all the relations
     with open(args.input_file, "rt") as f:
         mnli_data = []
@@ -140,4 +141,9 @@ json.dump(
     open(args.output_file, "w", encoding="utf-8"),
     indent=4,
 )
-print("saved at location : ", args.output_file)
+
+# Check if the file was created
+if os.path.exists(args.output_file):
+    print(f"tmp file {args.output_file} was successfully created.")
+else:
+    print(f"Failed to create the file {args.output_file}.")
