@@ -171,8 +171,6 @@ def wn2mnli_with_negative_pattern(
 
     # while it is a forbidden couple : choose an other one :
     # init the neg template
-    if len(negative_templates[instance.relation])==0:
-        print([instance.relation])
     negative_template = random.choices(negative_templates[instance.relation], k=negn)
     # print(instance.head_id  id2forbidden[0].keys())
     if str(instance.head_id) in id2forbidden[0].keys():
