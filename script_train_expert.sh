@@ -104,7 +104,7 @@ run_experiment() {
     source "script.sh" --splits $split --both $BOTH --bias $BIAS --processed_data_directory $P_FILE --task $TASK
 
     start_time=$(date +%s.%N)
-    touch "$P_FILE/train.log" # create log file
+    touch $BASE/$P_FILE"train.log" # create log file
 
     echo "=========== TRAIN ============"
     python3 "run_glue.py" \
