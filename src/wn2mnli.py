@@ -13,6 +13,7 @@ from templates import (
     templates_direct,
     template_indirect,
     FORBIDDEN_MIX,
+    FB_LABEL_TEMPLATES
 )
 import os
 
@@ -49,13 +50,24 @@ parser.add_argument("--output_file", type=str, default="data/WN18RR/valid.mnli.j
 parser.add_argument("--negn", type=int, default=1)
 parser.add_argument("--direct", type=bool, default=True)
 parser.add_argument("--both", type=bool, default=False)
-
+parser.add_argument("--task", default="wn18rr", type=str, metavar="N", help="dataset name")
 args = parser.parse_args()
+
+assert (
+        type(args.task) == type("str")
+    ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
+    
+if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
+    LABELS = WN_LABELS
+    LABEL_TEMPLATES = WN_LABEL_TEMPLATES
+if args.task.lower() in ["freebase", "fb", "fb15k237"]:
+    LABELS = list(FB_LABEL_TEMPLATES.keys())
+    LABEL_TEMPLATES = FB_LABEL_TEMPLATES
+
 print("=========== CONVERTION ============")
 print("convert ", args.input_file, " into NLI dataset")
 
 
-# labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 # to correspond to the config of pretrained model
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 
@@ -65,29 +77,29 @@ negative_templates: Dict[str, list] = defaultdict(list)
 templates = []
 if args.direct and not (args.both):
     # direct case
-    for relations in WN_LABELS:
+    for relations in LABELS:
         templates.append(
-            WN_LABEL_TEMPLATES[relations][0]
+            LABEL_TEMPLATES[relations][0]
         )  # the first ones are the direct labels
 if not (args.direct) and not (args.both):
     # indirect case
-    for relations in WN_LABELS:
-        templates.append(WN_LABEL_TEMPLATES[relations][1])
+    for relations in LABELS:
+        templates.append(LABEL_TEMPLATES[relations][1])
 if args.both:
-    for relations in WN_LABELS:
+    for relations in LABELS:
         # this time we add both the direct and indirect
-        templates.extend(WN_LABEL_TEMPLATES[relations])
+        templates.extend(LABEL_TEMPLATES[relations])
 # generate a two dict,
 # n°1 : positive_templates
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
 # n°2 : negative_templates
 #   {label of the relation in the dataset: "all the other pattern not related to this label, eg contradiction"}
-for relation in WN_LABELS:
+for relation in LABELS:
     # if not args.negative_pattern and label == "no_relation":
     #    continue
     for template in templates:
         # for the moment we just look at the direct patterns
-        if template in WN_LABEL_TEMPLATES[relation]:
+        if template in LABEL_TEMPLATES[relation]:
             # if the template is realy the one corresponding to the relation
             positive_templates[relation].append(
                 template
@@ -108,16 +120,18 @@ for relation in WN_LABELS:
 # pprint(positive_templates)
 # pprint(negative_templates)
 # load the forbidden couples
-with open(
-    os.path.join(
-        os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"
-    ),
-    "rt",
-) as f:
-    id2forbidden = json.load(
-        f
-    )  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
-
+if args.task in ["wordnet", "wn", "wn18rr"]:
+    with open(
+        os.path.join(
+            os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"
+        ),
+        "rt",
+    ) as f:
+        id2forbidden = json.load(
+            f
+        )  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+else : 
+    id2forbidden = [{}]
 
 def wn2mnli_with_negative_pattern(
     instance: REInputFeatures,
@@ -157,6 +171,8 @@ def wn2mnli_with_negative_pattern(
 
     # while it is a forbidden couple : choose an other one :
     # init the neg template
+    if len(negative_templates[instance.relation])==0:
+        print([instance.relation])
     negative_template = random.choices(negative_templates[instance.relation], k=negn)
     # print(instance.head_id  id2forbidden[0].keys())
     if str(instance.head_id) in id2forbidden[0].keys():
