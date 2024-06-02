@@ -2,8 +2,7 @@ import preprocess
 import pandas as pd
 import nltk
 
-nltk.download("wordnet")
-from nltk.corpus import wordnet as wn
+
 import argparse
 import json
 import pathlib
@@ -40,12 +39,19 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
 ### Global fonction
-def generate_nli_data(path:str, dataset:str=args.task):
-    assert str(type(dataset))=='str', "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
-    if dataset.lower() in ['wordnet', 'wn', 'wn18rr']: 
+def generate_nli_data(path: str, dataset: str = args.task):
+    assert (
+        type(dataset) == type("str")
+    ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
+    
+    if dataset.lower() in ["wordnet", "wn", "wn18rr"]:
+        nltk.download("wordnet")
+        from nltk.corpus import wordnet as wn
         return generate_nli_data_wordnet(path)
-    if dataset.lower() in ['freebase', 'fb', 'fb15k237']: 
+    
+    if dataset.lower() in ["freebase", "fb", "fb15k237"]:
         return generate_nli_data_freebase(path)
 
 
@@ -57,8 +63,8 @@ def generate_nli_data_wordnet(path):
     for index in range(0, len(head2tail_df)):
         triplet = head2tail_df.iloc[index]
         hypo2premise = {}
-        # get the synset object from NLTK using the id to have more info like lemmas 
-        s_head = get_synset(triplet["head"], triplet["head_id"]) 
+        # get the synset object from NLTK using the id to have more info like lemmas
+        s_head = get_synset(triplet["head"], triplet["head_id"])
         s_tail = get_synset(triplet["tail"], triplet["tail_id"])
         # process the retreived lemmas
         l_head = " or ".join(
@@ -68,7 +74,7 @@ def generate_nli_data_wordnet(path):
             [lemma.name().replace("_", " ").strip() for lemma in s_tail.lemmas()][0:2]
         )
 
-        # dictionnary contruction 
+        # dictionnary contruction
         hypo2premise["head_id"] = triplet["head_id"]
         hypo2premise["tail_id"] = triplet["tail_id"]
         hypo2premise["context"] = (
@@ -121,22 +127,29 @@ def get_synset(name, id):
 
 ### case of freebase
 def generate_nli_data_freebase(path):
-    head2tail_dict , desciptions = preprocess.preprocess_fb15k237(path)
+    head2tail_dict, desciptions = preprocess.preprocess_fb15k237(path)
     all_id = list(desciptions.keys())
+    #print(head2tail_dict)
     head2tail_df = pd.DataFrame(head2tail_dict)
     hypos2premises = []
     for index in range(0, len(head2tail_df)):
         triplet = head2tail_df.iloc[index]
         # remove the case with no description availaible
-        if triplet["head_id"] in all_id and triplet["tail_id"] in all_id: 
+        if triplet["head_id"] in all_id and triplet["tail_id"] in all_id:
             hypo2premise = {}
             hypo2premise["head_id"] = triplet["head_id"]
             hypo2premise["tail_id"] = triplet["tail_id"]
             hypo2premise["context"] = (
-                desciptions[triplet["head_id"]] + ". " + desciptions[triplet["tail_id"]].replace("@en", '')
-            ) # context formed with the definitions
+                desciptions[triplet["head_id"]]
+                + ". "
+                + desciptions[triplet["tail_id"]].replace("@en", "")
+            )  # context formed with the definitions
             hypo2premise["premise"] = (
-                triplet["head"] + " <" + str(triplet["relation"]) + "> " + triplet["tail"]
+                triplet["head"]
+                + " <"
+                + str(triplet["relation"])
+                + "> "
+                + triplet["tail"]
             )
             hypo2premise["subj"] = triplet["tail"]
             hypo2premise["obj"] = triplet["head"]
@@ -144,14 +157,15 @@ def generate_nli_data_freebase(path):
             hypos2premises.append(hypo2premise)
 
     out_path = path.replace("txt", "json")
-    """json.dump(
-    #    hypos2premises,
+    json.dump(
+        hypos2premises,
         open(out_path, "w", encoding="utf-8"),
         ensure_ascii=False,
         indent=4,
     )
-    print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))"""
+    print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
+
 
 def main():
     """path = "./data/WN18RR/test.txt"
