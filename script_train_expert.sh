@@ -104,7 +104,7 @@ run_experiment() {
     source "script.sh" --splits $split --both $BOTH --bias $BIAS --processed_data_directory $P_FILE --task $TASK
 
     start_time=$(date +%s.%N)
-    touch $BASE/$P_FILE"train.log" # create log file
+    touch $P_FILE"train.log" # create log file
 
     echo "=========== TRAIN ============"
     python3 "run_glue.py" \
@@ -130,7 +130,7 @@ run_experiment() {
       --fp16 "True" \
       --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
       --save_total_limit "1" \
-      --ignore_mismatched_sizes "True" > "$BASE/$P_FILE/train.log" 2>&1
+      --ignore_mismatched_sizes "True" > "/$P_FILE/train.log" 2>&1
 
     echo "******* TIME *******"
     end_time=$(date +%s.%N)
