@@ -6,24 +6,24 @@ import multiprocessing as mp
 from multiprocessing import Pool
 from typing import List
 
-#parser = argparse.ArgumentParser(description="preprocess")
-#parser.add_argument(
-#    "--task", default="wn18rr", type=str, metavar="N", help="dataset name"
-#)
-#parser.add_argument(
-#    "--workers", default=2, type=int, metavar="N", help="number of workers"
-#)
-#parser.add_argument(
-#    "--train-path", default="", type=str, metavar="N", help="path to training data"
-#)
-#parser.add_argument(
-#    "--valid-path", default="", type=str, metavar="N", help="path to valid data"
-#)
-#parser.add_argument(
-#    "--test-path", default="", type=str, metavar="N", help="path to valid data"
-#)
+parser = argparse.ArgumentParser(description="preprocess")
+parser.add_argument(
+    "--task", default="wn18rr", type=str, metavar="N", help="dataset name"
+)
+parser.add_argument(
+    "--workers", default=2, type=int, metavar="N", help="number of workers"
+)
+parser.add_argument(
+    "--train-path", default="", type=str, metavar="N", help="path to training data"
+)
+parser.add_argument(
+    "--valid-path", default="", type=str, metavar="N", help="path to valid data"
+)
+parser.add_argument(
+    "--test-path", default="", type=str, metavar="N", help="path to valid data"
+)
 
-#args = parser.parse_args()
+args = parser.parse_args()
 mp.set_start_method("fork")
 
 
@@ -46,14 +46,15 @@ def _check_sanity(relation_id_to_str: dict):
 def _normalize_relations(examples: List[dict], normalize_fn, is_train: bool):
     relation_id_to_str = {}
     for ex in examples:
-        rel_str = normalize_fn(ex["relation"])
-        relation_id_to_str[ex["relation"]] = rel_str
-        ex["relation"] = rel_str
+        if ex is not None: 
+            rel_str = normalize_fn(ex["relation"])
+            relation_id_to_str[ex["relation"]] = rel_str
+            ex["relation"] = rel_str
 
     _check_sanity(relation_id_to_str)
 
     if is_train:
-        out_path = "{}/relations.json".format(os.path.dirname("data/FB15k237/train.txt"))#args.train_path))
+        out_path = '{}/relations.json'.format(os.path.dirname(args.train_path))
         with open(out_path, "w", encoding="utf-8") as writer:
             json.dump(relation_id_to_str, writer, ensure_ascii=False, indent=4)
             print("Save {} relations to {}".format(len(relation_id_to_str), out_path))
@@ -131,12 +132,13 @@ def _load_fb15k237_wikidata(path: str):
         assert len(fs) == 2, 'Invalid line: {}'.format(line.strip())
         entity_id, name = fs[0], fs[1]
         name = name.replace('_', ' ').strip()
-        if entity_id not in fb15k_id2desc:
+        if entity_id in fb15k_id2desc:
+            fb15k_id2ent[entity_id] = (entity_id, name, fb15k_id2desc.get(entity_id, ''))
+        else: 
             # remove the print for log lisibility in train set out of 272115 pairs 684 disn't have match
             # those pairs were revoved in the dataset generation 
-            #print('No desc found for {}'.format(entity_id))
+            print('No desc found for {}'.format(entity_id))
             continue
-        fb15k_id2ent[entity_id] = (entity_id, name, fb15k_id2desc.get(entity_id, ''))
     print('Load {} entity names from {}'.format(len(fb15k_id2ent), path))
 
 
@@ -168,15 +170,18 @@ def _process_line_fb15k237(line: str) -> dict:
     fs = line.strip().split('\t')
     assert len(fs) == 3, 'Expect 3 fields for {}'.format(line)
     head_id, relation, tail_id = fs[0], fs[1], fs[2]
-
-    _, head, _ = fb15k_id2ent[head_id]
-    _, tail, _ = fb15k_id2ent[tail_id]
-    example = {'head_id': head_id,
-               'head': head,
-               'relation': relation,
-               'tail_id': tail_id,
-               'tail': tail}
-    return example
+    try : 
+        _, head, _ = fb15k_id2ent[head_id]
+        _, tail, _ = fb15k_id2ent[tail_id]
+        example = {'head_id': head_id,
+                'head': head,
+                'relation': relation,
+                'tail_id': tail_id,
+                'tail': tail}
+        return example
+    except:
+        print("No relation found for {} or {}".format(head_id, tail_id))
+        return None
 
 
 def preprocess_fb15k237(path):
@@ -187,10 +192,11 @@ def preprocess_fb15k237(path):
 
     lines = open(path, 'r', encoding='utf-8').readlines()
     pool = Pool(processes=4) #args.workers)
-    examples = pool.map(_process_line_fb15k237, lines)
+    examples_ = pool.map(_process_line_fb15k237, lines)
     pool.close()
     pool.join()
 
+    examples = [example for example in examples_ if example is not None]
     _normalize_relations(examples, normalize_fn=_normalize_fb15k237_relation, is_train=(path == path)) #args.train_path))
 
     out_path = path + '.json' # TODO remove .txt
