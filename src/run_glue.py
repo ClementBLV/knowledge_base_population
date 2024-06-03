@@ -48,16 +48,16 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
 # wandb
-import wandb
+#import wandb
 
-wandb.init()
-wandb.init(project="patate", entity="clementblv")
+#wandb.init()
+#wandb.init(project="patate", entity="clementblv")
 
-wandb.config.batch_size = 1  # Original batch size
-wandb.config.gradient_accumulation_steps = 32  # Your gradient accumulation steps
-wandb.config.effective_batch_size = (
-    wandb.config.batch_size * wandb.config.gradient_accumulation_steps
-)
+#wandb.config.batch_size = 1  # Original batch size
+#wandb.config.gradient_accumulation_steps = 32  # Your gradient accumulation steps
+#wandb.config.effective_batch_size = (
+#    wandb.config.batch_size * wandb.config.gradient_accumulation_steps
+#)
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -96,6 +96,10 @@ class DataTrainingArguments:
     split: Optional[str] = field(
         default=None,
         metadata={"help": "The split : " + ", ".join(task_to_keys.keys())},
+    )
+    wandb_bool: Optional[str] = field(
+        default=None,
+        metadata={"help": "The wandb : " + ", ".join(task_to_keys.keys())},
     )
     task_name: Optional[str] = field(
         default=None,
@@ -371,7 +375,8 @@ def main():
     # download the dataset.
 
     # wandb split
-    wandb.config.update({"split_percentage": int(data_args.split)})
+    #if ata_args.wandb_bool : 
+    #wandb.config.update({"split_percentage": int(data_args.split)})
 
     # logger.info(f"!!!!!!{data_args.task_name}")
 
@@ -727,7 +732,7 @@ def main():
             learning_rate = trainer.optimizer.param_groups[0]["lr"]
 
         # Log training metrics to WandB
-        wandb.log({"train_loss": train_loss, "learning_rate": learning_rate})
+        #wandb.log({"train_loss": train_loss, "learning_rate": learning_rate})
 
     # Evaluation
     if training_args.do_eval:
@@ -773,7 +778,7 @@ def main():
         eval_loss = metrics["eval_loss"]
         eval_accuracy = metrics["eval_accuracy"]
         # Log evaluation metrics to WandB
-        wandb.log({"eval_loss": eval_loss, "eval_accuracy": eval_accuracy})
+        #wandb.log({"eval_loss": eval_loss, "eval_accuracy": eval_accuracy})
 
     if training_args.do_predict:
         logger.info("*** Predict ***")
@@ -812,8 +817,8 @@ def main():
                             writer.write(f"{index}\t{item}\n")
 
         # Log additional information to WandB during prediction
-        if trainer.is_world_process_zero():
-            wandb.log({"predictions": predictions})
+        #if trainer.is_world_process_zero():
+        #    wandb.log({"predictions": predictions})
 
     kwargs = {
         "finetuned_from": model_args.model_name_or_path,
