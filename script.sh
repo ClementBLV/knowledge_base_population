@@ -46,7 +46,8 @@ python3 data_generator.py \
             --valid-path $VALID".txt" \
             --test-path $TEST".txt"
 
-
+# generate test eval file only ones 
+python3 src/wn2eval.py --input_file $TEST".json" --output_file "$P_FILE/test_eval.json"
 
 # Path 
 
