@@ -4,15 +4,15 @@ GLUE_DIR="$BASE/src/"
 TASK_NAME="MNLI"
 BIAS=true
 BOTH=false
-SPLIT=7
 
 show_help() {
     echo "Usage: $0 [options]"
     echo
     echo "Options:"
-    echo "  --splits VALUE                  Set the split values for the training data, should be an integer in percentage; e.g., 1 means 1% of the training data."
+    echo "  --split SPLIT                   Set the split values for the training data, should be an integer in percentage; e.g., 1 means 1% of the training data."
     echo "  --both BOOL                     Set the both parameter, it's a boolean; if true, then the direct and indirect relation will be shown; e.g., (true or false)."
     echo "  --bias BOOL                     Set the bias parameter; if true, the sub-set from the training data will be unbalanced as the original one."
+    echo "  --wandb BOOL                    Set the wandb parameter; if true, wandb will be called."
     echo "  --task STR                      Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
     echo "  --processed_data_directory DIR  Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
     echo "  --model MODEL                   Specify the model; should be a Hugging Face ID, e.g., 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli'."
@@ -25,9 +25,10 @@ show_help() {
 
 # Parse command-line arguments
 declare -A args=(
-    [--splits]=SPLIT_VALUES
+    [--splits]=SPLIT_VALUE
     [--both]=BOTH
     [--bias]=BIAS
+    [--wandb]=WANDB
     [--task]=TASK
     [--processed_data_directory]=P_FILE
     [--model]=MODEL
@@ -103,12 +104,14 @@ run_experiment() {
     # Generate a new dataset with new triplets
     source "script.sh" --splits $split --both $BOTH --bias $BIAS --processed_data_directory $P_FILE --task $TASK
 
+    # create log file
     start_time=$(date +%s.%N)
-    touch $P_FILE"train.log" # create log file
+    touch $P_FILE"train.log" 
 
     echo "=========== TRAIN ============"
     python3 "run_glue.py" \
       --split $split \
+      --wandb $WANDB \
       --model_name_or_path "$MODEL" \
       --do_train \
       --do_eval \
@@ -132,22 +135,35 @@ run_experiment() {
       --save_total_limit "1" \
       --ignore_mismatched_sizes "True" > "/$P_FILE/train.log" 2>&1
 
-    echo "******* TIME *******"
+
+    echo "=========== TIME ============"
     end_time=$(date +%s.%N)
     execution_time=$(echo "$end_time - $start_time" | bc)
 
     hours=$(echo "$execution_time / 3600" | bc)
     minutes=$(echo "($execution_time % 3600) / 60" | bc)
     seconds=$(echo "$execution_time % 60" | bc)
-
     echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
 
     # Remove the generated datasets
     echo "Remove generated files"
     rm -rf "$P_FILE/train_${split}.json" "$P_FILE/train_${split}.mnli.json"
+
+
+    echo "=========== EVALUATION ============"
+    # run evaluation 
+    source "script_eval_expert.sh" \
+      --split $split \
+      --model $MODEL \
+      --save_name $save_name".txt" \
+      --weights_path "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
+      --processed_test_dir "$P_FILE/test_eval.json" \
+      --i $i
 }
+
+# generate test eval file only ones 
 
 # Main experiment loop
 for i in {1..10}; do
-  run_experiment $i $SPLIT
+  run_experiment $i $SPLIT_VALUE
 done
