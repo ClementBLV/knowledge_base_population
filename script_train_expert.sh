@@ -106,7 +106,7 @@ run_experiment() {
 
     # create log file
     start_time=$(date +%s.%N)
-    touch $P_FILE"train.log" 
+    touch "$P_FILE/train_${save_name}.log" 
 
     echo "=========== TRAIN ============"
     python3 "run_glue.py" \
@@ -133,7 +133,7 @@ run_experiment() {
       --fp16 "True" \
       --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
       --save_total_limit "1" \
-      --ignore_mismatched_sizes "True" > "/$P_FILE/train.log" 2>&1
+      --ignore_mismatched_sizes "True" > "$P_FILE/train_${save_name}.log"  2>&1
 
 
     echo "=========== TIME ============"
@@ -161,7 +161,15 @@ run_experiment() {
       --i $i
 }
 
+if [[ "$TASK" == "wordnet" || "$TASK" == "wn" || "$TASK" == "wn18rr" ]]; then
+    ROOT=$BASE"/data/WN18RR/"
+else 
+    ROOT=$BASE"/data/FB15k237/"
+fi
+TEST=$ROOT"source/test"
+
 # generate test eval file only ones 
+python3 wn2eval.py --input_file $TEST".json" --output_file "$P_FILE/test_eval.json"
 
 # Main experiment loop
 for i in {1..10}; do
