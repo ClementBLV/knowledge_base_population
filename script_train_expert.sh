@@ -161,15 +161,7 @@ run_experiment() {
       --i $i
 }
 
-if [[ "$TASK" == "wordnet" || "$TASK" == "wn" || "$TASK" == "wn18rr" ]]; then
-    ROOT=$BASE"/data/WN18RR/"
-else 
-    ROOT=$BASE"/data/FB15k237/"
-fi
-TEST=$ROOT"source/test"
 
-# generate test eval file only ones 
-python3 wn2eval.py --input_file $TEST".json" --output_file "$P_FILE/test_eval.json"
 
 # Main experiment loop
 for i in {1..10}; do
