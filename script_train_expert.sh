@@ -19,6 +19,7 @@ show_help() {
     echo "  --output_dir DIR                Set the output directory where the trained weights will be saved."
     echo "  --hf_cache_dir DIR              Set the Hugging Face cache directory; if not set, it will be the default directory."
     echo "                                  If not provided or set to None, the cache settings will not be exported."
+    echo "  --no_training BOOL              If set to true, training will be skipped and 'HELLO WORLD NO TRAINING!' will be printed."
     echo "  --help                          Display this help message and exit."
     exit 0
 }
@@ -34,6 +35,7 @@ declare -A args=(
     [--model]=MODEL
     [--output_dir]=OUTPUT_DIR
     [--hf_cache_dir]=HF_CACHE_DIR
+    [--no_training]=NO_TRAINING
 )
 
 while [ $# -gt 0 ]; do
@@ -72,6 +74,19 @@ run_experiment() {
     local split="$2"
     local save_name
 
+    echo "=========== iteration $i ============"
+    # Set TEST_BOOL, VALID_BOOL, and DO_PREPROCESS to false if i > 1
+        if [ "$i" -gt 1 ]; then
+            TEST_BOOL=false
+            VALID_BOOL=false
+            DO_PREPROCESS=false
+        else
+            TEST_BOOL=true
+            VALID_BOOL=true
+            DO_PREPROCESS=true
+        fi
+
+        
     case "$MODEL" in
         'microsoft/deberta-v3-base')
             if $BIAS; then
@@ -107,66 +122,69 @@ run_experiment() {
      --both $BOTH \
      --bias $BIAS \
      --processed_data_directory $P_FILE \
-     --task $TASK
+     --task $TASK \
+     --test_bool $TEST_BOOL \
+     --valid_bool $VALID_BOOL \
+     --do_preprocess $DO_PREPROCESS
 
-    # create log file
-    start_time=$(date +%s.%N)
-    touch "$P_FILE/train_${save_name}.log" 
+    if [ "$NO_TRAINING" == "true" ]; then
+        echo "HELLO WORLD NO TRAINING!"
+    else
+        # create log file
+        start_time=$(date +%s.%N)
+        touch "$P_FILE/train_${save_name}.log" 
 
-    echo "=========== TRAIN ============"
-    python3 "run_glue.py" \
-      --split $split \
-      --wandb $WANDB \
-      --model_name_or_path "$MODEL" \
-      --do_train \
-      --do_eval \
-      --do_predict \
-      --train_file "$P_FILE/train_${split}.mnli.json" \
-      --test_file "$P_FILE/test.mnli.json" \
-      --validation_file "$P_FILE/valid.mnli.json" \
-      --max_seq_length "128" \
-      --per_device_train_batch_size "1" \
-      --gradient_accumulation_steps "32" \
-      --learning_rate "4e-6" \
-      --warmup_ratio "0.1"  \
-      --weight_decay "0.06"  \
-      --num_train_epochs "3" \
-      --logging_strategy "steps" \
-      --logging_steps "100" \
-      --evaluation_strategy "steps" \
-      --eval_steps  "100" \
-      --fp16 "True" \
-      --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
-      --save_total_limit "1" \
-      --ignore_mismatched_sizes "True" > "$P_FILE/train_${save_name}.log"  2>&1
+        echo "=========== TRAIN ============"
+        python3 "run_glue.py" \
+          --split $split \
+          --wandb $WANDB \
+          --model_name_or_path "$MODEL" \
+          --do_train \
+          --do_eval \
+          --do_predict \
+          --train_file "$P_FILE/train_${split}.mnli.json" \
+          --test_file "$P_FILE/test.mnli.json" \
+          --validation_file "$P_FILE/valid.mnli.json" \
+          --max_seq_length "128" \
+          --per_device_train_batch_size "1" \
+          --gradient_accumulation_steps "32" \
+          --learning_rate "4e-6" \
+          --warmup_ratio "0.1"  \
+          --weight_decay "0.06"  \
+          --num_train_epochs "3" \
+          --logging_strategy "steps" \
+          --logging_steps "100" \
+          --evaluation_strategy "steps" \
+          --eval_steps  "100" \
+          --fp16 "True" \
+          --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
+          --save_total_limit "1" \
+          --ignore_mismatched_sizes "True" > "$P_FILE/train_${save_name}.log"  2>&1
 
+        echo "=========== TIME ============"
+        end_time=$(date +%s.%N)
+        execution_time=$(echo "$end_time - $start_time" | bc)
 
-    echo "=========== TIME ============"
-    end_time=$(date +%s.%N)
-    execution_time=$(echo "$end_time - $start_time" | bc)
+        hours=$(echo "$execution_time / 3600" | bc)
+        minutes=$(echo "($execution_time % 3600) / 60" | bc)
+        seconds=$(echo "$execution_time % 60" | bc)
+        echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
 
-    hours=$(echo "$execution_time / 3600" | bc)
-    minutes=$(echo "($execution_time % 3600) / 60" | bc)
-    seconds=$(echo "$execution_time % 60" | bc)
-    echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
+        # Remove the generated datasets
+        echo "Remove generated files"
+        rm -rf "$P_FILE/train_${split}.json" "$P_FILE/train_${split}.mnli.json"
 
-    # Remove the generated datasets
-    echo "Remove generated files"
-    rm -rf "$P_FILE/train_${split}.json" "$P_FILE/train_${split}.mnli.json"
-
-
-    echo "=========== EVALUATION ============"
-    # run evaluation 
-    source "script_eval_expert.sh" \
-      --split $split \
-      --model $MODEL \
-      --save_name $save_name".txt" \
-      --weights_path "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
-      --processed_test_dir "$P_FILE/test_eval.json" \
-      --i $i
+        echo "=========== EVALUATION ============"
+        # run evaluation 
+        source "script_eval_expert.sh" \
+          --split $split \
+          --model $MODEL \
+          --save_name $save_name".txt" \
+          --weights_path "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
+          --processed_test_dir "$P_FILE/test_eval.json" \
+          --i $i
+    fi
 }
-
-
 
 # Main experiment loop
 for i in {1..10}; do
