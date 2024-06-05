@@ -132,7 +132,7 @@ run_experiment() {
     else
         # create log file
         start_time=$(date +%s.%N)
-        touch "$P_FILE/train_${save_name}.log" 
+        touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
         python3 "run_glue.py" \
@@ -159,7 +159,7 @@ run_experiment() {
           --fp16 "True" \
           --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
           --save_total_limit "1" \
-          --ignore_mismatched_sizes "True" > "$P_FILE/train_${save_name}.log"  2>&1
+          --ignore_mismatched_sizes "True" > "$BASE/log/train_${save_name}.log"  2>&1
 
         echo "=========== TIME ============"
         end_time=$(date +%s.%N)
@@ -170,9 +170,6 @@ run_experiment() {
         seconds=$(echo "$execution_time % 60" | bc)
         echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
 
-        # Remove the generated datasets
-        echo "Remove generated files"
-        rm -rf "$P_FILE/train_${split}.json" "$P_FILE/train_${split}.mnli.json"
 
         echo "=========== EVALUATION ============"
         # run evaluation 
@@ -184,9 +181,24 @@ run_experiment() {
           --processed_test_dir "$P_FILE/test_eval.json" \
           --i $i
     fi
+
+    # Remove the generated datasets
+    echo "=========== CLEANING ============"
+    echo -e "Remove generated files : \n $P_FILE/train_${split}.json \n $P_FILE/train_${split}.mnli.json"
+    rm -rf "$P_FILE/train_${split}.json" "$P_FILE/train_${split}.mnli.json"
 }
 
-# Main experiment loop
-for i in {1..10}; do
-  run_experiment $i $SPLIT_VALUE
-done
+
+# Check if SPLIT_VALUE is 100 and run experiment only once if true (no variance in that case)
+if [ "$SPLIT_VALUE" -eq 100 ]; then
+    echo "WARNING : you are running the experiment with a split = 100 % "
+    echo "          It will be launched only ones as no variance is induced "
+    echo "          as no sampling is done on the dataset "
+
+    run_experiment 1 $SPLIT_VALUE
+else
+    # Main experiment loop
+    for i in {1..10}; do
+      run_experiment $i $SPLIT_VALUE
+    done
+fi
