@@ -2,8 +2,8 @@
 BASE=$(pwd)
 GLUE_DIR="$BASE/src/"
 TASK_NAME="MNLI"
-BIAS=true
-BOTH=false
+#BIAS=true
+#BOTH=false
 
 show_help() {
     echo "Usage: $0 [options]"
@@ -25,7 +25,7 @@ show_help() {
 
 # Parse command-line arguments
 declare -A args=(
-    [--splits]=SPLIT_VALUE
+    [--split]=SPLIT_VALUE
     [--both]=BOTH
     [--bias]=BIAS
     [--wandb]=WANDB
@@ -102,7 +102,12 @@ run_experiment() {
     rm -rf "$P_FILE/train_${split}.mnli.json"
 
     # Generate a new dataset with new triplets
-    source "script.sh" --splits $split --both $BOTH --bias $BIAS --processed_data_directory $P_FILE --task $TASK
+    source "script.sh" \
+     --split $split \
+     --both $BOTH \
+     --bias $BIAS \
+     --processed_data_directory $P_FILE \
+     --task $TASK
 
     # create log file
     start_time=$(date +%s.%N)

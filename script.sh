@@ -9,7 +9,7 @@ VALID_BOOL=true
 
 # Parse command-line arguments
 declare -A args=(
-    [--splits]=SPLIT_VALUES
+    [--split]=SPLIT_VALUES
     [--both]=BOTH
     [--bias]=BIAS
     [--task]=TASK
@@ -22,6 +22,7 @@ while [ $# -gt 0 ]; do
         declare "${args[$key]}"="$2"
         shift 2
     else
+        echo $key
         echo "Unknown option: $1"
         exit 1
     fi
@@ -38,9 +39,9 @@ TRAIN=$ROOT"source/train"
 TEST=$ROOT"source/test"
 VALID=$ROOT"source/valid"
 
-cd src
+
 # preprocess the raw dataset
-python3 data_generator.py \
+python3 src/data_generator.py \
             --task "$TASK" \
             --train-path $TRAIN".txt" \
             --valid-path $VALID".txt" \
@@ -57,7 +58,7 @@ if $TRAIN_BOOL; then
 
 		echo "split $SPLIT %"
 
-		python3 split.py \
+		python3 src/split.py \
 			--input_file $TEST".json" \
 			--percentage $SPLIT \
 			--bias $BIAS\
@@ -65,7 +66,7 @@ if $TRAIN_BOOL; then
 			--output_file $P_FILE"train_"$SPLIT".json"
 
 		# convert to mnli format
-		python3 wn2mnli.py \
+		python3 src/wn2mnli.py \
 			--input_file $P_FILE"train_"$SPLIT".json" \
 			--output_file $P_FILE"train_"$SPLIT".mnli.json"\
 			--both $BOTH \
@@ -80,7 +81,7 @@ fi
 # convert to NLI format
 if $TEST_BOOL; then
 	echo "******* TEST *******"
-	python3 wn2mnli.py \
+	python3 src/wn2mnli.py \
         --input_file $TEST".json" \
         --output_file $ROOT"test.mnli.json" \
         --both $BOTH \
@@ -89,7 +90,7 @@ fi
 
 if $VALID_BOOL; then
 	echo "******* VALID *******"
-	python3 wn2mnli.py \
+	python3 src/wn2mnli.py \
         --input_file $VALID".json" \
         --output_file $ROOT"valid.mnli.json" \
         --both $BOTH \

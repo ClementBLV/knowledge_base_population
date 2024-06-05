@@ -19,13 +19,14 @@ show_help() {
 
 # Parse command-line arguments
 declare -A args=(
-    [--splits]=SPLIT_VALUE
+    [--split]=SPLIT_VALUE
     [--model]=MODEL
     [--indirect]=INDIRECT
     [--save_name]=SAVE_NAME
     [--weights_path]=WEIGHTS_PATH
     [--processed_test_dir]=P_FILE
     [--task]=TASK
+    [--i]=i
 )
 
 while [ $# -gt 0 ]; do
@@ -52,7 +53,6 @@ if [ -z "$MODEL" ] || [ -z "$SAVE_NAME" ] || [ -z "$WEIGHTS_PATH" ] || [ -z "$TA
     show_help
 fi
 
-cd src
 echo "******* EVAL *******"
 
 # Use the provided parameters
@@ -63,17 +63,17 @@ SAVE_NAME_PREFIX="${SAVE_NAME}_split${SPLIT_VALUE}"
 
     
 echo "Split $SPLIT_VALUE v $i"
-python3 eval.py \
+python3 src/eval.py \
             --input_file "$P_FILE/test_eval.json" \
             --output_file "eval" \
-            --model "$WEIGHTS_PATH/${SAVE_NAME_PREFIX}_v${i}/MNLI/checkpoint-" \
+            --model "${WEIGHTS_PATH}" \
             --name "${SAVE_NAME_PREFIX}_v${i}" \
             --source_model "$MODEL"
 if $INDIRECT; then 
-    python3 eval.py \
+    python3 src/eval.py \
                 --input_file "$P_FILE/test_eval_indirect.json" \
                 --output_file "eval" \
-                --model "$WEIGHTS_PATH/${SAVE_NAME_PREFIX}_v${i}/MNLI/checkpoint-" \
+                --model "${WEIGHTS_PATH}" \
                 --name "${SAVE_NAME_PREFIX}_indirect_v${i}" \
                 --source_model "$MODEL"
 fi
