@@ -137,7 +137,6 @@ run_experiment() {
         echo "=========== TRAIN ============"
         python3 "src/run_glue.py" \
           --split $split \
-          --wandb $WANDB \
           --model_name_or_path "$MODEL" \
           --do_train \
           --do_eval \
