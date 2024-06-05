@@ -135,7 +135,7 @@ run_experiment() {
         touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
-        python3 "run_glue.py" \
+        python3 "src/run_glue.py" \
           --split $split \
           --wandb $WANDB \
           --model_name_or_path "$MODEL" \
