@@ -65,14 +65,14 @@ SAVE_NAME_PREFIX="${SAVE_NAME}_split${SPLIT_VALUE}"
 echo "Split $SPLIT_VALUE v $i"
 python3 src/eval.py \
             --input_file "$P_FILE/test_eval.json" \
-            --output_file "eval" \
+            --output_file "${BASE}/eval" \
             --model "${WEIGHTS_PATH}" \
             --name "${SAVE_NAME_PREFIX}_v${i}" \
             --source_model "$MODEL"
 if $INDIRECT; then 
     python3 src/eval.py \
                 --input_file "$P_FILE/test_eval_indirect.json" \
-                --output_file "eval" \
+                --output_file "${BASE}/eval" \
                 --model "${WEIGHTS_PATH}" \
                 --name "${SAVE_NAME_PREFIX}_indirect_v${i}" \
                 --source_model "$MODEL"
