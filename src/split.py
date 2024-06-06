@@ -1,6 +1,7 @@
 import os
 import random
 import json
+from pathlib import Path
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from pprint import pprint
@@ -134,6 +135,10 @@ else:
             )
 print("dataset size", len(mnli_data))
 
+
+# Ensure file exists
+output_file_path = Path(args.output_file)
+output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
 # save
 json.dump(
