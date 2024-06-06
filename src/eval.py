@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from collections import Counter
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 from transformers import (
     AutoTokenizer,
@@ -35,9 +36,12 @@ if args.name is None:
     name = args.model.split("/")[-1]
 else:
     name = args.name
-output_file = (
-    f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
-)
+output_file_path = Path(f"{args.output_file}/eval_{name}.txt")
+output_file_path.parent.mkdir(exist_ok=True, parents=True)
+
+#output_file = (
+#    f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
+#)
 sys.stdout = open(output_file, "w")
 # print("=========== EVALUATION ============")
 
