@@ -59,7 +59,7 @@ echo "******* EVAL *******"
 INDIRECT=${INDIRECT:-false}
 
 
-SAVE_NAME_PREFIX="${SAVE_NAME}_split${SPLIT_VALUE}"
+SAVE_NAME_PREFIX="${SAVE_NAME}"
 
     
 echo "Split $SPLIT_VALUE v $i"
@@ -67,7 +67,7 @@ python3 src/eval.py \
             --input_file "$P_FILE/test_eval.json" \
             --output_file "${BASE}/eval" \
             --model "${WEIGHTS_PATH}" \
-            --name "${SAVE_NAME_PREFIX}_v${i}" \
+            --name "${SAVE_NAME_PREFIX}" \
             --source_model "$MODEL"
 if $INDIRECT; then 
     python3 src/eval.py \
