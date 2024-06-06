@@ -36,8 +36,8 @@ if args.name is None:
     name = args.model.split("/")[-1]
 else:
     name = args.name
-output_file_path = Path(f"{args.output_file}/eval_{name}.txt")
-output_file_path.parent.mkdir(exist_ok=True, parents=True)
+output_file = Path(f"{args.output_file}/eval_{name}.txt")
+output_file.parent.mkdir(exist_ok=True, parents=True)
 
 #output_file = (
 #    f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
