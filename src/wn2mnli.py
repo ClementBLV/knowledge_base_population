@@ -7,6 +7,7 @@ import json
 import sys
 from pprint import pprint
 import random
+from pathlib import Path
 from templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
@@ -235,6 +236,9 @@ with open(args.input_file, "rt") as f:
         mnli_data.extend(mnli_instance)
         relations.append(line["relation"])
         stats.append(line["relation"] != "no_relation")
+
+output_file_path = Path(args.output_file)
+output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
 ## cf wn2eval pour corriger le bug
 with open(args.output_file, "wt") as f:
