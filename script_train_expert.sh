@@ -177,7 +177,7 @@ run_experiment() {
           --model $MODEL \
           --save_name $save_name \
           --weights_path "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
-          --processed_test_dir "$P_FILE/test_eval.json" \
+          --processed_test_dir "$P_FILE" \
           --i $i
     fi
 
