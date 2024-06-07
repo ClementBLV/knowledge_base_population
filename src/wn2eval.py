@@ -54,8 +54,10 @@ print("convert ", args.input_file, " into NLI dataset")
 # choose the right label 
 if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
     LABELS = WN_LABELS
+    LABEL_TEMPLATES = WN_LABEL_TEMPLATES
 if args.task.lower() in ["freebase", "fb", "fb15k237"]:
     LABELS = list(FB_LABEL_TEMPLATES.keys())
+    LABEL_TEMPLATES = FB_LABEL_TEMPLATES
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
@@ -79,7 +81,7 @@ for relation in LABELS:  # TACRED_LABELS:
     for template in templates:
         # for the moment we just look at the direct patterns
         if (
-            template in WN_LABEL_TEMPLATES[relation]
+            template in LABEL_TEMPLATES[relation]
         ):  # si le template correspond au label du template
             positive_templates[relation].append(
                 template
