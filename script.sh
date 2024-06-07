@@ -112,7 +112,7 @@ if [ "$TEST_BOOL" == "true" ]; then
     echo "******* TEST *******"
     python3 src/wn2mnli.py \
         --input_file $TEST".json" \
-        --output_file $ROOT"test.mnli.json" \
+        --output_file $P_FILE"test.mnli.json" \
         --both $BOTH \
         --task "$TASK"
 fi
@@ -121,7 +121,7 @@ if [ "$VALID_BOOL" == "true" ]; then
     echo "******* VALID *******"
     python3 src/wn2mnli.py \
         --input_file $VALID".json" \
-        --output_file $ROOT"valid.mnli.json" \
+        --output_file $P_FILE"valid.mnli.json" \
         --both $BOTH \
         --task "$TASK"
 fi

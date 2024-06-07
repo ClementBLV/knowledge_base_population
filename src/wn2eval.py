@@ -166,6 +166,7 @@ output_file_path = Path(path)
 output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
 with open(path, "wt") as f:
+    print(f"writing file : {args.output_file}")
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     # json.dump([data.__dict__ for data in mnli_data], f, indent=2)

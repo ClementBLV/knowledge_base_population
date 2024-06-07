@@ -131,7 +131,6 @@ run_experiment() {
         echo "HELLO WORLD NO TRAINING!"
     else
         # create log file
-        start_time=$(date +%s.%N)
         touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
@@ -141,9 +140,9 @@ run_experiment() {
           --do_train \
           --do_eval \
           --do_predict \
-          --train_file "$P_FILE/train_${split}.mnli.json" \
-          --test_file "$P_FILE/test.mnli.json" \
-          --validation_file "$P_FILE/valid.mnli.json" \
+          --train_file "${P_FILE}train_${split}.mnli.json" \
+          --test_file "${P_FILE}test.mnli.json" \
+          --validation_file "${P_FILE}valid.mnli.json" \
           --max_seq_length "128" \
           --per_device_train_batch_size "1" \
           --gradient_accumulation_steps "32" \
