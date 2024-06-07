@@ -1,17 +1,17 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from collections import defaultdict, Counter
+from pathlib import Path
 from typing import Dict, List
 import numpy as np
 import json
 import sys
 from pprint import pprint
 import random
+import templates
 from templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
-    templates_direct,
-    template_indirect,
     FORBIDDEN_MIX,
     FB_LABEL_TEMPLATES
 )
@@ -51,13 +51,27 @@ args = parser.parse_args()
 print("=========== CONVERTION ============")
 print("convert ", args.input_file, " into NLI dataset")
 
+
+# Initialize the lists for direct and indirect templates
+direct_templates = []
+indirect_templates = []
+
 # choose the right label 
 if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
     LABELS = WN_LABELS
     LABEL_TEMPLATES = WN_LABEL_TEMPLATES
+    direct_templates = templates.templates_direct
+    indirect_templates = templates.template_indirect
 if args.task.lower() in ["freebase", "fb", "fb15k237"]:
     LABELS = list(FB_LABEL_TEMPLATES.keys())
     LABEL_TEMPLATES = FB_LABEL_TEMPLATES
+    # Loop through the dictionary and separate the templates
+
+    for key, templates in FB_LABEL_TEMPLATES.items():
+        if len(templates) >= 2:
+            direct_templates.append(templates[0])
+            indirect_templates.append(templates[1])
+
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
@@ -66,9 +80,9 @@ positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
 
 if args.direct:
-    templates = templates_direct
+    templates = direct_templates
 else:
-    templates = template_indirect
+    templates = indirect_templates
 
 # generate a two dict,
 # n°1 : positive_templates
@@ -146,6 +160,11 @@ with open(path, "rt") as f:
         mnli_data.append(mnli_feature)
 
 path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
+
+# Ensure file exists
+output_file_path = Path(path)
+output_file_path.parent.mkdir(exist_ok=True, parents=True)
+
 with open(path, "wt") as f:
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
