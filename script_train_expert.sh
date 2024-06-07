@@ -160,15 +160,6 @@ run_experiment() {
           --save_total_limit "1" \
           --ignore_mismatched_sizes "True" > "$BASE/log/train_${save_name}.log"  2>&1
 
-        echo "=========== TIME ============"
-        end_time=$(date +%s.%N)
-        execution_time=$(echo "$end_time - $start_time" | bc)
-
-        hours=$(echo "$execution_time / 3600" | bc)
-        minutes=$(echo "($execution_time % 3600) / 60" | bc)
-        seconds=$(echo "$execution_time % 60" | bc)
-        echo "Execution time: ${hours}h ${minutes}m ${seconds}s"
-
 
         echo "=========== EVALUATION ============"
         # run evaluation 
