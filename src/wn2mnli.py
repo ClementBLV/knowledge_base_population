@@ -237,17 +237,26 @@ with open(args.input_file, "rt") as f:
         relations.append(line["relation"])
         stats.append(line["relation"] != "no_relation")
 
-output_file_path = Path(args.output_file)
+path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
+
+# Ensure file exists
+output_file_path = Path(path)
 output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
 ## cf wn2eval pour corriger le bug
 with open(args.output_file, "wt") as f:
+    print(f"writing file : {args.output_file}")
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     # json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
+# save
+json.dump(
+    [data.__dict__ for data in mnli_data], open(path, "w", encoding="utf-8"), indent=4
+)
 
 count = Counter([data.label for data in mnli_data])
 print("Number of links : ", count)
 count = Counter(relations)
 pprint(dict(count))
+print("saved at location : ", args.output_file)
