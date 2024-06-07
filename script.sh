@@ -74,7 +74,10 @@ if [ "$DO_PREPROCESS" == "true" ]; then
                 --test-path $TEST".txt"
 
     # generate test eval file only once
-    python3 src/wn2eval.py --input_file $TEST".json" --output_file "$P_FILE/test_eval.json"
+    python3 src/wn2eval.py \
+                --input_file $TEST".json" \
+                --output_file "$P_FILE/test_eval.json" \
+                --task "$TASK"
 fi
 
 # Path 

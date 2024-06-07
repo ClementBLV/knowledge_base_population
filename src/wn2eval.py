@@ -7,8 +7,14 @@ import json
 import sys
 from pprint import pprint
 import random
-from templates import WN_LABELS, WN_LABEL_TEMPLATES, templates_direct, template_indirect
-
+from templates import (
+    WN_LABELS,
+    WN_LABEL_TEMPLATES,
+    templates_direct,
+    template_indirect,
+    FORBIDDEN_MIX,
+    FB_LABEL_TEMPLATES
+)
 random.seed(0)
 np.random.seed(0)
 
@@ -39,11 +45,17 @@ parser = ArgumentParser()
 parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
 parser.add_argument("--direct", type=bool, default=True)
+parser.add_argument("--task", type=str, default="fb")
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")
 print("convert ", args.input_file, " into NLI dataset")
 
+# choose the right label 
+if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
+    LABELS = WN_LABELS
+if args.task.lower() in ["freebase", "fb", "fb15k237"]:
+    LABELS = list(FB_LABEL_TEMPLATES.keys())
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
@@ -61,7 +73,7 @@ else:
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
 # n°2 : negative_templates
 #   {label of the relation in the dataset: "all the other pattern not related to this label, eg contradiction"}
-for relation in WN_LABELS:  # TACRED_LABELS:
+for relation in LABELS:  # TACRED_LABELS:
     # if not args.negative_pattern and label == "no_relation":
     #    continue
     for template in templates:
