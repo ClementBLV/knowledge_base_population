@@ -1,54 +1,78 @@
-# Textual Entailment for Link Prediction in WordNet
+# Textual Entailment for Link Prediction in a knowledge base
 
+![Conference](https://img.shields.io/badge/Conference-EKAW%202024-red)
+![Python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-Official code repository for ESWC 2024 paper 
-"Textual Entailment for Link Prediction in WordNet". 
+Welcome to the official code repository for the ESWC 2024 paper **"Textual Entailment for Link Prediction in WordNet"**.
 
-The paper is available at [https:/lien .pdf](https://.pdf).
-
-Clément BELIVEAU - [IMT Atlantique](https://www.imt-atlantique.fr/en) 
-
-[Guillermo Echegoyen Blanco]() and
-[José Manuel Gómez-Pérez](https://scholar.google.com/citations?user=P3B2MmwAAAAJ&hl=fr&oi=ao) - [Exper.ai](https://www.expert.ai)
-
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/ambv/black)
-[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+- **Paper:** [Available here](https://.pdf)
+- **Authors:** Clément BELIVEAU ([IMT Atlantique](https://www.imt-atlantique.fr/en)), Guillermo Echegoyen Blanco, and José Manuel Gómez-Pérez ([Expert.ai](https://www.expert.ai))
 
 
 <html> 
 <body> 
-	<div class="image-container"> 
-		<img src="https://www.pole-emc2.fr/app/uploads/logos_adherents/91fff3f6-c993-67c6-68ae-53957c2f623d-768x522.png" alt="Image 1" height="200">
-		<img src="https://www.expert.ai/wp-content/uploads/2020/09/logo-new.png" alt="Image 2" height="100"> 
+	<div class="image-container" style="display: flex; align-items: center;"> 
+		<img src="https://www.pole-emc2.fr/app/uploads/logos_adherents/91fff3f6-c993-67c6-68ae-53957c2f623d-768x522.png" alt="Image 1" height="100" style="margin-right: 20px;">
+		<img src="https://www.expert.ai/wp-content/uploads/2020/09/logo-new.png" alt="Image 2" height="50"> 
 	</div> 
 </body>
 </html>
 
-This repository contains the official code of the paper Textual Entailment for Link Prediction in WordNet, in this paper we have tackled the task of link prediction within a knowledge base and more precisely within WN18RR. To do so we are employing an entailment approach, leveraging the abstraction capacities of Large Language Models (LLMs). More precisely, we have achieved state-of-the-art performances with only a base-size model, hence demonstrating the effectiveness of our approach. 
 
-## Installation 🛠 
+## Table of Contents
+- [Introduction](#introduction)
+- [Installation](#installation)
+  - [Conda Virtual Environment](#conda-virtual-environment)
+- [Usage](#usage)
+  - [Datasets](#datasets)
+  - [Models](#models)
+- [Run Training](#run-training)
+  - [Bash](#bash)
+  - [Docker](#docker)
+  - [Colab](#colab)
+- [Results](#results)
+- [Citation](#citation)
 
-Prerequisite: python installed, ssh key of your GitHub account configured. 
+## Introduction
+This repository contains the code for the paper **"Textual Entailment for Link Prediction in WordNet"**. Our approach leverages the abstraction capabilities of Large Language Models (LLMs) to tackle link prediction within a knowledge base, specifically WN18RR. Our method demonstrates state-of-the-art performance using a base-size model.
 
-### Conda venv
+## Installation 🛠
 
-```[bash]
-   git clone git@github.com:ClementBLV/knowledge_base_population.git
-   cd /knowledge_base_population
-   python3 -m venv ~/ venvFicus
-   source ~/venvFicus/bin/activate
-   pip install -r requirement.txt
+### Prerequisites
+- Python installed
+- SSH key of your GitHub account configured
+
+### Conda Virtual Environment
+
+#### Using `venv`
+```bash
+git clone git@github.com:ClementBLV/knowledge_base_population.git
+cd knowledge_base_population
+python3 -m venv ~/venvFicus
+source ~/venvFicus/bin/activate
+pip install -r requirements.txt
 ```
-### Conda env 
 
-```[bash]
-   git clone git@github.com:ClementBLV/knowledge_base_population.git
-   cd /knowledge_base_population
-   conda create -n KBentail python=3.9
-   conda activate KBentail
-   pip install -r requirement.txt
+#### Using `conda`
+```bash
+git clone git@github.com:ClementBLV/knowledge_base_population.git
+cd knowledge_base_population
+conda create -n KBentail python=3.9
+conda activate KBentail
+pip install -r requirements.txt
 ```
+
+## Usage 🚀
+
+### Datasets
+For all our experiments, we use the WN18RR dataset, available in the `data` folder. The data preprocessing code is adapted from the [SimCKG](https://github.com/intfloat/SimKGC) repository.
+
+### Models
+We use `deberta-base-v3` as our model. The models are available on Hugging Face:
+- Pre-trained on entailment tasks: [`MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli`](https://huggingface.co/MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli)
+- Without prior training: [`microsoft/deberta-v3-base`](https://huggingface.co/microsoft/deberta-v3-base)
+
 ### Pipeline 
 
 <CENTER>
@@ -57,46 +81,50 @@ src="https://github.com/ClementBLV/knowledge_base_population/blob/main/doc/sch%C
 WIDTH=100%>
 </CENTER>
 
-## Get started 🚀
+## Run Training 🏃
 
-### Dataset 
-
-For all our experiments we have used three datasets: WR18RR dataset, available in the `data` file. The code to preprocess the data was heavily inspired by the code of the official repo of [SimCKG](https://github.com/intfloat/SimKGC) paper. 
-### Models 
-
-We have used `deberta-dase-v3` as our model, all models used are available on hugging face. We have two pre-trained models, one with prior training on entailment task name `"MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"` ([here](https://huggingface.co/MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli)) and another one without `"microsoft/deberta-v3-base"` ([here](https://huggingface.co/microsoft/deberta-v3-base))
-
-### Run scipts 
-- *Run training*
-
-All the training was done on GTXForce 1060, the hyperparameters are available in the section hyperparameters of the appendix ([here]()). To train our model we have adapted the script `run_glue`. given by hugging face. Before running the scripts, you can either activate your conda environment with the command: `conda activate KBentail`, or you can directly precise the path of your venv in the second line of the scripts `source //PATH_TO_YOUR_VENV/YOUR_VENV/bin/activate`
-
-```[bash]
-	source script_train.sh 
+### Bash
+```bash
+source script_train_expert.sh \
+  --split 1 \
+  --both false \
+  --bias true \
+  --processed_data_directory ~/knowledge_base_population/data/FB15k237/ \
+  --model "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli" \
+  --output_dir ~/knowledge_base_population/data/FB15k237/weights \
+  --task "fb" \
+  --no_training false #(to check the installation) / true #(to launch the training)
 ```
 
-- *Run inference*
+### Docker
+To build and run the Docker containers:
+1. Build Docker containers:
+   ```bash
+   sh build_docker.sh
+   ```
+    This command will build six docker container each one corresponding to a different split (1; 5; 7; 10; 20 and 100 %). If you only want one container with a given split value you should consider to modify the for loop in this file. 
+2. Run Docker containers:
+   ```bash
+   docker run -v `pwd`/volume split_1 [--no_training]
+   ```
+   As in the section above the argument `--no_training` means that no training will be done, it is usefull to check the installation and the build was done correctly. To run the training you should remove it.  
 
-```[bash]
-	
-```
+### Colab
+You can also run the training in Google Colab. Click the icon below to open the notebook:
 
-- *Run evaluations*
+[![Colab](https://img.shields.io/static/v1?label=Google&message=Open+with+Colab&color=blue&style=plastic&logo=google-colab)](https://colab.research.google.com/drive/16FhTJkbedGBKlUVF52hH3enEybqaWkhN#scrollTo=maNLM25S2i8q)
 
-```[bash]
-	source script_eval.sh 
-```
-
-### Expected results : 
-
-The expected results are given in the paper and detailed in the appendix available [here](https://github.com/ClementBLV/knowledge_base_population/doc/blob/main/Entailement_Paper___appendix.pdf)
-
-
+## Results ✌️
+The expected results and detailed evaluations are provided in the appendix, available [here](https://github.com/ClementBLV/knowledge_base_population/doc/blob/main/Entailement_Paper___appendix.pdf).
 
 ## Citation
-
 If you find our paper or code repository helpful, please consider citing as follows:
 
-```
-bibtex
+```bibtex
+@article{beliveau2024textual,
+  title={Textual Entailment for Link Prediction in WordNet},
+  author={Beliveau, Clément and Blanco, Guillermo Echegoyen and Gómez-Pérez, José Manuel},
+  journal={EKAW 2024},
+  year={2024}
+}
 ```
