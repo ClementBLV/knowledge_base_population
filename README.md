@@ -14,7 +14,7 @@ Welcome to the official code repository for the ESWC 2024 paper **"Textual Entai
 <body> 
 	<div class="image-container" style="display: flex; align-items: center;"> 
 		<img src="https://www.pole-emc2.fr/app/uploads/logos_adherents/91fff3f6-c993-67c6-68ae-53957c2f623d-768x522.png" alt="Image 1" height="100" style="margin-right: 20px;">
-		<img src="https://www.expert.ai/wp-content/uploads/2020/09/logo-new.png" alt="Image 2" height="50"> 
+		<img src="https://www.expert.ai/wp-content/uploads/2020/09/logo-new.png" alt="Image 2" height="50" style="margin-top: -35px;"> 
 	</div> 
 </body>
 </html>
