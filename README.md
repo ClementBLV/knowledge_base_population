@@ -9,17 +9,6 @@ Welcome to the official code repository for the ESWC 2024 paper **"Textual Entai
 - **Paper:** [Available here](https://.pdf)
 - **Authors:** Clément BELIVEAU ([IMT Atlantique](https://www.imt-atlantique.fr/en)), Guillermo Echegoyen Blanco, and José Manuel Gómez-Pérez ([Expert.ai](https://www.expert.ai))
 <html>
-<head>
-    <style>
-        .center {
-            text-align: center;
-            margin-top: 20%;
-        }
-        .center img {
-            width: 25%;
-        }
-    </style>
-</head>
 <body>
     <div class="center">
         <img src="https://github.com/ClementBLV/knowledge_base_population/blob/main/doc/logos.png" alt="Logos">
