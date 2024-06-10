@@ -118,7 +118,7 @@ def rank(mnli_input: MNLIInputFeatures, number_relation: int = 11):
     ]  # pour le truc global mais on va aussi return la relation
 
 
-def compute_hits_at_k(shots, element=0, k_values=[1, 3]):
+def compute_hits_at_k(shots, element=0, k_values=[1, 3, 10]):
     """
     shots : list of ranked index (the position correspond to the index)
     element : element in the list we want to compute the hit@
