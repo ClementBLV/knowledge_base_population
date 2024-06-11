@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # smaller possible split
-split=1
+split=100
 base_dir="$(pwd)/internal_volume"
 no_training=false
 both=false
