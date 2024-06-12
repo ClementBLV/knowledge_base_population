@@ -723,13 +723,13 @@ def main():
 
         ## wandb ####
         # Get the metrics
-        train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        metrics = train_result.metrics
-        train_loss = metrics["train_loss"]
-        try:
-            learning_rate = trainer.optimizer.lr_scheduler.get_last_lr()[0]
-        except:
-            learning_rate = trainer.optimizer.param_groups[0]["lr"]
+        #train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        #metrics = train_result.metrics
+        #train_loss = metrics["train_loss"]
+        #try:
+        #    learning_rate = trainer.optimizer.lr_scheduler.get_last_lr()[0]
+        #except:
+        #    learning_rate = trainer.optimizer.param_groups[0]["lr"]
 
         # Log training metrics to WandB
         #wandb.log({"train_loss": train_loss, "learning_rate": learning_rate})
@@ -774,9 +774,9 @@ def main():
 
         ## wandb ###
         # Get the metrics
-        metrics = trainer.evaluate(eval_dataset=eval_dataset)
-        eval_loss = metrics["eval_loss"]
-        eval_accuracy = metrics["eval_accuracy"]
+        #metrics = trainer.evaluate(eval_dataset=eval_dataset)
+        #eval_loss = metrics["eval_loss"]
+        #eval_accuracy = metrics["eval_accuracy"]
         # Log evaluation metrics to WandB
         #wandb.log({"eval_loss": eval_loss, "eval_accuracy": eval_accuracy})
 
