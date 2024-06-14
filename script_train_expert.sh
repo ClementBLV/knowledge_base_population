@@ -86,23 +86,28 @@ run_experiment() {
             DO_PREPROCESS=true
         fi
 
-        
+    if [ "$BOTH" == "true" ]; then
+        both_indicator="2w"
+    else
+        both_indicator="1w"
+    fi
+
     case "$MODEL" in
         'microsoft/deberta-v3-base')
             if $BIAS; then
-                save_name="untrained_2w_derbertabase_biased_split${split}_v$i"
+                save_name="untrained_${both_indicator}_derbertabase_biased_split${split}_v$i"
                 echo "UNTRAINED + BIAS!!"
             else
-                save_name="untrained_2w_derbertabase_unbiased_split${split}_v$i"
+                save_name="untrained_${both_indicator}_derbertabase_unbiased_split${split}_v$i"
                 echo "UNTRAINED + UNBIAS!!"
             fi
             ;;
         'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli')
             if $BIAS; then
-                save_name="trained_2w_derbertabase_biased_split${split}_v$i"
+                save_name="trained_${both_indicator}_derbertabase_biased_split${split}_v$i"
                 echo "TRAINED + BIAS!!"
             else
-                save_name="trained_2w_derbertabase_unbiased_split${split}_v$i"
+                save_name="trained_${both_indicator}_derbertabase_unbiased_split${split}_v$i"
                 echo "TRAINED + UNBIAS!!"
             fi
             ;;
