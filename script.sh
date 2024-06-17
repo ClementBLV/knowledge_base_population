@@ -89,7 +89,7 @@ if [ "$TRAIN_BOOL" == "true" ]; then
         echo "split $SPLIT %"
 
         python3 src/split.py \
-            --input_file $TEST".json" \
+            --input_file $TRAIN".json" \
             --percentage $SPLIT \
             --bias $BIAS\
             --threshold_effectif "923"\
