@@ -143,8 +143,6 @@ run_experiment() {
           --split $split \
           --model_name_or_path "$MODEL" \
           --do_train \
-          --do_eval \
-          --do_predict \
           --train_file "${P_FILE}train_${split}.mnli.json" \
           --test_file "${P_FILE}test.mnli.json" \
           --validation_file "${P_FILE}valid.mnli.json" \
@@ -164,6 +162,8 @@ run_experiment() {
           --save_total_limit "1" \
           --ignore_mismatched_sizes "True" > "$BASE/log/train_${save_name}.log"  2>&1
 
+        #--do_eval \
+        #--do_predict \
 
         echo "=========== EVALUATION ============"
         # run evaluation 
