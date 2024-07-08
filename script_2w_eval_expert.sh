@@ -6,12 +6,15 @@ INPUT_FILE="${BASE}/data/FB15k237/test_eval.json"
 INPUT_FILE_INDIRECT="${BASE}/data/FB15k237/test_eval_indirect.json"
 OUTPUT_FILE="${BASE}/eval"
 NORMALISE="true"
+TEST=$ROOT"source/test"
 
 show_help() {
     echo "Usage: source $0 [options]"
     echo
     echo "Options:"
     echo "  --weights_path MODEL          Specify the model; should be the path to inside a checkpoints"
+    echo "  --model MODEL                 Specify the model; should be a Hugging Face ID, e.g., 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli'. for the tokenizer"
+    echo "  --task STR                      Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
     echo "  --processed_data_directory DIR      Set the path where the processed test file for evaluation is stored are saved (here indirect and direct test set)."
     echo "  --input_file FILE             Path to the input file (default: ${BASE}/data/FB15k237/test_eval.json)"
     echo "  --input_file_indirect FILE    Path to the indirect input file (default: ${BASE}/data/FB15k237/test_eval_indirect.json)"
@@ -25,6 +28,8 @@ show_help() {
 # Parse command-line arguments
 declare -A args=(
     [--weights_path]=WEIGHTS_PATH
+    [--model]=MODEL
+    [--task]=TASK
     [--processed_data_directory]=P_FILE
     [--output_file]=OUTPUT_FILE
     [--model_name]=MODEL_NAME
