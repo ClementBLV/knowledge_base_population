@@ -6,7 +6,6 @@ INPUT_FILE="${BASE}/data/FB15k237/test_eval.json"
 INPUT_FILE_INDIRECT="${BASE}/data/FB15k237/test_eval_indirect.json"
 OUTPUT_FILE="${BASE}/eval"
 NORMALISE="true"
-TEST=$ROOT"source/test"
 
 show_help() {
     echo "Usage: source $0 [options]"
@@ -55,6 +54,16 @@ while [ $# -gt 0 ]; do
 done
 
 echo "******* EVAL *******"
+
+
+if [[ "$TASK" == "wordnet" || "$TASK" == "wn" || "$TASK" == "wn18rr" ]]; then
+    ROOT=$BASE"/data/WN18RR/"
+else 
+    ROOT=$BASE"/data/FB15k237/"
+fi
+
+TEST=$ROOT"source/test"
+
 
 
 # creation of the test files : 
