@@ -96,7 +96,7 @@ if [ "$TRAIN_BOOL" == "true" ]; then
             --output_file $P_FILE"train_"$SPLIT".json"
 
         # convert to mnli format
-        python3 src/wn2mnli.py \
+        python3 src/data2mnli.py \
             --input_file $P_FILE"train_"$SPLIT".json" \
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
             --both $BOTH \
@@ -110,7 +110,7 @@ fi
 # convert to NLI format
 if [ "$TEST_BOOL" == "true" ]; then
     echo "******* TEST *******"
-    python3 src/wn2mnli.py \
+    python3 src/data2mnli.py \
         --input_file $TEST".json" \
         --output_file $P_FILE"test.mnli.json" \
         --both $BOTH \
@@ -119,7 +119,7 @@ fi
 
 if [ "$VALID_BOOL" == "true" ]; then
     echo "******* VALID *******"
-    python3 src/wn2mnli.py \
+    python3 src/data2mnli.py \
         --input_file $VALID".json" \
         --output_file $P_FILE"valid.mnli.json" \
         --both $BOTH \

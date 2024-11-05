@@ -10,10 +10,18 @@ import pathlib
 
 parser = argparse.ArgumentParser(description="preprocess")
 parser.add_argument(
-    "--task", default="wn18rr", type=str, metavar="N", help="dataset name"
+    "--task", 
+    default="wn18rr", 
+    type=str, 
+    metavar="N", 
+    help="dataset name"
 )
 parser.add_argument(
-    "--workers", default=2, type=int, metavar="N", help="number of workers"
+    "--workers", 
+    default=2, 
+    type=int, 
+    metavar="N", 
+    help="number of workers"
 )
 parser.add_argument(
     "--train-path",
@@ -166,7 +174,7 @@ def generate_nli_data_freebase(path):
     print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
 
-
+# TODO : changer ça pour le cas de wn ET fb puissent être géré 
 def main():
     """path = "./data/WN18RR/test.txt"
     hypos2premises = generate_nli_data(path)
