@@ -1,70 +1,61 @@
+import logging
+import os
 import preprocess
 import pandas as pd
 import nltk
-
-
 import argparse
 import json
 import pathlib
+import logger
 
+################ setup : logger ################
+logger = logging.getLogger(__name__)
+logger.setup_logging()
 
+def path_check(p):
+    os.makedirs(p, exist_ok=True)
+    if os.path.splitext(args.train_path)[1].lower() == ".txt": 
+        return p
+    else :
+        raise argparse.ArgumentError('The path must be a .txt file')
+
+################ setup : args ################
 parser = argparse.ArgumentParser(description="preprocess")
-parser.add_argument(
-    "--task", 
-    default="wn18rr", 
-    type=str, 
-    metavar="N", 
-    help="dataset name"
-)
-parser.add_argument(
-    "--workers", 
-    default=2, 
-    type=int, 
-    metavar="N", 
-    help="number of workers"
-)
-parser.add_argument(
-    "--train-path",
-    default="./data/WN18RR/train.txt",
-    type=str,
-    metavar="N",
-    help="path to training data",
-)
-parser.add_argument(
-    "--valid-path",
-    default="./data/WN18RR/valid.txt",
-    type=str,
-    metavar="N",
-    help="path to valid data",
-)
-parser.add_argument(
-    "--test-path",
-    default="./data/WN18RR/test.txt",
-    type=str,
-    metavar="N",
-    help="path to test data",
-)
-
+parser.add_argument("--task", required=True, type=str, metavar="N", 
+                    help="dataset name : wordnet, wn, wn18rr or freebase, fb, fb15k237")
+parser.add_argument("--workers", default=2, type=int, metavar="N", 
+                    help="number of workers")
+parser.add_argument("--train_path", required=True, type=path_check, metavar="N",
+                    help="path to training data",)
+parser.add_argument("--valid_path", required=True, type=path_check, metavar="N",
+                    help="path to valid data",)
+parser.add_argument("--test_path", required=True, type=path_check, metavar="N",
+                    help="path to test data",)
 args = parser.parse_args()
 
 
-### Global fonction
+################ function : Global ################
 def generate_nli_data(path: str, dataset: str = args.task):
     assert (
         type(dataset) == type("str")
     ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
     
     if dataset.lower() in ["wordnet", "wn", "wn18rr"]:
+        logger.info("Task : WORDNET")
         nltk.download("wordnet")
         from nltk.corpus import wordnet as wn
         return generate_nli_data_wordnet(path)
     
     if dataset.lower() in ["freebase", "fb", "fb15k237"]:
+        logger.info("Task : FREEBASE")
         return generate_nli_data_freebase(path)
+    else : 
+        logger.error("The task is unknown")
+        raise TypeError("Unknown task called")
 
-
-### case of wordnet
+################ function : Wordnet ################
 def generate_nli_data_wordnet(path):
+    """Dataset generator for wornet - in ordor to have usable information for each nodes"""
     head2tail_dict = preprocess.preprocess_wn18rr(path)
     head2tail_df = pd.DataFrame(head2tail_dict)
     hypos2premises = []
@@ -103,12 +94,15 @@ def generate_nli_data_wordnet(path):
         hypos2premises.append(hypo2premise)
 
     out_path = path.replace("txt", "json")
-    json.dump(
-        hypos2premises,
-        open(out_path, "w", encoding="utf-8"),
-        ensure_ascii=False,
-        indent=4,
-    )
+    try :
+        json.dump(
+            hypos2premises,
+            open(out_path, "w", encoding="utf-8"),
+            ensure_ascii=False,
+            indent=4,
+        )
+    except (IOError, OSError) as e:
+        logger.error(f"Error writing file: {e}")
     print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
 
@@ -132,8 +126,7 @@ def get_synset(name, id):
     else:
         print("+" + name)
 
-
-### case of freebase
+################ function : Freebase ################
 def generate_nli_data_freebase(path):
     head2tail_dict, desciptions = preprocess.preprocess_fb15k237(path)
     all_id = list(desciptions.keys())
@@ -165,19 +158,21 @@ def generate_nli_data_freebase(path):
             hypos2premises.append(hypo2premise)
 
     out_path = path.replace("txt", "json")
-    json.dump(
-        hypos2premises,
-        open(out_path, "w", encoding="utf-8"),
-        ensure_ascii=False,
-        indent=4,
-    )
+    try : 
+        json.dump(
+            hypos2premises,
+            open(out_path, "w", encoding="utf-8"),
+            ensure_ascii=False,
+            indent=4,
+        )
+    except (IOError, OSError) as e:
+        logger.error(f"Error writing file: {e}")
     print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
 
-# TODO : changer ça pour le cas de wn ET fb puissent être géré 
 def main():
     """path = "./data/WN18RR/test.txt"
-    hypos2premises = generate_nli_data(path)
+    hypos2premises = generate_nli_data(args.test_path, args.task)
     print(pd.DataFrame(hypos2premises))"""
 
     generate_nli_data(args.train_path, args.task)
