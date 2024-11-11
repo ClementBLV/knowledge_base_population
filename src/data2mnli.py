@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from collections import defaultdict, Counter
+import logging
 from typing import Dict
 import numpy as np
 import json
@@ -18,14 +19,16 @@ from templates import (
 )
 import os
 
+################ setup : config ################
 random.seed(0)
 np.random.seed(0)
-
 sys.path.append("./")
+logger = logging.getLogger(__name__)
+logger.setup_logging()
 # directly express in the code for WN
 # from a2t.relation_classification.tacred import TACRED_LABEL_TEMPLATES, TACRED_LABELS
 
-
+################ setup : data objects ################
 @dataclass
 class REInputFeatures:
     head_id: str
@@ -43,15 +46,14 @@ class MNLIInputFeatures:
     hypothesis: str  # relation
     label: int
 
-
+################ setup : parser ################
 parser = ArgumentParser()
-
 parser.add_argument("--input_file", type=str, default="data/WN18RR/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid.mnli.json")
-parser.add_argument("--negn", type=int, default=1)
-parser.add_argument("--direct", type=bool, default=True)
-parser.add_argument("--both", type=bool, default=False)
-parser.add_argument("--task", default="wn18rr", type=str, metavar="N", help="dataset name")
+parser.add_argument("--negn", type=int, default=1, help="Number of negative examples for each pair")
+parser.add_argument("--direct", type=bool, default=True, help="If set on True only the direct relation will be present.")
+parser.add_argument("--both", type=bool, default=False, help="If set on True the direct and inverse relation will be present")
+parser.add_argument("--task", required=True, type=str, metavar="N", help="dataset name")
 args = parser.parse_args()
 
 assert (
@@ -64,6 +66,8 @@ if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
 if args.task.lower() in ["freebase", "fb", "fb15k237"]:
     LABELS = list(FB_LABEL_TEMPLATES.keys())
     LABEL_TEMPLATES = FB_LABEL_TEMPLATES
+else : 
+    raise TypeError("The task called is unknown")
 
 print("=========== CONVERTION ============")
 print("convert ", args.input_file, " into NLI dataset")
