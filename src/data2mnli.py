@@ -12,8 +12,6 @@ from pathlib import Path
 from templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
-    templates_direct,
-    template_indirect,  # TODO andle the indirect case
     FORBIDDEN_MIX,
     FB_LABEL_TEMPLATES
 )
@@ -56,6 +54,10 @@ parser.add_argument("--both", type=bool, default=False, help="If set on True the
 parser.add_argument("--task", required=True, type=str, metavar="N", help="dataset name")
 args = parser.parse_args()
 
+################ setup : variables ################
+logger.info("=========== CONVERTION ============")
+logger.info(f"Task called: {args.task}")
+logger.info(f"Convert {args.input_file} into NLI dataset")
 assert (
         type(args.task) == type("str")
     ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
@@ -69,36 +71,43 @@ if args.task.lower() in ["freebase", "fb", "fb15k237"]:
 else : 
     raise TypeError("The task called is unknown")
 
-print("=========== CONVERTION ============")
-print("convert ", args.input_file, " into NLI dataset")
-
-
-# to correspond to the config of pretrained model
+# to correspond to the config of pretrained model - TO CHECK 
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 
-positive_templates: Dict[str, list] = defaultdict(list)
-negative_templates: Dict[str, list] = defaultdict(list)
+################ setup : saving file ################
+path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
+output_file_path = Path(path)
+output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
+################ setup : templates ################
 templates = []
 if args.direct and not (args.both):
     # direct case
+    logger.info("Type : only direct relations")
     for relations in LABELS:
-        templates.append(
-            LABEL_TEMPLATES[relations][0]
-        )  # the first ones are the direct labels
+        templates.append(LABEL_TEMPLATES[relations][0])
+        # the first ones are the direct labels
 if not (args.direct) and not (args.both):
     # indirect case
+    logger.info("Type : only reverse relations")
     for relations in LABELS:
         templates.append(LABEL_TEMPLATES[relations][1])
 if args.both:
+    logger.info("Type : both relations")
     for relations in LABELS:
         # this time we add both the direct and indirect
         templates.extend(LABEL_TEMPLATES[relations])
+
+
+################ setup : positive-nagative examples ################
+
+positive_templates: Dict[str, list] = defaultdict(list)
+negative_templates: Dict[str, list] = defaultdict(list)
 # generate a two dict,
 # n°1 : positive_templates
 #   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
 # n°2 : negative_templates
-#   {label of the relation in the dataset: "all the other pattern not related to this label, eg contradiction"}
+#   {label of the relation in the dataset: "all the other pattern not related to this label, eg CONTRADCTION"}
 for relation in LABELS:
     # if not args.negative_pattern and label == "no_relation":
     #    continue
@@ -113,7 +122,7 @@ for relation in LABELS:
             # else the direct and indirect aire added
         else:
             if relation not in FORBIDDEN_MIX.keys():
-                # not a relations with issues of similarity
+                # not a relations with issues of similarity, it can be put as a contradiction
                 negative_templates[relation].append(template)
 
             else:
@@ -122,8 +131,7 @@ for relation in LABELS:
                     template not in FORBIDDEN_MIX[relation]
                 ):  # avoidthe template to wich this relation is too close
                     negative_templates[relation].append(template)
-# pprint(positive_templates)
-# pprint(negative_templates)
+
 # load the forbidden couples
 if args.task in ["wordnet", "wn", "wn18rr"]:
     with open(
@@ -132,17 +140,17 @@ if args.task in ["wordnet", "wn", "wn18rr"]:
         ),
         "rt",
     ) as f:
-        id2forbidden = json.load(
-            f
-        )  # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+        id2forbidden = json.load(f)  
+        # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
 else : 
     id2forbidden = [{}]
 
-def wn2mnli_with_negative_pattern(
+
+################ function : MNLI format ################
+def data2mnli_with_negative_examples(
     instance: REInputFeatures,
     positive_templates,
     negative_templates,
-    templates,
     negn,
     posn=1,
 ):
@@ -156,7 +164,6 @@ def wn2mnli_with_negative_pattern(
         )
     else:  # no need to randomly pick up examples as all of them must be picked up
         positive_template = positive_templates[instance.relation]
-    # print(positive_template)
 
     # add the templates to the relation
     mnli_instances.extend(
@@ -215,15 +222,15 @@ def wn2mnli_with_negative_pattern(
     return mnli_instances
 
 
-wn2mnli = wn2mnli_with_negative_pattern  # if args.negative_pattern else tacred2mnli
+data2mnli = data2mnli_with_negative_examples  # if args.negative_pattern else tacred2mnli
 
-
+################ function : data population ################
 with open(args.input_file, "rt") as f:
     mnli_data = []
     stats = []
     relations = []
     for line in json.load(f):
-        mnli_instance = wn2mnli(
+        mnli_instance = data2mnli(
             REInputFeatures(
                 head_id=line["head_id"],
                 tail_id=line["tail_id"],
@@ -234,19 +241,13 @@ with open(args.input_file, "rt") as f:
             ),
             positive_templates,
             negative_templates,
-            templates_direct,
             negn=args.negn,
         )
         mnli_data.extend(mnli_instance)
         relations.append(line["relation"])
         stats.append(line["relation"] != "no_relation")
 
-path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
-
-# Ensure file exists
-output_file_path = Path(path)
-output_file_path.parent.mkdir(exist_ok=True, parents=True)
-
+################ function : save ################
 ## cf wn2eval pour corriger le bug
 with open(args.output_file, "wt") as f:
     print(f"writing file : {args.output_file}")
@@ -254,13 +255,11 @@ with open(args.output_file, "wt") as f:
         f.write(f"{json.dumps(data.__dict__)}\n")
     # json.dump([data.__dict__ for data in mnli_data], f, indent=2)
 
-# save
 json.dump(
     [data.__dict__ for data in mnli_data], open(path, "w", encoding="utf-8"), indent=4
 )
 
+logger.info(f"Saved at location : {args.output_file}")
+
 count = Counter([data.label for data in mnli_data])
-print("Number of links : ", count)
-count = Counter(relations)
-pprint(dict(count))
-print("saved at location : ", args.output_file)
+logger.info(f"Number of links : {count}")
