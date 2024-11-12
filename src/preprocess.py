@@ -5,7 +5,7 @@ import multiprocessing as mp
 
 from multiprocessing import Pool
 from typing import List
-
+"""
 parser = argparse.ArgumentParser(description="preprocess")
 parser.add_argument(
     "--task", default="wn18rr", type=str, metavar="N", help="dataset name"
@@ -25,7 +25,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 mp.set_start_method("fork")
-
+"""
 
 def _check_sanity(relation_id_to_str: dict):
     # We directly use normalized relation string as a key for training and evaluation,
@@ -209,7 +209,7 @@ def preprocess_fb15k237(path):
     return examples, fb15k_id2desc
 
 
-
+"""
 def main():
     all_examples = []
     for path in [args.train_path, args.valid_path, args.test_path]:
@@ -235,7 +235,7 @@ def main():
         id2text=id2text)
     print('Done')
 
-
+"""
 
 #if __name__ == "__main__":
 #    main()

@@ -76,9 +76,9 @@ args = parser.parse_args()
 os.makedirs(args.output_dir, exist_ok=True)
 logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
+logger.info(f"Save location : {args.output_dir}, Save name : {args.model_name}")
 
 ################ load : model ################
-
 model_name = args.model_name
 max_length = 512
 
