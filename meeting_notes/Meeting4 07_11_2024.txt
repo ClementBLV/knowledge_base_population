@@ -1,0 +1,27 @@
+Meeting Notes 07/11/2024
+In order to support the utility of our paper we need to showcase the advantages of EntKGC against the Sota. 
+-	Claim 1 : entailment is a good proxy task for relation prediction in a KB setting + first time it has been used in order to solve this task (before KB embedding- structure based method). Relation prediction is different from relation extraction where this proxy tack as already been used. Here we are to unrelated text from which to predict a relation between two nodes while in relation extraction we have one text from which to extract a relation between two entities. A description is different from a text, as a description can be equivalent to the sense of a word. 
+-	Claim 2 : EntKBC has a higher interpretability compared to previous methods. Why ??  the verbalization of the relation which give us more control on the interpretation of the relation (human crafted). But in what way the human/llm intervention in crafting the relation is an advantage ? And how to show it ? 
+
+ROADMAP: 
+Priority : do the experiment with a 100% (monitor global training time)  see the results and maybe check with 20% to invoke the few shot performances == can be good for the construction of the KB eg when you don’t have that much data at the beginning in order to initiate the population of the KB. 
+TODOs ; 
+Hardware : 
+-	Find and configure a school GPU 
+-	Configure Expert.ai GPU (install Docker) 
+Code : TRAINING 
+-	Find a small model and a small train/test/valid set for prototyping new run glue (named hf_trainer.py)
+-	Rewrite runglue.py program, it is way too complicated to modify and understand what going on like that
+-	test hf_trainer on school GPU to check bugs (without docker)
+-	test hf_trainer on expert server to check bugs (with docker) 
+-	see to improve its speed on expert server (new parameters + parallelization) 
+Code : IMPROVEMENT 
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+-	Implement majority voting as intermediate step 
+-	Build a meta model : Use the newly trained models to generate a training set for the meta model 
+
+Code : EVALUATION 
+-	add MRR in the evaluation metric 
+-	Improve evaluation speed with parallelization
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 
