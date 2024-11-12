@@ -139,41 +139,14 @@ run_experiment() {
         touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
-        python3 "src/run_glue.py" \
-          --split $split \
-          --model_name_or_path "$MODEL" \
-          --do_train \
-          --train_file "${P_FILE}train_${split}.mnli.json" \
-          --test_file "${P_FILE}test.mnli.json" \
-          --validation_file "${P_FILE}valid.mnli.json" \
-          --max_seq_length "128" \
-          --per_device_train_batch_size "1" \
-          --gradient_accumulation_steps "32" \
-          --learning_rate "4e-6" \
-          --warmup_ratio "0.1"  \
-          --weight_decay "0.06"  \
-          --num_train_epochs "3" \
-          --logging_strategy "steps" \
-          --logging_steps "100" \
-          --evaluation_strategy "steps" \
-          --eval_steps  "100" \
-          --fp16 "True" \
-          --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
-          --save_total_limit "1" \
-          --ignore_mismatched_sizes "True" > "$BASE/log/train_${save_name}.log"  2>&1
-
-        #--do_eval \
-        #--do_predict \
-
-        echo "=========== EVALUATION ============"
-        # run evaluation 
-        source "script_eval_expert.sh" \
-          --split $split \
-          --model $MODEL \
-          --save_name $save_name \
-          --weights_path "$OUTPUT_DIR/${TASK_NAME}_${TASK}/$save_name/" \
-          --processed_test_dir "$P_FILE" \
-          --i $i
+        python3 "src/hf_trainer.py" \
+            --model_name "$MODEL" \
+            --do_train "yes"\
+            --train_file "${P_FILE}train_${split}.mnli.json" \
+            --test_file "${P_FILE}test.mnli.json" \
+            --validation_file "${P_FILE}valid.mnli.json" \
+            --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/" \
+            --save_name $save_name
     fi
 
     # Remove the generated datasets
