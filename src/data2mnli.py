@@ -21,8 +21,10 @@ import os
 random.seed(0)
 np.random.seed(0)
 sys.path.append("./")
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
-logger.setup_logging()
+logger.info("Progam : data2mnli.py ****")
+
 # directly express in the code for WN
 # from a2t.relation_classification.tacred import TACRED_LABEL_TEMPLATES, TACRED_LABELS
 
@@ -55,7 +57,7 @@ parser.add_argument("--task", required=True, type=str, metavar="N", help="datase
 args = parser.parse_args()
 
 ################ setup : variables ################
-logger.info("=========== CONVERTION ============")
+print("=========== CONVERTION ============")
 logger.info(f"Task called: {args.task}")
 logger.info(f"Convert {args.input_file} into NLI dataset")
 assert (
@@ -250,7 +252,7 @@ with open(args.input_file, "rt") as f:
 ################ function : save ################
 ## cf wn2eval pour corriger le bug
 with open(args.output_file, "wt") as f:
-    print(f"writing file : {args.output_file}")
+    logger.info(f"Saveing : writing file : {args.output_file}")
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     # json.dump([data.__dict__ for data in mnli_data], f, indent=2)

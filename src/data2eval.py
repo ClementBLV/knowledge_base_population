@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from collections import defaultdict, Counter
+import logging
 from pathlib import Path
 from typing import Dict, List
 import numpy as np
@@ -17,6 +18,10 @@ from templates import (
 )
 random.seed(0)
 np.random.seed(0)
+################ setup : logger ################
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
+logger.info("Progam : data2eval.py ****")
 
 sys.path.append("./")
 # directly express in the code for WN
@@ -49,7 +54,7 @@ parser.add_argument("--task", type=str, default="fb")
 
 args = parser.parse_args()
 print("=========== CONVERTION ============")
-print("convert ", args.input_file, " into NLI dataset")
+logger.info(f"convert {args.input_file} into NLI dataset")
 
 
 # Initialize the lists for direct and indirect templates
@@ -75,6 +80,7 @@ if args.task.lower() in ["freebase", "fb", "fb15k237"]:
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
+logger.info(f"Label : the label used are {labels2id}")
 
 positive_templates: Dict[str, list] = defaultdict(list)
 negative_templates: Dict[str, list] = defaultdict(list)
@@ -166,7 +172,7 @@ output_file_path = Path(path)
 output_file_path.parent.mkdir(exist_ok=True, parents=True)
 
 with open(path, "wt") as f:
-    print(f"writing file : {args.output_file}")
+    logger.info(f"Saving : Writing file : {args.output_file}")
     for data in mnli_data:
         f.write(f"{json.dumps(data.__dict__)}\n")
     # json.dump([data.__dict__ for data in mnli_data], f, indent=2)
@@ -175,4 +181,4 @@ with open(path, "wt") as f:
 json.dump(
     [data.__dict__ for data in mnli_data], open(path, "w", encoding="utf-8"), indent=4
 )
-print("saved at location : ", args.output_file)
+logger.info(f"Save : saved at location : {args.output_file}")
