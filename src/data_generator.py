@@ -1,20 +1,21 @@
 import logging
+
+################ setup : logger ################
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
+logger.info("Progam : data_generator.py ****")
+
 import os
+import sys
 import preprocess
 import pandas as pd
 import nltk
 import argparse
 import json
-import pathlib
-import logger
-
-################ setup : logger ################
-logger = logging.getLogger(__name__)
-logger.setup_logging()
 
 def path_check(p):
-    os.makedirs(p, exist_ok=True)
-    if os.path.splitext(args.train_path)[1].lower() == ".txt": 
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    if os.path.splitext(p)[1].lower() == ".txt":
         return p
     else :
         raise argparse.ArgumentError('The path must be a .txt file')
@@ -56,7 +57,7 @@ def generate_nli_data(path: str, dataset: str = args.task):
 ################ function : Wordnet ################
 def generate_nli_data_wordnet(path):
     """Dataset generator for wornet - in ordor to have usable information for each nodes"""
-    head2tail_dict = preprocess.preprocess_wn18rr(path)
+    head2tail_dict = preprocess.preprocess_wn18rr(path) #TODO give directly the good path here
     head2tail_df = pd.DataFrame(head2tail_dict)
     hypos2premises = []
     for index in range(0, len(head2tail_df)):
@@ -93,7 +94,10 @@ def generate_nli_data_wordnet(path):
         hypo2premise["relation"] = triplet["relation"]
         hypos2premises.append(hypo2premise)
 
-    out_path = path.replace("txt", "json")
+    file_name = os.path.basename(path).replace(".txt", ".json")  # Change .txt to _source.json
+    out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', file_name)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
     try :
         json.dump(
             hypos2premises,
@@ -103,7 +107,7 @@ def generate_nli_data_wordnet(path):
         )
     except (IOError, OSError) as e:
         logger.error(f"Error writing file: {e}")
-    print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
+    logger.info("Save : {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
 
 
@@ -157,7 +161,10 @@ def generate_nli_data_freebase(path):
             hypo2premise["relation"] = triplet["relation"]
             hypos2premises.append(hypo2premise)
 
-    out_path = path.replace("txt", "json")
+    file_name = os.path.basename(path).replace(".txt", ".json")  # Change .txt to _source.json
+    out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', file_name)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
     try : 
         json.dump(
             hypos2premises,
@@ -167,7 +174,8 @@ def generate_nli_data_freebase(path):
         )
     except (IOError, OSError) as e:
         logger.error(f"Error writing file: {e}")
-    print("Save {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
+
+    logger.info("Save : {} hypothesis and premises to {}".format(len(hypos2premises), out_path))
     return hypos2premises
 
 def main():
