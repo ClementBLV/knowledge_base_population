@@ -61,33 +61,33 @@ else
     ROOT=$BASE"/data/FB15k237/"
 fi
 
-TRAIN=$ROOT"source/train"
-TEST=$ROOT"source/test"
-VALID=$ROOT"source/valid"
+TRAIN=$ROOT"preprocessed/train"
+TEST=$ROOT"preprocessed/test"
+VALID=$ROOT"preprocessed/valid"
 
 if [ "$DO_PREPROCESS" == "true" ]; then
     # preprocess the raw dataset
     python3 src/data_generator.py \
                 --task "$TASK" \
-                --train-path $TRAIN".txt" \
-                --valid-path $VALID".txt" \
-                --test-path $TEST".txt"
+                --train_path $ROOT"source/train.txt" \
+                --valid_path $ROOT"source/valid.txt" \
+                --test_path $ROOT"source/test.txt"
 
     # generate test eval file only once
-    python3 src/wn2eval.py \
+    python3 src/data2eval.py \
                 --input_file $TEST".json" \
                 --output_file "$P_FILE/test_eval.json" \
                 --task "$TASK"
+else
+    echo "Warning : You must have already preprocessed the data" 
 fi
+
 
 # Path 
 
 if [ "$TRAIN_BOOL" == "true" ]; then
     for SPLIT in $SPLIT_VALUES; do 
         # Split train
-
-        echo "split $SPLIT %"
-
         python3 src/split.py \
             --input_file $TRAIN".json" \
             --percentage $SPLIT \
