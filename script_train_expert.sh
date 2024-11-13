@@ -50,7 +50,7 @@ while [ $# -gt 0 ]; do
                 shift 2
             else
                 echo "Unknown option: $1"
-                exit 1
+                #exit 1
             fi
             ;;
     esac
@@ -86,7 +86,7 @@ run_experiment() {
             DO_PREPROCESS=true
         fi
     
-    save_name=$(python3 src/name_generator.py "$MODEL" "$BIAS" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
+    save_name=$(python3 src/name_generation.py "$MODEL" "$BIAS" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
 
     # Remove old datasets
     echo "Remove old files"
@@ -115,7 +115,6 @@ run_experiment() {
             --do_train "yes"\
             --train_file "${P_FILE}train_${split}.mnli.json" \
             --test_file "${P_FILE}test.mnli.json" \
-            --validation_file "${P_FILE}valid.mnli.json" \
             --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/" \
             --save_name $save_name
     fi
@@ -136,7 +135,7 @@ if [ "$SPLIT_VALUE" -eq 100 ]; then
     run_experiment 1 $SPLIT_VALUE
 else
     # Main experiment loop
-    for i in {1..10}; do
-      run_experiment $i $SPLIT_VALUE
-    done
+    #for i in {1..1}; do
+    run_experiment 2 $SPLIT_VALUE
+    #done
 fi
