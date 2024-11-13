@@ -1,10 +1,17 @@
+import logging
 import os
 import json
 import argparse
 import multiprocessing as mp
 
 from multiprocessing import Pool
+import sys
 from typing import List
+
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
+logger.info("Progam : preprocess.py ****")
+
 """
 parser = argparse.ArgumentParser(description="preprocess")
 parser.add_argument(
@@ -43,7 +50,7 @@ def _check_sanity(relation_id_to_str: dict):
     return
 
 
-def _normalize_relations(examples: List[dict], normalize_fn, is_train: bool):
+def _normalize_relations(examples: List[dict], normalize_fn, path , is_train: bool):
     relation_id_to_str = {}
     for ex in examples:
         if ex is not None: 
@@ -54,10 +61,11 @@ def _normalize_relations(examples: List[dict], normalize_fn, is_train: bool):
     _check_sanity(relation_id_to_str)
 
     if is_train:
-        out_path = '{}/relations.json'.format(os.path.dirname(args.train_path))
+        out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', 'relations.json')
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as writer:
             json.dump(relation_id_to_str, writer, ensure_ascii=False, indent=4)
-            print("Save {} relations to {}".format(len(relation_id_to_str), out_path))
+            logger.info("Save : {} relations to {}".format(len(relation_id_to_str), out_path))
 
 
 wn18rr_id2ent = {}
@@ -71,7 +79,7 @@ def _load_wn18rr_texts(path: str):
         assert len(fs) == 3, "Invalid line: {}".format(line.strip())
         entity_id, word, desc = fs[0], fs[1].replace("__", ""), fs[2]
         wn18rr_id2ent[entity_id] = (entity_id, word, desc)
-    print("Load {} entities from {}".format(len(wn18rr_id2ent), path))
+    logger.info("Load {} entities from {}".format(len(wn18rr_id2ent), path))
 
 
 def _process_line_wn18rr(line: str) -> dict:
@@ -96,7 +104,7 @@ def preprocess_wn18rr(path, save=True):
             "{}/wordnet-mlj12-definitions.txt".format(os.path.dirname(path))
         )
     lines = open(path, "r", encoding="utf-8").readlines()
-    pool = Pool(processes=args.workers)
+    pool = Pool(processes=2)#args.workers)
     examples = pool.map(_process_line_wn18rr, lines)
     pool.close()
     pool.join()
@@ -104,17 +112,21 @@ def preprocess_wn18rr(path, save=True):
     _normalize_relations(
         examples,
         normalize_fn=lambda rel: rel,  # rel.replace('_', ' ').strip(),
-        is_train=(path == args.train_path),
+        path=path,
+        #is_train=(path == args.train_path),
     )
     if save:
-        out_path = path.replace(".txt", "_source.json")
+        file_name = os.path.basename(path).replace(".txt", "_source.json")  # Change .txt to _source.json
+        out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', file_name)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
         json.dump(
             examples,
             open(out_path, "w", encoding="utf-8"),
             ensure_ascii=False,
             indent=4,
         )
-        print("Save {} examples to {}".format(len(examples), out_path))
+        logger.info("Save : {} examples to {}".format(len(examples), out_path))
     return examples
 
 
@@ -137,9 +149,9 @@ def _load_fb15k237_wikidata(path: str):
         else: 
             # remove the print for log lisibility in train set out of 272115 pairs 684 disn't have match
             # those pairs were revoved in the dataset generation 
-            print('No desc found for {}'.format(entity_id))
+            logger.warning('No desc found for {}'.format(entity_id))
             continue
-    print('Load {} entity names from {}'.format(len(fb15k_id2ent), path))
+    logger.info('Load {} entity names from {}'.format(len(fb15k_id2ent), path))
 
 
 def _load_fb15k237_desc(path: str):
@@ -150,10 +162,11 @@ def _load_fb15k237_desc(path: str):
         assert len(fs) == 2, 'Invalid line: {}'.format(line.strip())
         entity_id, desc = fs[0], fs[1]
         fb15k_id2desc[entity_id] = _truncate(desc, 300)
-    print('Load {} entity descriptions from {}'.format(len(fb15k_id2desc), path))
+    logger.info('Load {} entity descriptions from {}'.format(len(fb15k_id2desc), path))
 
 
 def _normalize_fb15k237_relation(relation: str) -> str:
+    """Normalisation function of the relation specially designed for the fb dataset"""
     tokens = relation.replace('./', '/').strip().split('/')
     dedup_tokens = []
     for token in tokens:
@@ -180,7 +193,7 @@ def _process_line_fb15k237(line: str) -> dict:
                 'tail': tail}
         return example
     except:
-        print("No relation found for {} or {}".format(head_id, tail_id))
+        #logger.warning("No relation found for {} or {}".format(head_id, tail_id))
         return None
 
 
@@ -197,14 +210,24 @@ def preprocess_fb15k237(path):
     pool.join()
 
     examples = [example for example in examples_ if example is not None]
-    _normalize_relations(examples, normalize_fn=_normalize_fb15k237_relation, is_train=(path == path)) #args.train_path))
+    _normalize_relations(
+        examples, 
+        normalize_fn=_normalize_fb15k237_relation,
+        path=path, 
+        is_train=(path == path)
+    ) #args.train_path))
 
-    out_path = path + '.json' # TODO remove .txt
+    file_name = os.path.basename(path)  # Change .txt to _source.json
+    out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', file_name.replace(".txt", "_source.json"))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
     json.dump(examples, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
-    print('Save {} examples to {}'.format(len(examples), out_path))
+    logger.info('Save : {} examples to {}'.format(len(examples), out_path))
 
     # load the descripation
-    json.dump(fb15k_id2desc, open(path + "_desc.json", 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
+    #out_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'preprocessed', file_name.replace(".txt", "_dec.json"))
+    #os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    # json.dump(fb15k_id2desc, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
 
     return examples, fb15k_id2desc
 

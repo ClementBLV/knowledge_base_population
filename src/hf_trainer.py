@@ -30,7 +30,6 @@ DATE =  datetime.today().strftime("%Y%m%d")
 
 ################ setup : logger ################
 logger = logging.getLogger(__name__)
-logger.setup_logging()
 
 ################ setup : seed ################
 np.random.seed(SEED_GLOBAL)
