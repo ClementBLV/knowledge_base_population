@@ -18,6 +18,8 @@ from templates import (
 )
 random.seed(0)
 np.random.seed(0)
+print("=========== CONVERTION ============")
+
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -53,7 +55,6 @@ parser.add_argument("--direct", type=bool, default=True)
 parser.add_argument("--task", type=str, default="fb")
 
 args = parser.parse_args()
-print("=========== CONVERTION ============")
 logger.info(f"convert {args.input_file} into NLI dataset")
 
 
