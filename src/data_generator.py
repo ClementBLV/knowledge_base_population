@@ -1,17 +1,17 @@
 import logging
-
+import sys
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 logger.info("Progam : data_generator.py ****")
 
 import os
-import sys
 import preprocess
 import pandas as pd
 import nltk
 import argparse
 import json
+wn = None
 
 def path_check(p):
     os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -37,6 +37,7 @@ args = parser.parse_args()
 
 ################ function : Global ################
 def generate_nli_data(path: str, dataset: str = args.task):
+    global wn
     assert (
         type(dataset) == type("str")
     ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
@@ -44,7 +45,8 @@ def generate_nli_data(path: str, dataset: str = args.task):
     if dataset.lower() in ["wordnet", "wn", "wn18rr"]:
         logger.info("Task : WORDNET")
         nltk.download("wordnet")
-        from nltk.corpus import wordnet as wn
+        from nltk.corpus import wordnet
+        wn = wordnet
         return generate_nli_data_wordnet(path)
     
     if dataset.lower() in ["freebase", "fb", "fb15k237"]:
