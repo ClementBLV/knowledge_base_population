@@ -11,6 +11,7 @@ import argparse
 import logging
 import os
 import random
+import sys
 import numpy as np
 import pandas as pd
 import torch 
@@ -27,9 +28,14 @@ import logger
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
+FAST = True
+max_length = 512
+
 
 ################ setup : logger ################
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
+logger.info("Progam : hf_trainer.py ****")
 
 ################ setup : seed ################
 np.random.seed(SEED_GLOBAL)
@@ -75,11 +81,12 @@ args = parser.parse_args()
 os.makedirs(args.output_dir, exist_ok=True)
 logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
-logger.info(f"Save location : {args.output_dir}, Save name : {args.model_name}")
+logger.info(f"Save : Checkpoint Save location : {args.output_dir}")
+logger.info(f"Save : Trained model saving Name : {args.model_name}")
 
 ################ load : model ################
 model_name = args.model_name
-max_length = 512
+
 
 # label2id mapping
 if args.do_train:
@@ -110,14 +117,17 @@ raw_datasets = load_dataset(
                 "json",
                 data_files={
                                 "train": args.train_file,
-                                "validation": args.test_file,
+                                "test": args.test_file,
                             },
                 #cache_dir=model_args.cache_dir,
                 #token=model_args.token,
             )
+
 dataset_train = raw_datasets["train"]
 dataset_test  = raw_datasets["test"]
-dataset_train_filtered = dataset_train.select(range(1000))
+if FAST : 
+    dataset_train = dataset_train.select(range(1000))
+    dataset_test = dataset_test.select(range(500))
 
 
 ################
@@ -125,19 +135,60 @@ dataset_train_filtered = dataset_train.select(range(1000))
 ################
 
 
-def tokenize_func(examples):
+def tokenize_func_naive(examples):
     """ without padding="max_length" & max_length=512, it should do dynamic padding."""
-    return tokenizer(examples["text"], examples["hypothesis"], truncation=True)  # max_length=512,  padding=True
+    return tokenizer(examples["premise"], examples["hypothesis"], truncation=True)  # max_length=512,  padding=True
 
+# Parameters
+max_length_chars = int(max_length * 0.6)  # Approximate character count threshold
+skip_counter , total_pairs = 0, 0
 
-################ encoded data ################
+# Step 1: Filter the dataset based on length
+if "small" in model_name:
+    def filter_func(example):
+        global skip_counter, total_pairs
+        total_pairs += 1
+        
+        combined_text = example["premise"] + " " + example["hypothesis"]
+        if len(combined_text.split()) <= max_length_chars:
+            return True
+        else:
+            skip_counter += 1
+            return False
+
+    # Apply filtering
+    logger.warning("Prefilter the data to avoid long sequence when using a small model")
+    dataset_train_filtered = dataset_train.filter(filter_func)
+    skipped_percentage = (skip_counter / total_pairs) * 100
+    logger.info(f"Train : Skipped {skip_counter} pairs ({skipped_percentage:.2f}%) due to length exceeding {max_length} tokens.")
+
+    skip_counter , total_pairs = 0, 0
+    dataset_test_filtered = dataset_test.filter(filter_func)
+    skipped_percentage = (skip_counter / total_pairs) * 100
+    logger.info(f"Test : Skipped {skip_counter} pairs ({skipped_percentage:.2f}%) due to length exceeding {max_length} tokens.")
+
+# Step 2: Tokenize the filtered dataset
+def tokenize_func(examples):
+    return tokenizer(
+        examples["premise"],
+        examples["hypothesis"],
+        truncation="longest_first",
+        max_length=max_length,
+        padding="max_length",
+    )
+
+# Tokenize the filtered datasets
+logger.info("Train : tokenization")
 encoded_dataset_train = dataset_train_filtered.map(tokenize_func, batched=True)
-encoded_dataset_test = dataset_test.map(tokenize_func, batched=True)
-logger.info(f"len train = {len(encoded_dataset_train)} , len test = {len(encoded_dataset_test)}")
+logger.info("Test : tokenization")
+encoded_dataset_test = dataset_test_filtered.map(tokenize_func, batched=True)
 
+
+logger.info(f"len train = {len(encoded_dataset_train)} , len test = {len(encoded_dataset_test)}")
+print(encoded_dataset_test.column_names)
 # remove columns the library does not expect
-encoded_dataset_train = encoded_dataset_train.remove_columns(["hypothesis", "text"])
-encoded_dataset_test = encoded_dataset_test.remove_columns(["hypothesis", "text"])
+encoded_dataset_train = encoded_dataset_train.remove_columns(["hypothesis", "premise"])
+encoded_dataset_test = encoded_dataset_test.remove_columns(["hypothesis", "premise"])
 
 
 ################
@@ -150,9 +201,9 @@ fp16_bool = True if torch.cuda.is_available() else False
 if "mDeBERTa" in model_name: fp16_bool = False  # mDeBERTa does not support FP16 yet
 
 # https://huggingface.co/transformers/main_classes/trainer.html#transformers.TrainingArguments
-eval_batch = 64 if "large" in model_name else 64*2
-per_device_train_batch_size = 8 if "large" in model_name else 32
-gradient_accumulation_steps = 4 if "large" in model_name else 1
+eval_batch = 10 #64 if "large" in model_name else 64*2
+per_device_train_batch_size = 2 #8 if "large" in model_name else 32
+gradient_accumulation_steps = 1 # if "large" in model_name else 1
 warmup_ratio=0.06
 weight_decay=0.01
 num_train_epochs=3
