@@ -15,6 +15,7 @@ show_help() {
     echo "  --wandb BOOL                    Set the wandb parameter; if true, wandb will be called."
     echo "  --task STR                      Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
     echo "  --processed_data_directory DIR  Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
+    echo "  --do_preprocess BOOL            Set the do_preprocess parameter; if not precise false it will be set on true, preprocessing steps will be executed."
     echo "  --model MODEL                   Specify the model; should be a Hugging Face ID, e.g., 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli'."
     echo "  --output_dir DIR                Set the output directory where the trained weights will be saved."
     echo "  --hf_cache_dir DIR              Set the Hugging Face cache directory; if not set, it will be the default directory."
@@ -32,6 +33,7 @@ declare -A args=(
     [--wandb]=WANDB
     [--task]=TASK
     [--processed_data_directory]=P_FILE
+    [--do_preprocess]=DO_PREPROCESS
     [--model]=MODEL
     [--output_dir]=OUTPUT_DIR
     [--hf_cache_dir]=HF_CACHE_DIR
@@ -60,7 +62,7 @@ done
 if [ -n "$HF_CACHE_DIR" ] && [ "$HF_CACHE_DIR" != "None" ]; then
     export HF_HOME="$HF_CACHE_DIR/hf/"
     export HF_DATASETS_CACHE="$HF_CACHE_DIR/hf/datasets"
-    export TRANSFORMERS_CACHE="$HF_CACHE_DIR/hf/models"
+    #export TRANSFORMERS_CACHE="$HF_CACHE_DIR/hf/models"
 fi
 
 # Validate necessary variables
@@ -69,22 +71,29 @@ if [ -z "$P_FILE" ] || [ -z "$MODEL" ] || [ -z "$OUTPUT_DIR" ]; then
     show_help
 fi
 
+if [ -z "$DO_PREPROCESS" ]; then
+    DO_PREPROCESS=true
+fi
+
 run_experiment() {
     local i="$1"
     local split="$2"
     local save_name
+    local DO_PREPROCESS="$3"  # Optionally pass this from outside
 
     echo "=========== iteration $i ============"
-    # Set TEST_BOOL, VALID_BOOL, and DO_PREPROCESS to false if i > 1
-        if [ "$i" -gt 1 ]; then
-            TEST_BOOL=false
-            VALID_BOOL=false
-            DO_PREPROCESS=false
-        else
-            TEST_BOOL=true
-            VALID_BOOL=true
-            DO_PREPROCESS=true
-        fi
+
+    # Check if i > 1 or DO_PREPROCESS has already been set to false by the user
+    if [ "$i" -gt 1 ] || [ "$DO_PREPROCESS" == "false" ]; then
+        TEST_BOOL=false
+        VALID_BOOL=false
+        DO_PREPROCESS=false
+    else
+        TEST_BOOL=true
+        VALID_BOOL=true
+        DO_PREPROCESS=true
+    fi
+    
     
     save_name=$(python3 src/name_generation.py "$MODEL" "$BIAS" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
 
@@ -135,7 +144,7 @@ if [ "$SPLIT_VALUE" -eq 100 ]; then
     run_experiment 1 $SPLIT_VALUE
 else
     # Main experiment loop
-    #for i in {1..1}; do
-    run_experiment 2 $SPLIT_VALUE
-    #done
+    for i in {1..1}; do
+        run_experiment 1 $SPLIT_VALUE
+    done
 fi
