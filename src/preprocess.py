@@ -6,7 +6,7 @@ import multiprocessing as mp
 
 from multiprocessing import Pool
 import sys
-from typing import List
+from typing import Dict, List
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ args = parser.parse_args()
 mp.set_start_method("fork")
 """
 
-def _check_sanity(relation_id_to_str: dict):
+def _check_sanity(relation_id_to_str: Dict):
     # We directly use normalized relation string as a key for training and evaluation,
     # make sure no two relations are normalized to the same surface form
     relation_str_to_id = {}
@@ -50,7 +50,7 @@ def _check_sanity(relation_id_to_str: dict):
     return
 
 
-def _normalize_relations(examples: List[dict], normalize_fn, path , is_train: bool):
+def _normalize_relations(examples: List[Dict], normalize_fn, path , is_train: bool):
     relation_id_to_str = {}
     for ex in examples:
         if ex is not None: 
@@ -69,20 +69,23 @@ def _normalize_relations(examples: List[dict], normalize_fn, path , is_train: bo
 
 
 wn18rr_id2ent = {}
-
+wn18rr_id2rels = {}
+wn18rr_idhead2idtail = {}
 
 def _load_wn18rr_texts(path: str):
-    global wn18rr_id2ent
+    global wn18rr_id2ent, wn18rr_id2rels
     lines = open(path, "r", encoding="utf-8").readlines()
     for line in lines:
         fs = line.strip().split("\t")
         assert len(fs) == 3, "Invalid line: {}".format(line.strip())
         entity_id, word, desc = fs[0], fs[1].replace("__", ""), fs[2]
         wn18rr_id2ent[entity_id] = (entity_id, word, desc)
+        wn18rr_id2rels[entity_id] = set()
     logger.info("Load {} entities from {}".format(len(wn18rr_id2ent), path))
 
 
-def _process_line_wn18rr(line: str) -> dict:
+def _process_line_wn18rr(line: str) -> Dict:
+    global wn18rr_id2rel
     fs = line.strip().split("\t")
     assert len(fs) == 3, "Expect 3 fields for {}".format(line)
     head_id, relation, tail_id = fs[0], fs[1], fs[2]
@@ -95,8 +98,28 @@ def _process_line_wn18rr(line: str) -> dict:
         "tail_id": tail_id,
         "tail": tail,
     }
+    wn18rr_id2rels[head_id].add(relation)
+    wn18rr_id2rels[tail_id].add(relation)
+    if head_id in wn18rr_idhead2idtail:
+        wn18rr_idhead2idtail[head_id].add(tail_id)
+    else : 
+        wn18rr_idhead2idtail[head_id] = set(tail_id)
     return example
 
+def _process_id2rel()->Dict:
+    # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+    return {
+        head_id: {tail_id: list(wn18rr_id2rels[tail_id]) for tail_id in tails}
+        for head_id, tails in wn18rr_idhead2idtail.items()
+    }
+
+
+def _save_wn18rr_forbidden_couples(out_path: str):
+    """Save the wn18rr_id2rel dictionary to a JSON file."""
+    rel_file = os.path.join(out_path, "forbidden_couples.json")
+    with open(rel_file, "w", encoding="utf-8") as f:
+        json.dump(_process_id2rel(), f, ensure_ascii=False, indent=4)
+    logger.info("Save : forbidden_couples to {}".format(rel_file))
 
 def preprocess_wn18rr(path, save=True):
     if not wn18rr_id2ent:
@@ -113,7 +136,7 @@ def preprocess_wn18rr(path, save=True):
         examples,
         normalize_fn=lambda rel: rel,  # rel.replace('_', ' ').strip(),
         path=path,
-        #is_train=(path == args.train_path),
+        is_train=(path == path),
     )
     if save:
         file_name = os.path.basename(path).replace(".txt", "_source.json")  # Change .txt to _source.json
@@ -127,6 +150,8 @@ def preprocess_wn18rr(path, save=True):
             indent=4,
         )
         logger.info("Save : {} examples to {}".format(len(examples), out_path))
+        _save_wn18rr_forbidden_couples(os.path.dirname(out_path))
+
     return examples
 
 
@@ -179,7 +204,7 @@ def _normalize_fb15k237_relation(relation: str) -> str:
     return relation
 
 
-def _process_line_fb15k237(line: str) -> dict:
+def _process_line_fb15k237(line: str) -> Dict:
     fs = line.strip().split('\t')
     assert len(fs) == 3, 'Expect 3 fields for {}'.format(line)
     head_id, relation, tail_id = fs[0], fs[1], fs[2]
