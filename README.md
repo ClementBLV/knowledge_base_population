@@ -45,8 +45,8 @@ This repository contains the code for the paper **"Textual Entailment for Link P
 ```bash
 git clone git@github.com:ClementBLV/knowledge_base_population.git
 cd knowledge_base_population
-python3 -m venv ~/venvFicus
-source ~/venvFicus/bin/activate
+python3 -m venv ~/EntKBC
+source ~/EntKBC/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -54,8 +54,8 @@ pip install -r requirements.txt
 ```bash
 git clone git@github.com:ClementBLV/knowledge_base_population.git
 cd knowledge_base_population
-conda create -n KBentail python=3.9
-conda activate KBentail
+conda create -n EntKBC python=3.9
+conda activate EntKBC
 pip install -r requirements.txt
 ```
 
@@ -82,14 +82,57 @@ WIDTH=100%>
 ### Bash
 ```bash
 source script_train_expert.sh \
-  --split 1 \
+  --split int \ #percentage of the data which will be used 
+  --both boolean \
+  --bias boolean \
+  --processed_data_directory /your/directory/ #directory of the data to process usually knowledge_base_population/data/WN18RR/ but data folder can be moved in another location without an issue
+  --model "hugging face id" \ #name of the model wich will be used for training
+  --output_dir /your/directory \ #where the training output will be stored
+  --task "" \ # either wn/wordnet/wn18rr or fb/freebase/fb15k237 
+  --no_training boolean \ # it the training is launched or not
+  --hf_cache_dir //users/local/c20beliv/ #hugging face cache dir 
+```
+**Step 1:** Firstly lets do a dummy test without any training to check that the data are correctly processed and save in the folders. After starting the venv, copy and paste :  
+```bash
+source script_train_expert.sh \
+  --split 1 \ #percentage of the data which will be used 
   --both false \
   --bias true \
-  --processed_data_directory ~/knowledge_base_population/data/FB15k237/ \
-  --model "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli" \
+  --processed_data_directory ~/knowledge_base_population/data/WN18RR/
+  --model "microsoft/deberta-v3-small" \
+  --output_dir ~/knowledge_base_population/data/WN18RR/weights \
+  --task "wn" \ 
+  --no_training true \
+  --hf_cache_dir //users/local/c20beliv/ 
+```
+
+**Step 2:** Now try it with Freebase dataset
+```bash
+source script_train_expert.sh \
+  --split 1 \ #percentage of the data which will be used 
+  --both false \
+  --bias true \
+  --processed_data_directory ~/knowledge_base_population/data/FB15k237/
+  --model "microsoft/deberta-v3-small" \
   --output_dir ~/knowledge_base_population/data/FB15k237/weights \
-  --task "fb" \
-  --no_training false #(to check the installation) / true #(to launch the training)
+  --task "fb" \ 
+  --no_training true \
+  --hf_cache_dir //users/local/c20beliv/ 
+```
+
+**Step 3:** Try to train the model with hugging face
+
+```bash
+source script_train_expert.sh \
+  --split 1 \ #percentage of the data which will be used 
+  --both false \
+  --bias true \
+  --processed_data_directory ~/knowledge_base_population/data/FB15k237/
+  --model "microsoft/deberta-v3-small" \
+  --output_dir ~/knowledge_base_population/data/FB15k237/weights \
+  --task "fb" \ 
+  --no_training false \
+  --hf_cache_dir //users/local/c20beliv/ 
 ```
 
 ### Docker
