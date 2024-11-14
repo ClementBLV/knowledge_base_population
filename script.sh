@@ -79,7 +79,7 @@ if [ "$DO_PREPROCESS" == "true" ]; then
                 --output_file "$P_FILE/test_eval.json" \
                 --task "$TASK"
 else
-    echo "Warning : You must have already preprocessed the data" 
+    echo "WARNING : You must have already preprocessed the data" 
 fi
 
 
@@ -98,12 +98,13 @@ if [ "$TRAIN_BOOL" == "true" ]; then
         # convert to mnli format
         python3 src/data2mnli.py \
             --input_file $P_FILE"train_"$SPLIT".json" \
+            --data_source $ROOT \
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
             --both $BOTH \
             --task "$TASK"
 
         rm -rf $P_FILE"train_"$SPLIT".json"
-        echo "tmp file $P_FILE"train_"$SPLIT".json" was successfully removed"
+        echo "INFO : Save : tmp file $P_FILE"train_"$SPLIT".json" was successfully removed"
     done
 fi
 
@@ -112,6 +113,7 @@ if [ "$TEST_BOOL" == "true" ]; then
     echo "******* TEST *******"
     python3 src/data2mnli.py \
         --input_file $TEST".json" \
+        --data_source $ROOT \
         --output_file $P_FILE"test.mnli.json" \
         --both $BOTH \
         --task "$TASK"
@@ -121,6 +123,7 @@ if [ "$VALID_BOOL" == "true" ]; then
     echo "******* VALID *******"
     python3 src/data2mnli.py \
         --input_file $VALID".json" \
+        --data_source $ROOT \
         --output_file $P_FILE"valid.mnli.json" \
         --both $BOTH \
         --task "$TASK"
