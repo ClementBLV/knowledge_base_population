@@ -1,27 +1,35 @@
 import sys
 import warnings
 import logging 
+import re
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def extract_size(sentence):
+    match = re.search(r'\b(base|small|large)\b', sentence, re.IGNORECASE)
+    if match:
+        return match.group(0).lower()
+    return "unkown"
 
 def generate_save_name(model, bias, both, split, version, custom_name=None):
     if custom_name:
         return custom_name
 
-    if model == "microsoft/deberta-v3-base":
-        prefix = "untrained"
-    elif model == "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli":
-        prefix = "trained"
+    if "microsoft" in model :
+        prefix = "naive"
+    elif "MoritzLaurer" in model:
+        prefix = "mnli"
     else:
-        logger.warning(f"Unknown model: {model}. Defaulting to 'unknown_model'.")
-        prefix = "unknown_model"
+        prefix = f"{model.replace("/", "_")}_split{split}_v{version}"
     
     both_indicator = "2w" if both else "1w"
     bias_indicator = "biased" if bias else "unbiased"
 
-    save_name = f"{prefix}_{both_indicator}_derbertabase_{bias_indicator}_split{split}_v{version}"
-    logger.info(f"Save : Trained model saving Name : {save_name}")
+    size = extract_size(model)
+
+    save_name = f"{prefix}_derberta_{size}_{both_indicator}_{bias_indicator}_split{split}_v{version}"
     return save_name
 
 if __name__ == "__main__":
