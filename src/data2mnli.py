@@ -16,6 +16,7 @@ from templates import (
     FB_LABEL_TEMPLATES
 )
 import os
+print("=========== CONVERTION ============")
 
 ################ setup : config ################
 random.seed(0)
@@ -48,8 +49,9 @@ class MNLIInputFeatures:
 
 ################ setup : parser ################
 parser = ArgumentParser()
-parser.add_argument("--input_file", type=str, default="data/WN18RR/valid.json")
-parser.add_argument("--output_file", type=str, default="data/WN18RR/valid.mnli.json")
+parser.add_argument("--input_file", type=str)
+parser.add_argument("--data_source", type=str, help="Folder with the data, used to pick the forbidden mixe relation")
+parser.add_argument("--output_file", type=str)
 parser.add_argument("--negn", type=int, default=1, help="Number of negative examples for each pair")
 parser.add_argument("--direct", type=bool, default=True, help="If set on True only the direct relation will be present.")
 parser.add_argument("--both", type=bool, default=False, help="If set on True the direct and inverse relation will be present")
@@ -57,7 +59,6 @@ parser.add_argument("--task", required=True, type=str, metavar="N", help="datase
 args = parser.parse_args()
 
 ################ setup : variables ################
-print("=========== CONVERTION ============")
 logger.info(f"Task called: {args.task}")
 logger.info(f"Convert {args.input_file} into NLI dataset")
 assert (
@@ -67,7 +68,7 @@ assert (
 if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
     LABELS = WN_LABELS
     LABEL_TEMPLATES = WN_LABEL_TEMPLATES
-if args.task.lower() in ["freebase", "fb", "fb15k237"]:
+elif args.task.lower() in ["freebase", "fb", "fb15k237"]:
     LABELS = list(FB_LABEL_TEMPLATES.keys())
     LABEL_TEMPLATES = FB_LABEL_TEMPLATES
 else : 
@@ -138,7 +139,7 @@ for relation in LABELS:
 if args.task in ["wordnet", "wn", "wn18rr"]:
     with open(
         os.path.join(
-            os.path.dirname(os.getcwd()), "data/WN18RR/source/forbidden_couple.json"
+            f"{args.data_source}/preprocessed/forbidden_couples.json"
         ),
         "rt",
     ) as f:
@@ -187,7 +188,7 @@ def data2mnli_with_negative_examples(
     # init the neg template
     negative_template = random.choices(negative_templates[instance.relation], k=negn)
     # print(instance.head_id  id2forbidden[0].keys())
-    if str(instance.head_id) in id2forbidden[0].keys():
+    if str(instance.head_id) in id2forbidden.keys():
         # this entity as forbidden couples (else keep the random chossen no risk)
         if str(instance.tail_id) in id2forbidden[0][str(instance.head_id)].keys():
             # check if the tail of this head is present, which mean there are several relation between
@@ -195,7 +196,7 @@ def data2mnli_with_negative_examples(
             n = 0
             # generate the forbidden template
             forbidden_templates = []
-            for relation in id2forbidden[0][str(instance.head_id)][
+            for relation in id2forbidden[str(instance.head_id)][
                 str(instance.tail_id)
             ]:
                 # for each relations in the forbidden mix we add the template
