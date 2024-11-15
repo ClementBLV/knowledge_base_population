@@ -52,7 +52,7 @@ while [ $# -gt 0 ]; do
                 shift 2
             else
                 echo "Unknown option: $1"
-                #exit 1
+                exit 1
             fi
             ;;
     esac
