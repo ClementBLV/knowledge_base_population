@@ -81,6 +81,8 @@ if args.task.lower() in ["freebase", "fb", "fb15k237"]:
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
+labels2id = {'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
+
 logger.info(f"Label : the label used are {labels2id}")
 
 positive_templates: Dict[str, list] = defaultdict(list)
