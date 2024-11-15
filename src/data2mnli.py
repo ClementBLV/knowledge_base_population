@@ -217,7 +217,7 @@ def data2mnli_with_negative_examples(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
                 label=labels2id[
-                    "contradiction"
+                    "not_entailment"
                 ],  # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
             )
             for t in negative_template
