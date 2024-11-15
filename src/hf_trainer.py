@@ -28,7 +28,7 @@ import logger
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
-FAST = True
+FAST = False
 max_length = 512
 
 
@@ -158,12 +158,12 @@ if "small" in model_name:
 
     # Apply filtering
     logger.warning("Prefilter the data to avoid long sequence when using a small model")
-    dataset_train_filtered = dataset_train.filter(filter_func)
+    dataset_train = dataset_train.filter(filter_func)
     skipped_percentage = (skip_counter / total_pairs) * 100
     logger.info(f"Train : Skipped {skip_counter} pairs ({skipped_percentage:.2f}%) due to length exceeding {max_length} tokens.")
 
     skip_counter , total_pairs = 0, 0
-    dataset_test_filtered = dataset_test.filter(filter_func)
+    dataset_test = dataset_test.filter(filter_func)
     skipped_percentage = (skip_counter / total_pairs) * 100
     logger.info(f"Test : Skipped {skip_counter} pairs ({skipped_percentage:.2f}%) due to length exceeding {max_length} tokens.")
 
@@ -179,9 +179,9 @@ def tokenize_func(examples):
 
 # Tokenize the filtered datasets
 logger.info("Train : tokenization")
-encoded_dataset_train = dataset_train_filtered.map(tokenize_func, batched=True)
+encoded_dataset_train = dataset_train.map(tokenize_func_naive, batched=True)
 logger.info("Test : tokenization")
-encoded_dataset_test = dataset_test_filtered.map(tokenize_func, batched=True)
+encoded_dataset_test = dataset_test.map(tokenize_func_naive, batched=True)
 
 
 logger.info(f"len train = {len(encoded_dataset_train)} , len test = {len(encoded_dataset_test)}")
@@ -201,9 +201,9 @@ fp16_bool = True if torch.cuda.is_available() else False
 if "mDeBERTa" in model_name: fp16_bool = False  # mDeBERTa does not support FP16 yet
 
 # https://huggingface.co/transformers/main_classes/trainer.html#transformers.TrainingArguments
-eval_batch = 10 #64 if "large" in model_name else 64*2
-per_device_train_batch_size = 2 #8 if "large" in model_name else 32
-gradient_accumulation_steps = 1 # if "large" in model_name else 1
+eval_batch = 64 if "large" in model_name else 64*2
+per_device_train_batch_size = 8 if "large" in model_name else 32
+gradient_accumulation_steps = 4 if "large" in model_name else 1
 warmup_ratio=0.06
 weight_decay=0.01
 num_train_epochs=3
