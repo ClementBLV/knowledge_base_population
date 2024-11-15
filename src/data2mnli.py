@@ -75,8 +75,8 @@ else :
     raise TypeError("The task called is unknown")
 
 # to correspond to the config of pretrained model - TO CHECK 
-labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
-labels2id = {'entailment':0, 'contradiction':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
+#labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
+labels2id = {'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
 logger.info(f"Label : the label used are {labels2id}")
 
 ################ setup : saving file ################
