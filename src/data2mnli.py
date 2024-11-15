@@ -146,7 +146,7 @@ if args.task in ["wordnet", "wn", "wn18rr"]:
         id2forbidden = json.load(f)  
         # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
 else : 
-    id2forbidden = [{}]
+    id2forbidden = {}
 
 
 ################ function : MNLI format ################
