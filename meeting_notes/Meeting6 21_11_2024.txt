@@ -1,0 +1,17 @@
+Meeting Notes 14/11/2024
+
+TODOs ; 
+Code : TRAINING 
++ DONE  necessity to had a config file for the hyperparameter for each model training
+-	see to improve its speed on expert server (new parameters + parallelization) 
+
+Code : IMPROVEMENT 
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+-	Implement majority voting as intermediate step 
+-	Build a meta model : Use the newly trained models to generate a training set for the meta model 
+
+Code : EVALUATION 
+-	add MRR in the evaluation metric 
+-	Improve evaluation speed with parallelization
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 

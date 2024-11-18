@@ -1,0 +1,23 @@
+Meeting Notes 14/11/2024
+
+TODOs ; 
+Hardware : 
+- DONE	Find and configure a school GPU --> DONE (venv created - GPU only work between 8am to 6pm in week days)
+- DONE	Configure Expert.ai GPU (install Docker) --> DONE (code tested with christian)
+Code : TRAINING 
+- DONE	Find a small model and a small train/test/valid set for prototyping new run glue (named hf_trainer.py)
+- DONE	Rewrite runglue.py program, it is way too complicated to modify and understand what going on like that 
+- DONE	test hf_trainer on school GPU to check bugs (without docker)
+- DONE	test hf_trainer on expert server to check bugs (with docker) --> DONE (the ne programm have been tested on Expert GPU it works - still need improvement)
++   necessity to had a config file for the hyperparameter for each model training
+-	see to improve its speed on expert server (new parameters + parallelization) 
+Code : IMPROVEMENT 
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+-	Implement majority voting as intermediate step 
+-	Build a meta model : Use the newly trained models to generate a training set for the meta model 
+
+Code : EVALUATION 
+-	add MRR in the evaluation metric 
+-	Improve evaluation speed with parallelization
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 
