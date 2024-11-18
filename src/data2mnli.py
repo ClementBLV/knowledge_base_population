@@ -18,16 +18,22 @@ from templates import (
 import os
 print("=========== CONVERTION ============")
 
-################ setup : config ################
+################ setup : seed ################
 random.seed(0)
 np.random.seed(0)
 sys.path.append("./")
+
+################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 logger.info("Progam : data2mnli.py ****")
 
-# directly express in the code for WN
-# from a2t.relation_classification.tacred import TACRED_LABEL_TEMPLATES, TACRED_LABELS
+################ setup : config ################
+current_dir = os.path.dirname(__file__)
+config_path = os.path.join(current_dir, "..", "config", "config.json")
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
+
 
 ################ setup : data objects ################
 @dataclass
@@ -76,7 +82,8 @@ else :
 
 # to correspond to the config of pretrained model - TO CHECK 
 #labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
-labels2id = {'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
+#{'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
+labels2id = config["labels2id"] 
 logger.info(f"Label : the label used are {labels2id}")
 
 ################ setup : saving file ################
@@ -210,7 +217,7 @@ def data2mnli_with_negative_examples(
                     negative_templates[instance.relation], k=negn
                 )
                 n += 1
-
+    # TODO andle the contradiction case ? 
     mnli_instances.extend(
         [
             MNLIInputFeatures(

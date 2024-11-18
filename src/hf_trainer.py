@@ -10,6 +10,7 @@
 import argparse
 import logging
 import os
+import json
 import random
 import sys
 import numpy as np
@@ -29,8 +30,12 @@ import logger
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
 FAST = False
-max_length = 512
 
+################ setup : config ################
+current_dir = os.path.dirname(__file__)
+config_path = os.path.join(current_dir, "..", "config", "config.json")
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
 
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
@@ -86,12 +91,13 @@ logger.info(f"Save : Trained model saving Name : {args.model_name}")
 
 ################ load : model ################
 model_name = args.model_name
-
+max_length = config["max_length"]
+assert (config["model_name"]==model_name) ,"The config isn't the one of the model used"
 
 # label2id mapping
 if args.do_train:
-    label2id = {"entailment": 0, "not_entailment": 1}  #{"entailment": 0, "neutral": 1, "contradiction": 2}
-    id2label = {0: "entailment", 1: "not_entailment"}  #{0: "entailment", 1: "neutral", 2: "contradiction"}
+    label2id = config["label2id"]#{"entailment": 0, "not_entailment": 1}  #{"entailment": 0, "neutral": 1, "contradiction": 2}
+    id2label = config["id2label"]#{0: "entailment", 1: "not_entailment"}  #{0: "entailment", 1: "neutral", 2: "contradiction"}
     logger.info(f"Label used : {list(label2id.keys())}")
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -201,19 +207,19 @@ fp16_bool = True if torch.cuda.is_available() else False
 if "mDeBERTa" in model_name: fp16_bool = False  # mDeBERTa does not support FP16 yet
 
 # https://huggingface.co/transformers/main_classes/trainer.html#transformers.TrainingArguments
-eval_batch = 64 if "large" in model_name else 64*2
-per_device_train_batch_size = 8 if "large" in model_name else 32
-gradient_accumulation_steps = 4 if "large" in model_name else 1
-warmup_ratio=0.06
-weight_decay=0.01
-num_train_epochs=3
-learning_rate=9e-6
+eval_batch = config["eval_batch"]#64 if "large" in model_name else 64*2
+per_device_train_batch_size = config["per_device_train_batch_size"] #8 if "large" in model_name else 32
+gradient_accumulation_steps = config["gradient_accumulation_steps"] #4 if "large" in model_name else 1
+warmup_ratio=config["warmup_ratio"]
+weight_decay=config["weight_decay"]
+num_train_epochs=config["num_train_epochs"]
+learning_rate=config["learning_rate"]
 
 train_args = TrainingArguments(
     output_dir=args.output_dir,
     logging_dir=logging_directory,
     #deepspeed="ds_config_zero3.json",  # if using deepspeed
-    lr_scheduler_type= "linear",
+    lr_scheduler_type= config["lr_scheduler_type"] ,
     group_by_length=False,  # can increase speed with dynamic padding, by grouping similar length texts https://huggingface.co/transformers/main_classes/trainer.html
     learning_rate=learning_rate if "large" in model_name else 2e-5,
     per_device_train_batch_size=per_device_train_batch_size,
@@ -232,8 +238,8 @@ train_args = TrainingArguments(
     #load_best_model_at_end=True,
     #metric_for_best_model="accuracy",
     #eval_steps=300,  # evaluate after n steps if evaluation_strategy!='steps'. defaults to logging_steps
-    save_strategy="steps",  # options: "no"/"steps"/"epoch"
-    save_steps=1000,  # Number of updates steps before two checkpoint saves.
+    save_strategy=config["save_strategy"],  # options: "no"/"steps"/"epoch"
+    save_steps=config["save_steps"],  # Number of updates steps before two checkpoint saves.
     #save_total_limit=1,  # If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints in output_dir
     #logging_strategy="epoch",
     #logging_steps=100,
