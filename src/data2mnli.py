@@ -30,7 +30,7 @@ logger.info("Progam : data2mnli.py ****")
 
 ################ setup : config ################
 current_dir = os.path.dirname(__file__)
-config_path = os.path.join(current_dir, "..", "config", "config.json")
+config_path = os.path.join(os.path.dirname(current_dir), "configs", "config.json")
 with open(config_path, "r") as config_file:
     config = json.load(config_file)
 
@@ -57,6 +57,7 @@ class MNLIInputFeatures:
 parser = ArgumentParser()
 parser.add_argument("--input_file", type=str)
 parser.add_argument("--data_source", type=str, help="Folder with the data, used to pick the forbidden mixe relation")
+parser.add_argument("--config_name", type=str, help="File name of the config, must be a .json")
 parser.add_argument("--output_file", type=str)
 parser.add_argument("--negn", type=int, default=1, help="Number of negative examples for each pair")
 parser.add_argument("--direct", type=bool, default=True, help="If set on True only the direct relation will be present.")
@@ -81,10 +82,10 @@ else :
     raise TypeError("The task called is unknown")
 
 # to correspond to the config of pretrained model - TO CHECK 
-#labels2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
+#label2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
 #{'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
-labels2id = config["labels2id"] 
-logger.info(f"Label : the label used are {labels2id}")
+label2id = config["label2id"] 
+logger.info(f"Label : the label used are {label2id}")
 
 ################ setup : saving file ################
 path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
@@ -183,7 +184,7 @@ def data2mnli_with_negative_examples(
             MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                label=labels2id["entailment"],
+                label=label2id["entailment"],
             )
             for t in positive_template
         ]
@@ -223,9 +224,9 @@ def data2mnli_with_negative_examples(
             MNLIInputFeatures(
                 premise=instance.context,
                 hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                label=labels2id[
+                label=label2id[
                     "not_entailment"
-                ],  # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else labels2id["contradiction"],
+                ],  # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else label2id["contradiction"],
             )
             for t in negative_template
         ]
