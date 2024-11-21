@@ -82,7 +82,6 @@ run_experiment() {
     local DO_PREPROCESS="$3"  # Optionally pass this from outside
 
     echo "=========== iteration $i ============"
-
     # Check if i > 1 or DO_PREPROCESS has already been set to false by the user
     if [ "$i" -gt 1 ] || [ "$DO_PREPROCESS" == "false" ]; then
         TEST_BOOL=false
@@ -119,7 +118,7 @@ run_experiment() {
         touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
-        python3 "src/hf_trainer.py" \
+        python3 "src/trainer_hf.py" \
             --model_name "$MODEL" \
             --do_train "yes"\
             --train_file "${P_FILE}train_${split}.mnli.json" \
@@ -145,6 +144,6 @@ if [ "$SPLIT_VALUE" -eq 100 ]; then
 else
     # Main experiment loop
     for i in {1..1}; do
-        run_experiment 1 $SPLIT_VALUE
+        run_experiment 1 $SPLIT_VALUE $DO_PREPROCESS
     done
 fi
