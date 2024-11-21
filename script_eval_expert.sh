@@ -9,8 +9,10 @@ show_help() {
     echo "  --i INDEX                     Set the i values for the training data, should be an integer it is the rank of the training."
     echo "  --model MODEL                 Specify the model; should be a Hugging Face ID, e.g., 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli'. It is important to get the right tokenizer"
     echo "  --indirect BOOL               Set the indirect parameter; it's a boolean; if true, it will run the indirect evaluation as well."
-    echo "  --save_name NAME              Specify the save name of the evaluation file."
+    echo "  --saving_name NAME            Specify the save name of the evaluation file."
     echo "  --weights_path PATH           Set the path where the model weights are saved."
+    echo "  --parallel BOOL               Boolean to evaluate in parallel."
+    echo "  --batch_size INT              Batch size for the evaluation."
     echo "  --processed_test_dir DIR      Set the path where the processed test file for evaluation is stored are saved."
     echo "  --task TASK                   Set the task parameter; it indicates the task, e.g., 'fb' for Freebase or 'wn' for WordNet."
     echo "  --help                        Display this help message and exit."
@@ -22,8 +24,10 @@ declare -A args=(
     [--split]=SPLIT_VALUE
     [--model]=MODEL
     [--indirect]=INDIRECT
-    [--save_name]=SAVE_NAME
+    [--saving_name]=SAVE_NAME
     [--weights_path]=WEIGHTS_PATH
+    [--parallel]=PARALLEL_BOOL
+    [--batch_size]=BATCH_SIZE
     [--processed_test_dir]=P_FILE
     [--task]=TASK
     [--i]=i
@@ -67,8 +71,10 @@ python3 src/eval.py \
             --input_file "$P_FILE/test_eval.json" \
             --output_file "${BASE}/eval" \
             --model "${WEIGHTS_PATH}" \
-            --name "${SAVE_NAME_PREFIX}" \
-            --source_model "$MODEL"
+            --saving_name "${SAVE_NAME_PREFIX}" \
+            --parallel "${PARALLEL_BOOL}" \
+            --batch_size $BATCH_SIZE 
+#--source_model "$MODEL"\
 if $INDIRECT; then 
     python3 src/eval.py \
                 --input_file "$P_FILE/test_eval_indirect.json" \

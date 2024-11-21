@@ -1,11 +1,10 @@
-from argparse import ArgumentParser
-from collections import Counter  # TODO remoove useless libraiies 
+import argparse
 from dataclasses import dataclass
+from setup import setup_logger
 from pathlib import Path
 from typing import List
 from transformers import (
     AutoTokenizer,
-    DebertaForSequenceClassification,
     AutoModelForSequenceClassification,
 )
 from tqdm import tqdm
@@ -13,39 +12,60 @@ import json
 import numpy as np
 import torch
 import sys
-import os
-from pprint import pprint
+from torch.utils.data import DataLoader, Dataset
+import torch.nn.functional as F
 
-### device
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-print("device ", device)
-
-parser = ArgumentParser()
-
-parser.add_argument("--input_file", type=str, default="data/WN18RR/valid_eval.json")
-parser.add_argument("--output_file", type=str, default="eval")
-parser.add_argument("--model", type=str, default="")
-parser.add_argument("--source_model", type=str, default="")
-parser.add_argument("--name", type=str, default=None)
-
+################ setup : parser ################
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_file", type=str, required=True,
+                    help=" File with the eval json eg : data/WN18RR/valid_eval.json")
+parser.add_argument("--output_file", type=str, required=True, default="eval")
+parser.add_argument("--model", type=str, required=True, 
+                    help="Path of the weight of the model")
+parser.add_argument("--saving_name", type=str, default=None, 
+                    help="Name to save the evaluation file")
+parser.add_argument('-parallel', '--parallel', type=str2bool, default=True,
+                    help='If true the evaluation will be done in batch and parallelise on GPU')
+parser.add_argument('-batch_size', '--batch_size', type=int, default=32,
+                    help='Batch size for the evaluation')
 args = parser.parse_args()
-print("=========== EVALUATION ============")
 
-# Define the file name where you want to save the output and redirect the print
-if args.name is None:
-    name = args.model.split("/")[-1]
-else:
-    name = args.name
-output_file = Path(f"{args.output_file}/eval_{name}.txt")
+################ initialisation : path ################
+name = args.model.split("/")[-1] if args.saving_name is None else args.saving_name
+output_file = Path(f"{args.output_file}/eval_{name}")
 output_file.parent.mkdir(exist_ok=True, parents=True)
 
-#output_file = (
-#    f"{os.path.join( os.path.dirname(os.getcwd()),args.output_file)}/eval_{name}.txt"
-#)
-sys.stdout = open(output_file, "w")
-# print("=========== EVALUATION ============")
 
-# Initialition
+################ Setup: Logger ################
+
+# Set up the logger
+log_file = f"{args.output_file}.log"  # Save log to `eval.log` or as specified
+logger = setup_logger(log_file)
+logger.info("Program: eval.py ****")
+
+
+print("=========== EVALUATION ============")
+
+
+################ setup : device ################
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+logger.info(f"Device : {device}")
+if not(torch.cuda.is_available()) and args.parallel: 
+    args.parallel = False 
+    logger.warning("CPU devise, no parralelization possible - evaluation will be done sequentially")
+
+
+
+################ initialisation : data-objects ################
 @dataclass
 class MNLIInputFeatures:
     premise: str  # context
@@ -54,25 +74,28 @@ class MNLIInputFeatures:
     relation: str
 
 
+class MNLIDataset(Dataset):
+    def __init__(self, mnli_data : List[MNLIInputFeatures], tokenizer : AutoTokenizer, number_relation=11):
+        self.mnli_data = mnli_data
+        self.tokenizer = tokenizer
+        self.number_relation = number_relation
+
+    def __len__(self):
+        return len(self.mnli_data)
+
+    def __getitem__(self, idx):
+        data = self.mnli_data[idx]
+        inputs = []
+        true_hypothesis = data.hypothesis_true[0]
+        inputs.append((data.premise, true_hypothesis, 1))  # True hypothesis marked as label 1
+
+        for hf in data.hypothesis_false:
+            inputs.append((data.premise, hf, 0))  # False hypothesis marked as label 0
+
+        return inputs, data.relation  # Return relation for mapping
+
+################ initialisation : data ################
 mnli_data = []
-# dict with key = True relation and the list of score to evaluate each realtion independantly
-relation_score = {}
-
-
-# load model
-path = args.model
-""" With the below writing some weight where randomly initialised
-tokenizer = AutoTokenizer.from_pretrained(args.source_model)
-model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
-model.to(device)"""
-
-# model_name = "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
-tokenizer = AutoTokenizer.from_pretrained(path)
-model = AutoModelForSequenceClassification.from_pretrained(path)
-model.to(device)
-
-
-# read json
 lines = json.load(open(args.input_file, "rt"))
 for line in lines:
     mnli_data.append(
@@ -86,37 +109,96 @@ for line in lines:
         )
     )
 
-# evalute
-def rank(mnli_input: MNLIInputFeatures, number_relation: int = 11):
-    """
-    Method to rank a feature, the entailement probability of the true premise is ranked against all the
-    other premises probabilities. The output is a list of rank index, the position of the index corresponding to
-    the rank and the index to the relation. The true relation is the element 0. If the 0 is place at the
-    position 2 that would mean that the true premise only have the third highest rank.
-    """
 
-    # initialisation
+################ code : ranking ################
+def rank(
+            mnli_input : MNLIInputFeatures, 
+            tokenizer : AutoTokenizer,
+            model: AutoModelForSequenceClassification, 
+            device, 
+            number_relation=11
+        ):
+    """
+    Sequential computation for ranking entailment scores without parallelism.
+    """
     premise = mnli_input.premise
 
-    # entail the true
-
+    # Compute entailment for the true hypothesis
     input = tokenizer(
         premise, mnli_input.hypothesis_true[0], truncation=True, return_tensors="pt"
     )
-    output = model(input["input_ids"].to(device))  # device = "cuda:0" or "cpu"
-    prediction = torch.softmax(output["logits"][0], -1).tolist()
-    entailment = [prediction[0]]  # the True element is at index 0
-    # entail the false
-    for hf in mnli_input.hypothesis_false:
-        input = tokenizer(premise, hf, truncation=True, return_tensors="pt")
-        output = model(input["input_ids"].to(device))  # device = "cuda:0" or "cpu"
-        prediction = torch.softmax(output["logits"][0], -1).tolist()
-        entailment.append(prediction[0])  # [ proba entail , proba contradiction
-    # rank the element, ind is the link of index of increasing probabilty
-    return np.array(entailment).argsort()[-number_relation:][
-        ::-1
-    ]  # pour le truc global mais on va aussi return la relation
+    input = input.to(device)
+    output = model(input["input_ids"])
+    prediction = torch.softmax(output["logits"][0], dim=-1).tolist()
+    entailment = [prediction[0]]  # True hypothesis score
 
+    # Compute entailment for false hypotheses
+    for hf in mnli_input.hypothesis_false:
+        input = tokenizer(premise, hf, truncation=True, return_tensors="pt").to(device)
+        output = model(input["input_ids"])
+        prediction = torch.softmax(output["logits"][0], dim=-1).tolist()
+        entailment.append(prediction[0])
+
+    # Rank the scores
+    return np.array(entailment).argsort()[-number_relation:][::-1]
+
+def collate_fn(batch):
+    premises, hypotheses, labels = [], [], []
+    relations = []
+    for inputs, relation in batch:
+        for premise, hypothesis, label in inputs:
+            premises.append(premise)
+            hypotheses.append(hypothesis)
+            labels.append(label)
+        relations.append(relation)
+    return premises, hypotheses, labels, relations
+
+def rank_parallel(
+            mnli_data : List[MNLIInputFeatures], 
+            tokenizer : AutoTokenizer,
+            model: AutoModelForSequenceClassification, 
+            device, 
+            batch_size=32,
+            number_relation=11
+            ):
+    """
+    Parallelized computation for ranking entailment scores using batching on GPU.
+    """
+    dataset = MNLIDataset(mnli_data, tokenizer, number_relation)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn, num_workers=4
+    )
+
+    ranked_results = []
+    relation2shots = {}
+
+    model.to(device)
+    model.eval()
+
+    for premises, hypotheses, _, relations in tqdm(dataloader):
+        inputs = tokenizer(
+            premises, hypotheses, padding=True, truncation=True, return_tensors="pt"
+        ).to(device)
+
+        with torch.no_grad():
+            outputs = model(inputs["input_ids"])
+            predictions = F.softmax(outputs["logits"], dim=-1)[:, 0]  # Probability of entailment
+
+        # Group predictions by relation and rank
+        for i, relation in enumerate(relations):
+            entailments = predictions[i * number_relation: (i + 1) * number_relation]
+            ranked_indices = entailments.argsort(descending=True).tolist()
+
+            # Store ranked indices
+            ranked_results.append(ranked_indices)
+
+            if relation not in relation2shots:
+                relation2shots[relation] = []
+            relation2shots[relation].append(ranked_indices)
+
+    return ranked_results, relation2shots
+
+################ code : score ################
 
 def compute_hits_at_k(shots, element=0, k_values=[1, 3, 10]):
     """
@@ -134,28 +216,67 @@ def compute_hits_at_k(shots, element=0, k_values=[1, 3, 10]):
 
     return hits
 
+################ code : evaluation ################
 
-# Sample ranked lists for each shot
-shots = []
-relation2shots = {}
-for data in tqdm(mnli_data):
-    if len(data.hypothesis_true) > 0:  # TODO remove that in the future
-        ranked_relations = rank(data)
-        # all the shots to compute the global hit@
-        shots.append(ranked_relations)
-        # each relation to ist rank
-        if data.relation in relation2shots.keys():
-            relation2shots[data.relation].append(ranked_relations)
-        else:
-            relation2shots[data.relation] = [ranked_relations]
+def evaluate(
+        mnli_data: List [MNLIInputFeatures], 
+        tokenizer : AutoTokenizer, 
+        model : AutoModelForSequenceClassification, 
+        parallel : bool, 
+        device : str = "cpu", 
+        batch_size : str = 32, 
+        number_relation : int =11):
+    """
+    Main function to evaluate rankings, with an option for parallelism.
+    """
+    if parallel and torch.cuda.is_available():
+        logger.info("Running in parallel mode on GPU...")
+        device = torch.device("cuda")
+        return rank_parallel(mnli_data, tokenizer, model, device, batch_size, number_relation)
+    else:
+        logger.info("Running in sequential mode on CPU...")
+        ranked_results = []
+        relation2shots = {}
+
+        for data in tqdm(mnli_data):
+            if len(data.hypothesis_true) > 0:  # Ensure valid input
+                ranked_relations = rank(data, tokenizer, model, device, number_relation)
+                ranked_results.append(ranked_relations)
+
+                if data.relation in relation2shots.keys():
+                    relation2shots[data.relation].append(ranked_relations)
+                else:
+                    relation2shots[data.relation] = [ranked_relations]
+
+        return ranked_results, relation2shots
+
+
+path = args.model
+""" With the below writing some weight where randomly initialised
+tokenizer = AutoTokenizer.from_pretrained(args.source_model)
+model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
+model.to(device)"""
+# model_name = "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
+tokenizer = AutoTokenizer.from_pretrained(path)
+model = AutoModelForSequenceClassification.from_pretrained(path)
+model.to(device)
 
 # Compute Hit at 1 and Hit at 3 for the element across shots
-hits = compute_hits_at_k(shots)
+ranked_results, relation2shots = evaluate(
+            mnli_data=mnli_data, 
+            tokenizer=tokenizer, 
+            model=model, 
+            parallel=args.parallel, 
+            device=device, 
+            batch_size = args.batch_size, 
+            number_relation =11
+        )
+hits = compute_hits_at_k(ranked_results)
 
 # Display the Global results
 for k, hit in hits.items():
     # print(f"Global Hit_at_{k}: {hit/len(shots)}")
-    print(f"Hit_at_{k};Global;{hit/len(shots)}")
+    logger.log(f"Hit_at_{k};Global;{hit/len(ranked_results)}")
 # print("------------------------------------")
 
 # Display the results for each relation
@@ -166,8 +287,6 @@ for relation in relation2shots.keys():
     # Display the results
     for k, hit in hits.items():
         # print(f"{relation} Hit_at_{k}: {hit/len(relation2shots[relation])}")
-        print(f"Hit_at_{k};{relation};{hit/len(relation2shots[relation])}")
+        logger.log(f"Hit_at_{k};{relation};{hit/len(relation2shots[relation])}")
     # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-sys.stdout.close()
-sys.stdout = sys.__stdout__
