@@ -18,6 +18,7 @@ import pandas as pd
 import torch 
 import gc
 from accelerate.utils import release_memory
+import shutil
 
 import transformers
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -25,7 +26,6 @@ from transformers import TrainingArguments, Trainer
 from datasets import load_dataset
 
 from datetime import datetime
-import logger
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
@@ -33,7 +33,7 @@ FAST = False
 
 ################ setup : config ################
 current_dir = os.path.dirname(__file__)
-config_path = os.path.join(current_dir, "..", "config", "config.json")
+config_path = os.path.join(os.path.dirname(current_dir), "configs", "config.json")
 with open(config_path, "r") as config_file:
     config = json.load(config_file)
 
@@ -270,6 +270,7 @@ if args.do_train:
 ################ save ################
 model_path = f"{args.output_dir}/{args.save_name}-{DATE}"
 trainer.save_model(output_dir=model_path)
+shutil.copy(config_path, f"{model_path}/config_used.json")
 
 if device == "cuda":
     # free memory
