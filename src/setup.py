@@ -1,4 +1,5 @@
 import logging
+import sys
 from typing import Optional
 
 def setup_logger(output_file):

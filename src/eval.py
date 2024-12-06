@@ -1,5 +1,6 @@
 import argparse
 from dataclasses import dataclass
+import logging
 from setup import setup_logger
 from pathlib import Path
 from typing import List
@@ -14,6 +15,7 @@ import torch
 import sys
 from torch.utils.data import DataLoader, Dataset
 import torch.nn.functional as F
+print("=========== EVALUATION ============")
 
 ################ setup : parser ################
 def str2bool(v):
@@ -29,6 +31,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", type=str, required=True,
                     help=" File with the eval json eg : data/WN18RR/valid_eval.json")
 parser.add_argument("--output_file", type=str, required=True, default="eval")
+parser.add_argument("--source_model", type=str, required=True, 
+                    help="Hugging face ID of the model used")
 parser.add_argument("--model", type=str, required=True, 
                     help="Path of the weight of the model")
 parser.add_argument("--saving_name", type=str, default=None, 
@@ -51,10 +55,6 @@ output_file.parent.mkdir(exist_ok=True, parents=True)
 log_file = f"{args.output_file}.log"  # Save log to `eval.log` or as specified
 logger = setup_logger(log_file)
 logger.info("Program: eval.py ****")
-
-
-print("=========== EVALUATION ============")
-
 
 ################ setup : device ################
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -175,7 +175,7 @@ def rank_parallel(
     model.to(device)
     model.eval()
 
-    for premises, hypotheses, _, relations in tqdm(dataloader):
+    for premises, hypotheses, _, relations in tqdm(dataloader, desc="Running Ranking :"):
         inputs = tokenizer(
             premises, hypotheses, padding=True, truncation=True, return_tensors="pt"
         ).to(device)
@@ -200,7 +200,7 @@ def rank_parallel(
 
 ################ code : score ################
 
-def compute_hits_at_k(shots, element=0, k_values=[1, 3, 10]):
+def compute_hits_at_k(ranked_results, element=0, k_values=[1, 3, 10]):
     """
     shots : list of ranked index (the position correspond to the index)
     element : element in the list we want to compute the hit@
@@ -208,13 +208,35 @@ def compute_hits_at_k(shots, element=0, k_values=[1, 3, 10]):
     """
     hits = {k: 0 for k in k_values}
 
-    for shot in shots:
-        if element in shot[: k_values[-1]]:
+    for ranking in ranked_results:
+        if element in ranking[: k_values[-1]]:
             for k in k_values:
-                if element in shot[:k]:
+                if element in ranking[:k]:
                     hits[k] += 1
 
     return hits
+
+def compute_mrr(ranked_results, element=0):
+    """
+    Compute the Mean Reciprocal Rank (MRR) for a set of ranked results.
+    
+    Args:
+        ranked_results: List of ranked indices for each evaluation example.
+        element: The target element (e.g., the correct index) for which to compute the rank.
+
+    Returns:
+        float: The Mean Reciprocal Rank (MRR).
+    """
+    reciprocal_ranks = []
+    for ranking in ranked_results:
+        try:
+            rank_position = ranking.index(element) + 1  # Rank positions are 1-based
+            reciprocal_ranks.append(1 / rank_position)
+        except ValueError:
+            reciprocal_ranks.append(0.0)  # Element not found in ranking
+
+    return sum(reciprocal_ranks) / len(reciprocal_ranks) if reciprocal_ranks else 0.0
+
 
 ################ code : evaluation ################
 
@@ -238,7 +260,7 @@ def evaluate(
         ranked_results = []
         relation2shots = {}
 
-        for data in tqdm(mnli_data):
+        for data in tqdm(mnli_data, desc="Running Sequential Ranking :"):
             if len(data.hypothesis_true) > 0:  # Ensure valid input
                 ranked_relations = rank(data, tokenizer, model, device, number_relation)
                 ranked_results.append(ranked_relations)
@@ -256,8 +278,11 @@ path = args.model
 tokenizer = AutoTokenizer.from_pretrained(args.source_model)
 model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
 model.to(device)"""
-# model_name = "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli"
-tokenizer = AutoTokenizer.from_pretrained(path)
+tokenizer = AutoTokenizer.from_pretrained(
+        args.source_model, 
+        use_fast=False, 
+        model_max_length=512
+    ) 
 model = AutoModelForSequenceClassification.from_pretrained(path)
 model.to(device)
 
@@ -272,21 +297,22 @@ ranked_results, relation2shots = evaluate(
             number_relation =11
         )
 hits = compute_hits_at_k(ranked_results)
-
+mrr = compute_mrr(ranked_results)
+logger.info(f"Global MRR: {mrr}")
 # Display the Global results
 for k, hit in hits.items():
-    # print(f"Global Hit_at_{k}: {hit/len(shots)}")
-    logger.log(f"Hit_at_{k};Global;{hit/len(ranked_results)}")
-# print("------------------------------------")
+    logger.info(f"Hit_at_{k};Global;{hit/len(ranked_results)}")
 
 # Display the results for each relation
 for relation in relation2shots.keys():
     # Compute Hit at 1 and Hit at 3 for the element across shots
+    mrr_relation = compute_mrr(relation2shots[relation])
+    logger.info(f"MRR;{relation};{mrr_relation}")
+
     hits = compute_hits_at_k(relation2shots[relation])
 
     # Display the results
     for k, hit in hits.items():
-        # print(f"{relation} Hit_at_{k}: {hit/len(relation2shots[relation])}")
-        logger.log(f"Hit_at_{k};{relation};{hit/len(relation2shots[relation])}")
-    # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
+        logger.info(f"Hit_at_{k};{relation};{hit/len(relation2shots[relation])}")
+    
+    
