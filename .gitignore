@@ -8,6 +8,7 @@ __pycache__/
 src/*.txt
 data/*.txt
 tmp/
+*.pth
 # C extensions
 *.so
 
