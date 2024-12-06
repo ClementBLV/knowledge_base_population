@@ -1,17 +1,19 @@
-Meeting Notes 14/11/2024
+Meeting Notes 21/11/2024
 
 TODOs ; 
 Code : TRAINING 
-+ DONE  necessity to had a config file for the hyperparameter for each model training
+- DONE  necessity to had a config file for the hyperparameter for each model training
 -	see to improve its speed on expert server (new parameters + parallelization) 
++   see how much examples are above 1024 token
 
 Code : IMPROVEMENT 
 -	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
--	Implement majority voting as intermediate step 
+-	Implement majority voting as intermediate step
++   Build the data2meta.py : code which agregate the three models to generate the probability for each eaxample for training and testing
 -	Build a meta model : Use the newly trained models to generate a training set for the meta model 
 
 Code : EVALUATION 
--	add MRR in the evaluation metric 
--	Improve evaluation speed with parallelization
+- DONE	add MRR in the evaluation metric 
+- DONE	Improve evaluation speed with parallelization
 -	See how it is done in the literature
 -	Evaluate the models one by one and with the meta model (MRR + hit@) 

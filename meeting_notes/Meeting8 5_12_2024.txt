@@ -1,0 +1,28 @@
+Meeting Notes 5/12/2024
+
+TODOs ; 
+Code : TRAINING 
++ TEST add wandb API key agument and loss traking
++   see for early stopping 
++   see for LORA for faster training
+-	see to improve its speed on expert server (new parameters + parallelization) 
+!!  see how much examples are above 1024 token
+
+Code : IMPROVEMENT 
+-  TEST Build a meta model.py : Use the newly trained models to generate a training set for the meta model
+-   in data processing and training ONLY take the en the entailment prob
+-   Parallelize data2meta_v2.py 
++   Build Eval for meta model
++   Heuristic fro training meta
+-   Build script_eval_meta_expert.sh 
++   Test all scripts (deberta-small)
++   Test all scripts (deberta-small + GPU : expert)
+
++   (Modify Entypoints)
++   (Test Entrypoint (expert.ai GPU ))
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+
+
+Code : EVALUATION 
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 

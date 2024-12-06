@@ -1,0 +1,30 @@
+Meeting Notes 28/11/2024
+
+TODOs ; 
+Code : TRAINING 
++ DONE/NOT-TESTED add wandb API key agument and loss traking
++   see for early stopping 
++   see for LORA for faster training
+-	see to improve its speed on expert server (new parameters + parallelization) 
+-   see how much examples are above 1024 token
+
+Code : IMPROVEMENT 
+-  DONE/NOT-TESTED Build a meta model.py : Use the newly trained models to generate a training set for the meta model
+-  DONE Build the data2meta.py : code which agregate the three models to generate the probability for each eaxample for training and testing
++  DONE Parallelize data2meta.py 
+-  DONE Build script_train_meta_expert_binairy.sh --> for binary classification 
++  DONE Build data2meta_v2.py + script_train_meta_expert.sh
++   Parallelize data2meta_v2.py 
+-  DONE	Build majority voting as intermediate step and add it to the model
+-   Build script_eval_meta_expert.sh 
++   Test all scripts + write config files
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+
+Code : EVALUATION 
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 
+
+
++ Heuristic fro training meta
++ Entypoints 
++ confing file should be outside in a volume 
