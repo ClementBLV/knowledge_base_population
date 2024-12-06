@@ -95,8 +95,6 @@ os.makedirs(logging_directory, exist_ok=True)
 logger.info(f"Save : Checkpoint Save location : {args.output_dir}")
 logger.info(f"Save : Trained model saving Name : {args.model_name}")
 
-
-
 ################ load : model ################
 model_name = args.model_name
 max_length = config["max_length"]
