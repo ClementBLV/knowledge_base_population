@@ -19,7 +19,7 @@ import torch
 import gc
 from accelerate.utils import release_memory
 import shutil
-
+import wandb
 import transformers
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers import TrainingArguments, Trainer
@@ -31,11 +31,7 @@ SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
 FAST = False
 
-################ setup : config ################
-current_dir = os.path.dirname(__file__)
-config_path = os.path.join(os.path.dirname(current_dir), "configs", "config.json")
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
+
 
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
@@ -80,7 +76,17 @@ parser.add_argument('-output_dir', '--output_dir',type=str, required=True,
                     help='Directroy to save the outputs (log - weights)')
 parser.add_argument('-save_name', '--save_name',type=str, required=True,
                     help='Name under which the model will be saved in the output dir')
+parser.add_argument("--config_file", type=str, required=True, 
+                    help="Nale if the config file of for the meta model")
+parser.add_argument('--wandb_api_key', type=str, required=True,
+                    help='Weights & Biases API key for logging')
 args = parser.parse_args()
+
+################ setup : config ################
+current_dir = os.path.dirname(__file__)
+config_path = os.path.join(os.path.dirname(current_dir), "configs", args.config_file)
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
 
 ################ setup : dirrectories ################
 os.makedirs(args.output_dir, exist_ok=True)
@@ -88,6 +94,8 @@ logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
 logger.info(f"Save : Checkpoint Save location : {args.output_dir}")
 logger.info(f"Save : Trained model saving Name : {args.model_name}")
+
+
 
 ################ load : model ################
 model_name = args.model_name
@@ -117,6 +125,26 @@ else:
     logger.error("This script is for training not evaluation")
     raise ValueError("You must use this script for training")
 
+############### setup : wandb ################
+
+if args.do_train :
+    logger.info("Setting up wandb for logging...")
+    wandb.login(key=args.wandb_api_key)  # Use the API key from args
+
+    # Initialize wandb run
+    wandb.init(
+        project="your_project_name",  # Replace with your wandb project name
+        config={
+            "learning_rate": config["learning_rate"],
+            "epochs": config["num_train_epochs"],
+            "batch_size": config["per_device_train_batch_size"],
+            "gradient_accumulation_steps": config["gradient_accumulation_steps"],
+            "model_name": model_name,
+            "seed": SEED_GLOBAL,
+        },
+        name=f"run_{args.save_name}_{DATE}",
+    )
+    logger.info("wandb initialized.")
 
 ################ load : data ################
 raw_datasets = load_dataset(
@@ -253,24 +281,42 @@ train_args = TrainingArguments(
 )
 
 ################ trainer ################
+def log_metrics(metrics, phase="train"):
+    """Log metrics to wandb."""
+    if wandb.run:
+        for key, value in metrics.items():
+            wandb.log({f"{phase}_{key}": value})
+
 trainer = Trainer(
     model=model,
     tokenizer=tokenizer,
     args=train_args,
-    train_dataset=encoded_dataset_train,  #.shard(index=1, num_shards=200),  # https://huggingface.co/docs/datasets/processing.html#sharding-the-dataset-shard
-    eval_dataset=encoded_dataset_test,  #.shard(index=1, num_shards=20),
-    #compute_metrics=lambda x: compute_metrics_standard(x, label_text_alphabetical=label_text_unique)  #compute_metrics,
+    train_dataset=encoded_dataset_train,  
+    eval_dataset=encoded_dataset_test,  
+    # Add custom callback to log metrics to wandb
+    callbacks=[transformers.TrainerCallback(
+        on_log=lambda args, state, control, logs=None: log_metrics(logs, "train")
+    )],
 )
-
 ################ train ################
 if args.do_train:
-    trainer.train()
+    train_result = trainer.train()
 
+    model_path = f"{args.output_dir}/{args.save_name}-{DATE}"
+    trainer.save_model(output_dir=model_path)
+    shutil.copy(config_path, f"{model_path}/config_used.json")
+    
+    # Log final metrics
+    final_metrics = train_result.metrics
+    log_metrics(final_metrics, "final_train")
 
+    # Close wandb run
+    if wandb.run:
+        wandb.finish()
+    
+    wandb.config.update({"model_path": model_path})
 ################ save ################
-model_path = f"{args.output_dir}/{args.save_name}-{DATE}"
-trainer.save_model(output_dir=model_path)
-shutil.copy(config_path, f"{model_path}/config_used.json")
+
 
 if device == "cuda":
     # free memory
