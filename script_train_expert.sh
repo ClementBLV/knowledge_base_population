@@ -21,6 +21,8 @@ show_help() {
     echo "  --hf_cache_dir DIR              Set the Hugging Face cache directory; if not set, it will be the default directory."
     echo "                                  If not provided or set to None, the cache settings will not be exported."
     echo "  --no_training BOOL              If set to true, training will be skipped and 'HELLO WORLD NO TRAINING!' will be printed."
+    echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
+    echo "  --wandb_key STR                 The API key for wandb logging"
     echo "  --help                          Display this help message and exit."
     exit 0
 }
@@ -38,6 +40,8 @@ declare -A args=(
     [--output_dir]=OUTPUT_DIR
     [--hf_cache_dir]=HF_CACHE_DIR
     [--no_training]=NO_TRAINING
+    [--config_file]=CONFIG_FILE
+    [--wandb_key]=WANK_KEY
 )
 
 while [ $# -gt 0 ]; do
@@ -109,7 +113,8 @@ run_experiment() {
      --task $TASK \
      --test_bool $TEST_BOOL \
      --valid_bool $VALID_BOOL \
-     --do_preprocess $DO_PREPROCESS
+     --do_preprocess $DO_PREPROCESS \
+     --config_file $CONFIG_FILE \
 
     if [ "$NO_TRAINING" == "true" ]; then
         echo "HELLO WORLD NO TRAINING!"
@@ -124,7 +129,9 @@ run_experiment() {
             --train_file "${P_FILE}train_${split}.mnli.json" \
             --test_file "${P_FILE}test.mnli.json" \
             --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/" \
-            --save_name $save_name
+            --save_name $save_name \
+            --config_file $BASE"/configs/$CONFIG_FILE" \
+            --wandb_api_key
     fi
 
     # Remove the generated datasets
