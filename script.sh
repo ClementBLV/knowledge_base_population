@@ -20,6 +20,7 @@ show_help() {
     echo "  --test_bool BOOL                  Set the test_bool parameter; if true, testing will be performed."
     echo "  --valid_bool BOOL                 Set the valid_bool parameter; if true, validation will be performed."
     echo "  --do_preprocess BOOL              Set the do_preprocess parameter; if true, preprocessing steps will be executed."
+    echo "  --config_file PATH                NAME of the config.json you want to use in the config file"    
     echo "  --help                            Display this help message and exit."
     exit 0
 }
@@ -35,6 +36,7 @@ declare -A args=(
     [--test_bool]=TEST_BOOL
     [--valid_bool]=VALID_BOOL
     [--do_preprocess]=DO_PREPROCESS
+    [--config_file]=CONFIG_FILE
 )
 
 while [ $# -gt 0 ]; do
@@ -76,8 +78,10 @@ if [ "$DO_PREPROCESS" == "true" ]; then
     # generate test eval file only once
     python3 src/data2eval.py \
                 --input_file $TEST".json" \
-                --output_file "$P_FILE/test_eval.json" \
+                --output_file $ROOT"preprocessed/test_eval.json" \
                 --task "$TASK"
+                #you might want to change the output path if you have limited resources but beware to adapt the eval file
+                
 else
     echo "WARNING : You must have already preprocessed the data" 
 fi
@@ -101,7 +105,8 @@ if [ "$TRAIN_BOOL" == "true" ]; then
             --data_source $ROOT \
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
             --both $BOTH \
-            --task "$TASK"
+            --task "$TASK" \
+            --config_name $CONFIG_FILE 
 
         rm -rf $P_FILE"train_"$SPLIT".json"
         echo "INFO : Save : tmp file $P_FILE"train_"$SPLIT".json" was successfully removed"
