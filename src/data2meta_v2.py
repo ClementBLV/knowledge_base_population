@@ -28,6 +28,8 @@ from transformers import (
 )
 from torch.multiprocessing import Pool, set_start_method
 from collections import defaultdict
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
 from templates import FB_LABEL_TEMPLATES, WN_LABEL_TEMPLATES, WN_LABELS
 LABELS, LABEL_TEMPLATES = None , None
@@ -217,34 +219,35 @@ def process_data(line):
     return id, probas, labels
 
 ################ parralel approach ################
-def  process_relation(relation: Relation, context, model):
+def  process_relation(relations: List[Relation], context:str , model, model_name: str):
     """Process a single relation with the given model."""
-    with torch.no_grad():
-        # Direct relation
-        if model_name in ["model_1", "model_3"]: 
-        encoded_context = tokenizer(
-            context,
-            relation.relation_direct,
-            truncation="longest_first",
-            max_length=config["max_length"],
-            padding="max_length",
-            return_tensors="pt"
-        ).to(device)
-        direct_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
+    for relation in inputs.relations: 
+        with torch.no_grad():
+            # Direct relation
+            if model_name in ["model_1", "model_3"]: 
+                encoded_context = tokenizer(
+                    context,
+                    relation.relation_direct,
+                    truncation="longest_first",
+                    max_length=config["max_length"],
+                    padding="max_length",
+                    return_tensors="pt"
+                ).to(device)
+                direct_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
+                return direct_probs
 
-        if model_name in ["model_2", "model_4"]: 
-            # Reverse relation
-            encoded_context = tokenizer(
-                context,
-                relation.relation_reverse,
-                truncation="longest_first",
-                max_length=config["max_length"],
-                padding="max_length",
-                return_tensors="pt"
-            ).to(device)
-            reverse_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
-
-    return direct_probs, reverse_probs
+            if model_name in ["model_2", "model_4"]: 
+                # Reverse relation
+                encoded_context = tokenizer(
+                    context,
+                    relation.relation_reverse,
+                    truncation="longest_first",
+                    max_length=config["max_length"],
+                    padding="max_length",
+                    return_tensors="pt"
+                ).to(device)
+                reverse_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
+                return direct_probs, reverse_probs
 
 def process_data_for_model(lines, model_name):
     """Process all data for a specific model."""
@@ -252,13 +255,9 @@ def process_data_for_model(lines, model_name):
     model = models[model_name]
     for line in lines:
         inputs = dataload(line)
-        probas = []
-        labels = []
-        for relation in inputs.relations:
-            direct_probs, reverse_probs = process_relation(relation, inputs.context, model)
-            probas.extend([direct_probs, reverse_probs])
-            labels.append(relation.label)
-        results.append({"id": inputs.id, "proba": probas, "label": labels})
+        labels = [re]
+        probs = process_relation(inputs, model)
+        results.append({"id": inputs.id, "proba": probs, "label": labels, "model_name": model_name})
     return results
 
 def process_data_concurrently(datas):
@@ -278,8 +277,17 @@ def process_data_concurrently(datas):
 
 
 
+def fuse_results (all_results):
+    """Fuse the probabilities obtain on the four threads"""
+    for result in all results: 
+        
+    final_results.append({
+            "id": id,
+            "proba": proba for all relation
+            "label": list of labels
+        })
 
-
+    return final_results
 
         
 ################ Main Processing ################
