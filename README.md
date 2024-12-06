@@ -133,11 +133,39 @@ source script_train_expert.sh \
   The input for binary prediction is a matrix where each column corresponds to a model's prediction probabilities. Each column contains two probabilities: one for entailment (`p_{entail}`) and one for contradiction (`p_{contra}`), as described below:
 
   $$
-  \mathbf{X} = 
+  \mathbf{X (tail, relation, head)} = \mathbf{X (hypostesis, premise)} = 
   \begin{bmatrix}
-  [p_{1,\text{entail}}, p_{1,\text{contra}}]  & [p_{2,\text{entail}}, p_{2,\text{contra}}] & [p_{3,\text{entail}}, p_{3,\text{contra}}] & [p_{4,\text{entail}}, p_{4,\text{contra}}]
+  p_{1,\text{entail}}  & p_{2,\text{entail}} & p_{3,\text{entail}} & p_{4,\text{entail}}
   \end{bmatrix}
   $$
+
+  $$
+  \mathbf{Y} = real \space label  = {0=entailement , 1= contradiction}
+  $$
+
+  UPDATE --> only keep the p_entail hense 4 probabilites
+  for data in data (batch - 1000): 
+    compute the 4 prob 
+    train meta model 
+    if loss decrees 
+      continue 
+    else: 
+      stop
+
+first performace = 0 
+for i in step : 
+  start with (step * 10%) : 
+  generate the data to train (4 probabilities)
+  train the model 
+  evaluate 
+  if new performance > first_perf : 
+    continue 
+  else : 
+    stop 
+
+----> heuristic, improvement of epsilon choosen ( eg improvement below 10-3)
+
+
 
   Here:
   - $( p_{i,\text{entail}} )$ is the probability of entailment from the $(i)$-th model.
@@ -170,7 +198,7 @@ source script_train_expert.sh \
   With this method we are doing a more refined prediction where the model is given all the probability  one for entailment (`p_{entail}`) and one for contradiction (`p_{contra}`) obtained with the three models, for each relation at ones. Then it must output a vector of size [1, Number of relation], for instance the output is [0, 0 , 1, 0, 0] if the relation 5 is the good relation. 
 
   $$
-  \mathbf{X} = 
+  \mathbf{X ( head ,relation_i,  i \in \{0, n\}, tail )} = 
   \begin{bmatrix}
   [p_{1,\text{entail}}^{r1}, p_{1,\text{contra}}^{r1}]  & [p_{2,\text{entail}}^{r1}, p_{2,\text{contra}}^{r1}] & [p_{3,\text{entail}}^{r1}, p_{3,\text{contra}}^{r1}] & [p_{4,\text{entail}}^{r1}, p_{4,\text{contra}}^{r1}] \\
   \\
@@ -188,7 +216,7 @@ source script_train_expert.sh \
   Then given $X$ the model is trained to predict the probability of entailment or contradiction of the pair of hypothesis and premise for all the relations
 
   $$
-  \text{BinairyModel}(X) = 
+  \text{VectorModel}(X) = 
   \begin{bmatrix}
   0 & 0 & 1
   \end{bmatrix}

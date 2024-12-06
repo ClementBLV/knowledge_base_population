@@ -1,43 +1,30 @@
-from argparse import ArgumentParser
-from dataclasses import dataclass
-from collections import defaultdict, Counter
+import argparse
 import logging
-from typing import Dict
-import numpy as np
+import os
+import random
 import json
 import sys
-from pprint import pprint
-import random
 from pathlib import Path
+from dataclasses import dataclass
+from collections import Counter, defaultdict
+from typing import Dict, List
 from templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
     FORBIDDEN_MIX,
-    FB_LABEL_TEMPLATES
+    FB_LABEL_TEMPLATES,
 )
-import os
-print("=========== CONVERTION ============")
 
-################ setup : seed ################
+LABELS, LABEL_TEMPLATES = None , None
+
+
+# Set random seeds
 random.seed(0)
-np.random.seed(0)
-sys.path.append("./")
 
-################ setup : logger ################
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
-logger.info("Progam : data2mnli.py ****")
-
-################ setup : config ################
-current_dir = os.path.dirname(__file__)
-config_path = os.path.join(os.path.dirname(current_dir), "configs", "config.json")
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
-
-
-################ setup : data objects ################
+################ setup : dataclass ################
 @dataclass
 class REInputFeatures:
+    """Represents a relation extraction input instance."""
     head_id: str
     tail_id: str
     subj: str
@@ -49,230 +36,256 @@ class REInputFeatures:
 
 @dataclass
 class MNLIInputFeatures:
-    premise: str  # context
-    hypothesis: str  # relation
+    """Represents an MNLI input instance."""
+    premise: str
+    hypothesis: str
     label: int
+    way: int
 
-################ setup : parser ################
-parser = ArgumentParser()
-parser.add_argument("--input_file", type=str)
-parser.add_argument("--data_source", type=str, help="Folder with the data, used to pick the forbidden mixe relation")
-parser.add_argument("--config_name", type=str, help="File name of the config, must be a .json")
-parser.add_argument("--output_file", type=str)
-parser.add_argument("--negn", type=int, default=1, help="Number of negative examples for each pair")
-parser.add_argument("--direct", type=bool, default=True, help="If set on True only the direct relation will be present.")
-parser.add_argument("--both", type=bool, default=False, help="If set on True the direct and inverse relation will be present")
-parser.add_argument("--task", required=True, type=str, metavar="N", help="dataset name")
-args = parser.parse_args()
 
-################ setup : variables ################
-logger.info(f"Task called: {args.task}")
-logger.info(f"Convert {args.input_file} into NLI dataset")
-assert (
-        type(args.task) == type("str")
-    ), "Must presise the dataset either 'wordnet', 'wn', 'wn18rr' or 'freebase', 'fb', 'fb15k237' in a string"
+@dataclass
+class Relation:
+    """Represents a relation and its template."""
+    relation: str
+    template: str
+    way: int
+
+
+################ setup : args ################
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
     
-if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
-    LABELS = WN_LABELS
-    LABEL_TEMPLATES = WN_LABEL_TEMPLATES
-elif args.task.lower() in ["freebase", "fb", "fb15k237"]:
-    LABELS = list(FB_LABEL_TEMPLATES.keys())
-    LABEL_TEMPLATES = FB_LABEL_TEMPLATES
-else : 
-    raise TypeError("The task called is unknown")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Convert data into MNLI format.")
+    parser.add_argument("--input_file", type=str, required=True, help="Input file path.")
+    parser.add_argument("--data_source", type=str, required=True, help="Folder with data for forbidden relations.")
+    parser.add_argument("--config_name", type=str, required=True, help="Name of the config file (JSON).")
+    parser.add_argument("--output_file", type=str, required=True, help="Path to save the output file.")
+    parser.add_argument("--negn", type=int, default=1, help="Number of negative examples per pair.")
+    parser.add_argument("--direct", type=str2bool, default="true",  help="Include only direct relations.")
+    parser.add_argument("--both", type=str2bool, default="false" , help="Include both direct and inverse relations.")
+    parser.add_argument("--task", type=str, required=True, help="Dataset name (e.g., 'wordnet' or 'freebase').")
+    return parser.parse_args()
 
-# to correspond to the config of pretrained model - TO CHECK 
-#label2id = {"entailment": 0, "neutral": 1, "contradiction": 2}
-#{'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
-label2id = config["label2id"] 
-logger.info(f"Label : the label used are {label2id}")
 
-################ setup : saving file ################
-path = os.path.join(os.path.dirname(os.getcwd()), args.output_file)
-output_file_path = Path(path)
-output_file_path.parent.mkdir(exist_ok=True, parents=True)
+################ setup : logger ################
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
+
+################ setup : config ################
+def load_config(config_file: Path) -> Dict:
+    with open(config_file, "r") as f:
+        config = json.load(f)
+    assert "label2id" in config, "Config must include 'label2id'."
+    return config
 
 ################ setup : templates ################
-templates = []
-if args.direct and not (args.both):
-    # direct case
-    logger.info("Type : only direct relations")
-    for relations in LABELS:
-        templates.append(LABEL_TEMPLATES[relations][0])
-        # the first ones are the direct labels
-if not (args.direct) and not (args.both):
-    # indirect case
-    logger.info("Type : only reverse relations")
-    for relations in LABELS:
-        templates.append(LABEL_TEMPLATES[relations][1])
-if args.both:
-    logger.info("Type : both relations")
-    for relations in LABELS:
-        # this time we add both the direct and indirect
-        templates.extend(LABEL_TEMPLATES[relations])
+# Create templates based on task and arguments
+def create_templates(task: str, direct: bool, both: bool) -> List[Relation]:
+    global LABELS
+    global LABEL_TEMPLATES
+    if task.lower() in ["wordnet", "wn", "wn18rr"]:
+        LABELS = WN_LABELS
+        LABEL_TEMPLATES = WN_LABEL_TEMPLATES
+    elif task.lower() in ["freebase", "fb", "fb15k237"]:
+        LABELS = list(FB_LABEL_TEMPLATES.keys())
+        LABEL_TEMPLATES = FB_LABEL_TEMPLATES
+    else:
+        raise ValueError(f"Unknown task: {task}")
 
+    templates = []
+    for relation in LABELS:
+        if direct and not both:
+            templates.append(Relation(relation, LABEL_TEMPLATES[relation][0], way=1))
+        elif not direct and not both:
+            templates.append(Relation(relation, LABEL_TEMPLATES[relation][1], way=-1))
+        elif both:
+            templates.append(Relation(relation, LABEL_TEMPLATES[relation][0], way=1))
+            templates.append(Relation(relation, LABEL_TEMPLATES[relation][1], way=-1))
 
-################ setup : positive-nagative examples ################
-
-positive_templates: Dict[str, list] = defaultdict(list)
-negative_templates: Dict[str, list] = defaultdict(list)
-# generate a two dict,
-# n°1 : positive_templates
-#   {label of the relation in the dataset : "the positive template corresponding to this label"} (LABEL_TEMPLATES = positive_pattern)
-# n°2 : negative_templates
-#   {label of the relation in the dataset: "all the other pattern not related to this label, eg CONTRADCTION"}
-for relation in LABELS:
-    # if not args.negative_pattern and label == "no_relation":
-    #    continue
-    for template in templates:
-        # for the moment we just look at the direct patterns
-        if template in LABEL_TEMPLATES[relation]:
-            # if the template is realy the one corresponding to the relation
-            positive_templates[relation].append(
-                template
-            )  # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
-            # if not both only 1 relation is added
-            # else the direct and indirect aire added
-        else:
-            if relation not in FORBIDDEN_MIX.keys():
-                # not a relations with issues of similarity, it can be put as a contradiction
-                negative_templates[relation].append(template)
-
-            else:
-                # relation wich need to can't be label as negative as hypernym and instance_hypernym
-                if (
-                    template not in FORBIDDEN_MIX[relation]
-                ):  # avoidthe template to wich this relation is too close
-                    negative_templates[relation].append(template)
-
-# load the forbidden couples
-if args.task in ["wordnet", "wn", "wn18rr"]:
-    with open(
-        os.path.join(
-            f"{args.data_source}/preprocessed/forbidden_couples.json"
-        ),
-        "rt",
-    ) as f:
-        id2forbidden = json.load(f)  
-        # { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
-else : 
-    id2forbidden = {}
-
+    return templates
 
 ################ function : MNLI format ################
+def format_relation(t: Relation, obj: str , subj:str , way: int)-> str:
+    if way > 0 :
+        return f"{t.template.format(subj=subj, obj=obj)}."
+    else : 
+        return f"{t.template.format(subj=obj, obj=obj)}."
+# Generate MNLI examples with positive and negative templates
 def data2mnli_with_negative_examples(
     instance: REInputFeatures,
-    positive_templates,
-    negative_templates,
-    negn,
-    posn=1,
-):
-    if args.both:
-        negn, posn = 2, 2  # cause to examples for direct and indirect
+    positive_templates: Dict[str, List[Relation]],
+    negative_templates: Dict[str, List[Relation]],
+    id2forbidden: Dict[str, Dict[str, List[str]]],
+    label2id: Dict[str, int],
+    way: int, 
+    both: bool,
+    negn: int=1,
+) -> List[MNLIInputFeatures]:
     mnli_instances = []
-    # Generate the positive examples
-    if posn < len(positive_templates[instance.relation]):
-        positive_template = random.choices(
-            positive_templates[instance.relation], k=posn
+
+    # Positive examples
+    relevant_positive_templates = [
+        t for t in positive_templates[instance.relation]
+        if t.way == way or both
+    ]
+    mnli_instances.extend([
+        MNLIInputFeatures(
+            premise=instance.context,
+            hypothesis=format_relation(t, instance.obj, instance.subj, t.way) ,
+            label=label2id["entailment"],
+            way=t.way
         )
-    else:  # no need to randomly pick up examples as all of them must be picked up
-        positive_template = positive_templates[instance.relation]
+        for t in relevant_positive_templates
+    ])
 
-    # add the templates to the relation
-    mnli_instances.extend(
-        [
-            MNLIInputFeatures(
-                premise=instance.context,
-                hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                label=label2id["entailment"],
-            )
-            for t in positive_template
-        ]
+    # Negative examples
+    forbidden_templates = set(
+        template
+        for r in id2forbidden.get(instance.head_id, {}).get(instance.tail_id, [])
+        for template in LABEL_TEMPLATES[r]
+    ) # andle the case LABEL_TEMPLATE is empty
+    # id2forbidden { id_head : {id_tail_1 : [r1, r2], id_tail_2 : [r1, r2, r3, r4]} , id_head_2 : ...}}
+
+    potential_negatives = [
+        t for t in negative_templates[instance.relation]
+        if t.template not in forbidden_templates and t.way == way
+    ]
+    selected_negatives = random.sample(
+        potential_negatives, k=min(negn, len(potential_negatives))
     )
 
-    # Generate the negative templates
-    # random pick up in the negative templates here 1 ,
-    # hense for each positive element there is a random negative one
-
-    # while it is a forbidden couple : choose an other one :
-    # init the neg template
-    negative_template = random.choices(negative_templates[instance.relation], k=negn)
-    # print(instance.head_id  id2forbidden[0].keys())
-    if str(instance.head_id) in id2forbidden.keys():
-        # this entity as forbidden couples (else keep the random chossen no risk)
-        if str(instance.tail_id) in id2forbidden[0][str(instance.head_id)].keys():
-            # check if the tail of this head is present, which mean there are several relation between
-            # this head and this tail and we need to check, else no pb the issues is with another tail
-            n = 0
-            # generate the forbidden template
-            forbidden_templates = []
-            for relation in id2forbidden[str(instance.head_id)][
-                str(instance.tail_id)
-            ]:
-                # for each relations in the forbidden mix we add the template
-                forbidden_templates.extend(WN_LABEL_TEMPLATES[relation])
-                print(forbidden_templates)
-            # check it
-            while negative_template in forbidden_templates and n < 10:
-                negative_template = random.choices(
-                    negative_templates[instance.relation], k=negn
-                )
-                n += 1
-    # TODO andle the contradiction case ? 
-    mnli_instances.extend(
-        [
-            MNLIInputFeatures(
-                premise=instance.context,
-                hypothesis=f"{t.format(subj=instance.subj, obj=instance.obj)}.",
-                label=label2id[
-                    "not_entailment"
-                ],  # remove the neutral part  # ["neutral"] if instance.label != "no_relation" else label2id["contradiction"],
+    # If both is enabled, add reverse counterparts for the selected negatives
+    if both:
+        reverse_negatives = [
+            Relation(
+                relation=t.relation,
+                template=LABEL_TEMPLATES[t.relation][0 if t.way > 0 else 1],
+                way=-t.way
             )
-            for t in negative_template
+            for t in selected_negatives
         ]
-    )
-    # make some examples where subj and obj are inverted
+        selected_negatives.extend(reverse_negatives)
+
+    mnli_instances.extend([
+        MNLIInputFeatures(
+            premise=instance.context,
+            hypothesis=format_relation(t, instance.obj, instance.subj, t.way),
+            label=label2id["not_entailment"],
+            way=t.way
+        )
+        for t in selected_negatives
+    ])
+
     return mnli_instances
 
 
-data2mnli = data2mnli_with_negative_examples  # if args.negative_pattern else tacred2mnli
 
-################ function : data population ################
-with open(args.input_file, "rt") as f:
+
+def main():
+    print("=========== CONVERTION ============")
+    logger.info("Program : data2mnli.py ****")
+    args = parse_args()
+
+    ################ setup : param ################
+    current_dir = Path(__file__).resolve().parent
+    config_file = current_dir.parent / "configs" / args.config_name
+    config = load_config(config_file)
+    label2id = config["label2id"]
+    way = 1 if args.direct else -1 
+
+    ################ setup : templates ################
+    templates = create_templates(args.task, args.direct, args.both)
+    assert LABELS is not None and LABEL_TEMPLATES is not None, 'Issue with template initialization'
+    # Split templates into positive and negative examples
+    # generate a two dict,
+    # n°1 : positive_templates
+    #   {label of the relation in the dataset : "the positive template corresponding to this label"} 
+    #   (LABEL_TEMPLATES = positive_pattern(x1))} 
+    #   eg : 
+    #       {   "_hypernym":                    "{obj} specifies {subj}",
+    #           "_derivationally_related_form": "{obj} derived from {subj}", ...
+    # 
+    # n°2 : negative_templates
+    #   {label of the relation in the dataset: "all the other pattern not related to this label, 
+    #    eg : 
+    #       {   "_hypernym":                    ["{obj} derived from {subj}", "{obj} is the domain region of {subj}", ...], 
+    #           "_derivationally_related_form": ["{obj} specifies {subj}",, ... ]
+
+    positive_templates: Dict[str, List[Relation]] = defaultdict(list)
+    negative_templates: Dict[str, List[Relation]] = defaultdict(list)
+
+    for relation in LABELS:
+        for template in templates:
+            if template.template in LABEL_TEMPLATES[relation]:
+                # Add the template as positive for the relation
+                positive_templates[relation].append(template)
+            else:
+                if relation not in FORBIDDEN_MIX.keys():
+                    # Add the template as negative if no forbidden mix is defined
+                    negative_templates[relation].append(template)
+                else:
+                    # Skip templates that are too similar to the relation
+                    if template.template not in FORBIDDEN_MIX[relation]:
+                        negative_templates[relation].append(template)
+
+ 
+    ################ setup : forbidden relation ################
+    if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
+        forbidden_file = Path(args.data_source) / "preprocessed" / "forbidden_couples.json"
+        with open(forbidden_file, "r") as f:
+            id2forbidden = json.load(f)
+    else:
+        id2forbidden = {}
+
+    ################ setup : output ################
+    output_file_path = Path(os.path.join(os.path.dirname(os.getcwd()), args.output_file))
+    output_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Data population
     mnli_data = []
-    stats = []
     relations = []
-    for line in json.load(f):
-        mnli_instance = data2mnli(
-            REInputFeatures(
-                head_id=line["head_id"],
-                tail_id=line["tail_id"],
-                subj=line["subj"],
-                obj=line["obj"],
-                context=line["context"],
-                relation=line["relation"],
-            ),
-            positive_templates,
-            negative_templates,
-            negn=args.negn,
-        )
-        mnli_data.extend(mnli_instance)
-        relations.append(line["relation"])
-        stats.append(line["relation"] != "no_relation")
+    stats = []
 
-################ function : save ################
-## cf wn2eval pour corriger le bug
-with open(args.output_file, "wt") as f:
-    logger.info(f"Saveing : writing file : {args.output_file}")
-    for data in mnli_data:
-        f.write(f"{json.dumps(data.__dict__)}\n")
-    # json.dump([data.__dict__ for data in mnli_data], f, indent=2)
+    with open(args.input_file, "rt") as f:
+        input_data = json.load(f)
+        logger.info(f"Loaded {len(input_data)} instances from {args.input_file}.")
 
-json.dump(
-    [data.__dict__ for data in mnli_data], open(path, "w", encoding="utf-8"), indent=4
-)
+        for line in input_data:
+            mnli_instance = data2mnli_with_negative_examples(
+                REInputFeatures(
+                    head_id=line["head_id"],
+                    tail_id=line["tail_id"],
+                    subj=line["subj"],
+                    obj=line["obj"],
+                    context=line["context"],
+                    relation=line["relation"],
+                ),
+                positive_templates,
+                negative_templates,
+                id2forbidden,
+                label2id,
+                way=way,
+                negn=args.negn,
+                both=args.both,
+            )
+            mnli_data.extend(mnli_instance)
+            relations.append(line["relation"])
+            stats.append(line["relation"] != "no_relation")
 
-logger.info(f"Saved at location : {args.output_file}")
+    # Save results
+    logger.info(f"Saving {len(mnli_data)} MNLI instances to {args.output_file}.")
+    with open(args.output_file, "w", encoding="utf-8") as f:
+        json.dump([data.__dict__ for data in mnli_data], f, indent=4)
 
-count = Counter([data.label for data in mnli_data])
-logger.info(f"Number of links : {count}")
+    count = Counter([data.label for data in mnli_data])
+    logger.info(f"Label distribution: {count}")
+if __name__ == "__main__":
+    main()
