@@ -45,7 +45,8 @@ for i in range(len(df)):
     l = []
     for p in ['p1', 'p2', 'p3', 'p4']:
         if df.iloc[i][p] is not None:
-            l.extend(df.iloc[i][p][config["label2id"]["entailment"]])
+            ent_indx = config["label2id"]["entailment"]
+            l.extend([df.iloc[i][p][0][ent_indx]])
     if l:  # Append only if 'l' is non-empty
         X.append(l)
         filtered_y.append(y[i])  # Append the corresponding label
@@ -118,6 +119,7 @@ class MetaModelNN(nn.Module):
             x = x.view(batch_size, self.num_models, self.num_classes)
             # Flatten back to (batch_size, input_size)
             x = x.view(batch_size, -1)
+        print(x)
         x = self.relu(self.fc1(x))
         x = self.relu(self.fc2(x))
         x = self.sigmoid(self.fc3(x))
@@ -127,7 +129,7 @@ class MetaModelNN(nn.Module):
 ################ training ################
 # Parameters
 num_models = 4
-num_classes = 2
+num_classes = 1
 
 # Create instances of the models
 voting_model = VotingModel(num_models=num_models, num_classes=num_classes)
@@ -161,11 +163,13 @@ torch.save(meta_model.state_dict(), "meta_model.pth")
 # Example usage
 dummy_x = torch.tensor([[[0.8, 0.2], [0.4, 0.6], [0.7, 0.3], [0.6, 0.4]],
                         [[0.2, 0.8], [0.5, 0.5], [0.3, 0.7], [0.1, 0.9]]])
-
+dummy_x = torch.tensor([[0.8, 0.4,0.7,0.6],
+                        [0.2, 0.3, 0.1, 0.9]])
 voting_output = voting_model(dummy_x)
 meta_model_output = meta_model(dummy_x,flattened=False)
 
 logger.info(f"Input : \n\t{dummy_x}")
+logger.info(f"Processed Input : \n\t{dummy_x}")
 logger.info(f"Voting Model Output:\n\t{voting_output}")
 logger.info(f"MetaModelNN Output: \n\t{meta_model_output}")
 

@@ -101,6 +101,7 @@ run_experiment() {
         python3 src/trainer_meta.py --input_file "$P_FILE/$SAVING_NAME" \
                                     --output_dir $WEIGHT_DIR \
                                     --num_epochs 3\
+                                    --config_file $CONFIG_FILE 
         
     fi
 }

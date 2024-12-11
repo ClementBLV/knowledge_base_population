@@ -64,9 +64,9 @@ if [ -z "$P_FILE" ] || [ -z "$WEIGHT_DIR" ]; then
 fi
 
 if [[ "$TASK" == "wordnet" || "$TASK" == "wn" || "$TASK" == "wn18rr" ]]; then
-    ROOT=$BASE"/data/WN18RR/"
+    ROOT=$BASE"/data/WN18RR/preprocessed/"
 else 
-    ROOT=$BASE"/data/FB15k237/"
+    ROOT=$BASE"/data/FB15k237/preprocessed"
 fi
 
 if [ -z "$DO_PREPROCESS" ]; then
@@ -79,7 +79,7 @@ run_experiment() {
     if [ "$DO_PREPROCESS" == "true" ]; then  
 
         python3 src/data2meta_v2.py  \
-            --input_file $P_FILE"/$TRAINING_FILE" \
+            --input_file $ROOT"/$INPUT_FILE" \
             --output_folder $P_FILE \
             --saving_name $SAVING_NAME \
             --config_file $CONFIG_FILE \

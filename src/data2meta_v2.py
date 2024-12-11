@@ -153,6 +153,7 @@ def format_relation(t: Relation, obj: str , subj:str , way: int)-> str:
     
 def dataload (line):
     relations: List[Relation] = []
+    print(line)
     template = LABEL_TEMPLATES[line["relation"]]
     true_relation = Relation(
         name=line["relation"],

@@ -144,7 +144,6 @@ def process_data_line(line, model, model_name):
 
     with torch.no_grad():
         logits = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
-    print(model_name, id, line["way"])
     return {"id": id, "logits": logits, "real_label": line["label"]}
 
 def process_model_for_all_data(model_name, data_batch):
