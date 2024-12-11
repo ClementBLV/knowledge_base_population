@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
+import json
 import logging
+import os
 from pprint import pprint
 import sys
 import numpy as np
@@ -21,9 +23,16 @@ parser.add_argument("--input_file", type=str, required=True,
 parser.add_argument("--num_epochs", type=int)
 parser.add_argument('-output_dir', '--output_dir',type=str, required=True,
                     help='Directroy to save the outputs (log - weights)')
+parser.add_argument("--config_file", type=str, required=True, 
+                    help="Name if the config file of for the meta model")
 args = parser.parse_args()
 
-
+################ setup : config ################
+current_dir = os.path.dirname(__file__)
+config_path = os.path.join(os.path.dirname(current_dir), "configs", args.config_file)
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
+    
 ################ setup : dataframe ################
 df = pd.read_json(args.input_file, orient="records", lines=True)
 
@@ -36,7 +45,7 @@ for i in range(len(df)):
     l = []
     for p in ['p1', 'p2', 'p3', 'p4']:
         if df.iloc[i][p] is not None:
-            l.extend(df.iloc[i][p][0])
+            l.extend(df.iloc[i][p][config["label2id"]["entailment"]])
     if l:  # Append only if 'l' is non-empty
         X.append(l)
         filtered_y.append(y[i])  # Append the corresponding label
