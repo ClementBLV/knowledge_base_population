@@ -11,8 +11,7 @@ Code : TRAINING
 Code : IMPROVEMENT 
 -  TEST Build a meta model.py : Use the newly trained models to generate a training set for the meta model
 -   in data processing and training ONLY take the en the entailment prob
--   Parallelize data2meta_v2.py 
-+   Build Eval for meta model
+-  DONE/NOT-TESTED Parallelize data2meta_v2.py 
 +   Heuristic fro training meta
 -   Build script_eval_meta_expert.sh 
 +   Test all scripts (deberta-small)

@@ -198,19 +198,19 @@ for i in step :
   With this method we are doing a more refined prediction where the model is given all the probability  one for entailment (`p_{entail}`) and one for contradiction (`p_{contra}`) obtained with the three models, for each relation at ones. Then it must output a vector of size [1, Number of relation], for instance the output is [0, 0 , 1, 0, 0] if the relation 5 is the good relation. 
 
   $$
-  \mathbf{X ( head ,relation_i,  i \in \{0, n\}, tail )} = 
+  \mathbf{X ( head ,relation_{i \in \{0, 3\}}, tail )} = 
   \begin{bmatrix}
-  [p_{1,\text{entail}}^{r1}, p_{1,\text{contra}}^{r1}]  & [p_{2,\text{entail}}^{r1}, p_{2,\text{contra}}^{r1}] & [p_{3,\text{entail}}^{r1}, p_{3,\text{contra}}^{r1}] & [p_{4,\text{entail}}^{r1}, p_{4,\text{contra}}^{r1}] \\
+  p_{1,\text{entail}}^{r1} & p_{2,\text{entail}}^{r1} & p_{3,\text{entail}}^{r1} & p_{4,\text{entail}}^{r1} \\
   \\
-  [p_{1,\text{entail}}^{r2}, p_{1,\text{contra}}^{r2}]  & [p_{2,\text{entail}}^{r2}, p_{2,\text{contra}}^{r2}] & [p_{3,\text{entail}}^{r2}, p_{3,\text{contra}}^{r2}] & [p_{4,\text{entail}}^{r2}, p_{4,\text{contra}}^{r2}] \\
+  p_{1,\text{entail}}^{r2} & p_{2,\text{entail}}^{r2} & p_{3,\text{entail}}^{r2} & p_{4,\text{entail}}^{r2} \\
   \\
-  [p_{1,\text{entail}}^{r3}, p_{1,\text{contra}}^{r3}]  & [p_{2,\text{entail}}^{r3}, p_{2,\text{contra}}^{r3}] & [p_{3,\text{entail}}^{r3}, p_{3,\text{contra}}^{r3}] & [p_{4,\text{entail}}^{r3}, p_{4,\text{contra}}^{r3}] 
+  p_{1,\text{entail}}^{r3} & p_{2,\text{entail}}^{r3} & p_{3,\text{entail}}^{r3} & p_{4,\text{entail}}^{r3} 
   \end{bmatrix}
   $$
 
   Here:
   - $( p_{i,\text{entail}}^{ri} )$ is the probability of entailment from the $(i)^{th}$ model for the $(i)^{th}$ relation.
-  - $( p_{i,\text{contra}}^{ri} )$ is the probability of contradiction from the $(i)^{th}$ model for the $(i)^{th}$ relation.
+  - relation_{i \in \{0, 3\}} all the relation in the dataset, each row of the input matrix correspond to one of them
   - The matrix has dimensions $(n \times 4 \times 2)$, where the row represent the probabilities for the entailment and contradiction classes for a given couple of hypothesis an premise for all relation, and the columns represent the four models.
 
   Then given $X$ the model is trained to predict the probability of entailment or contradiction of the pair of hypothesis and premise for all the relations
