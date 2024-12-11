@@ -16,7 +16,7 @@ from pathlib import Path
 from pprint import pprint
 import random
 import sys
-from typing import List
+from typing import Dict, List
 
 import pandas as pd
 from tqdm import tqdm
@@ -132,13 +132,19 @@ def sha1(text):
 
 def worker_init():
     global models
+    global model2prob
     models = {
         "model_1": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_1way"]).to(device),
         "model_3": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_2ways"]).to(device),
         "model_2": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_1way_reverse"]).to(device),
         "model_4": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_2ways"]).to(device),
     }
-
+    model2prob = {
+        "model_1": "p1",
+        "model_3": "p2",
+        "model_2": "p3",
+        "model_4": "p4",
+    }
 def format_relation(t: Relation, obj: str , subj:str , way: int)-> str:
     if way > 0 :
         return f"{t.template.format(subj=subj, obj=obj)}."
@@ -184,6 +190,7 @@ def process_data(line):
     """Process a single data point to get predictions."""
 
     inputs = dataload(line)
+    ent_index = config["label2id"]["entailment"]
     labels = []
     probas = []
     for relation in inputs.relations: 
@@ -214,19 +221,25 @@ def process_data(line):
             p2 = models["model_2"](**encoded_context).logits.softmax(dim=-1).cpu().tolist()
             p4 = models["model_4"](**encoded_context).logits.softmax(dim=-1).cpu().tolist()
         
-        probas.extend([p1, p2, p3, p4])
+        # probas = [[p1, p2, p3, p4], [p1, ...]]
+        probas.extend([p1[ent_index], p2[ent_index], p3[ent_index], p4[ent_index]])
         labels.append(relation.label)
     return id, probas, labels
 
 ################ parralel approach ################
-def  process_relation(relations: List[Relation], context:str , model, model_name: str):
+def  process_relation(
+        inputs : MNLIInputFeatures,
+        model : AutoModelForSequenceClassification, 
+        model_name: str) -> Dict:
     """Process a single relation with the given model."""
+    ent_index = config["label2id"]["entailment"]
+    probs = []
     for relation in inputs.relations: 
         with torch.no_grad():
             # Direct relation
             if model_name in ["model_1", "model_3"]: 
                 encoded_context = tokenizer(
-                    context,
+                    inputs.context,
                     relation.relation_direct,
                     truncation="longest_first",
                     max_length=config["max_length"],
@@ -234,12 +247,11 @@ def  process_relation(relations: List[Relation], context:str , model, model_name
                     return_tensors="pt"
                 ).to(device)
                 direct_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
-                return direct_probs
-
+                probs.append(direct_probs[ent_index])
             if model_name in ["model_2", "model_4"]: 
                 # Reverse relation
                 encoded_context = tokenizer(
-                    context,
+                    inputs.context,
                     relation.relation_reverse,
                     truncation="longest_first",
                     max_length=config["max_length"],
@@ -247,7 +259,8 @@ def  process_relation(relations: List[Relation], context:str , model, model_name
                     return_tensors="pt"
                 ).to(device)
                 reverse_probs = model(**encoded_context).logits.softmax(dim=-1).cpu().tolist()
-                return direct_probs, reverse_probs
+                probs.append(reverse_probs[ent_index])
+        return probs
 
 def process_data_for_model(lines, model_name):
     """Process all data for a specific model."""
@@ -255,8 +268,8 @@ def process_data_for_model(lines, model_name):
     model = models[model_name]
     for line in lines:
         inputs = dataload(line)
-        labels = [re]
-        probs = process_relation(inputs, model)
+        labels = [relation.label for relation in inputs.relations]
+        probs = process_relation(inputs, model, model_name)
         results.append({"id": inputs.id, "proba": probs, "label": labels, "model_name": model_name})
     return results
 
@@ -279,30 +292,49 @@ def process_data_concurrently(datas):
 
 def fuse_results (all_results):
     """Fuse the probabilities obtain on the four threads"""
-    for result in all results: 
-        
-    final_results.append({
-            "id": id,
-            "proba": proba for all relation
-            "label": list of labels
-        })
+    merged_results = {
+        result["id"]: {label_id: {"p1": None, "p2": None, "p3": None, "p4": None} for label_id in config["id2label"]}
+        for result in tqdm(all_results, desc="Initializing Merged Results")
+    }
+    
+    for result in tqdm(all_results, desc="Merging Results Paraalel"):
+        merged_results[result["id"]][str(result["real_label"])][model2prob[result["model_name"]]] = result['proba']
+    
+    for id in merged_results: 
+        for label in merged_results[id]: 
+            probas = []
+            for i in range(0, len(merged_results[id][label]["p1"])): 
+                row = [merged_results[id][label][p][i] for p in ["p1", "p2", "p3", "p4"]]
+                probas.extend(row)
+                # probas = [[p1, p2, p3, p4], [p1, ...]]
+
+            final_results.append({
+                "id": id,
+                "proba": probas,
+                "label": label
+            })
 
     return final_results
 
         
 ################ Main Processing ################
 create_templates(args.task)
-logger.info("Running in sequential mode...")
-# Adding tqdm to monitor processing progress in sequential mode
-final_results = []
-labels = []
-for line in tqdm(datas, desc="Processing Data Sequentially"):
-    id , p, l = process_data(line)
-    final_results.append({
-            "id": id,
-            "proba": p,
-            "label": l
-        })
+worker_init()
+
+if args.parallel:
+    all_results = process_data_concurrently(datas)
+    final_results = fuse_results (all_results)
+
+else : 
+    logger.info("Running in sequential mode...")
+    final_results , labels = [], []
+    for line in tqdm(datas, desc="Processing Data Sequentially"):
+        id , p, l = process_data(line)
+        final_results.append({
+                "id": id,
+                "proba": p,
+                "label": l
+            })
 
 logger.info(f"There are {len(final_results)} premisses (direct and reverse relation) each one with two examples [entailment - contradiction]")
 logger.info(f"Example of the data  \n\n\t {final_results[0]} \n")
