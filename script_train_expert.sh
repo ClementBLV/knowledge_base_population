@@ -24,7 +24,7 @@ show_help() {
     echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
     echo "  --wandb_key STR                 The API key for wandb logging"
     echo "  --help                          Display this help message and exit."
-    exit 0
+    exit 1
 }
 
 # Parse command-line arguments
@@ -70,7 +70,7 @@ if [ -n "$HF_CACHE_DIR" ] && [ "$HF_CACHE_DIR" != "None" ]; then
 fi
 
 # Validate necessary variables
-if [ -z "$P_FILE" ] || [ -z "$MODEL" ] || [ -z "$OUTPUT_DIR" ]; then
+if [ -z "$P_FILE" ] || [ -z "$MODEL" ] || [ -z "$OUTPUT_DIR" ] || [ -z "$CONFIG_FILE" ]; then
     echo "Error: Missing required parameters."
     show_help
 fi
@@ -103,7 +103,6 @@ run_experiment() {
     # Remove old datasets
     echo "Remove old files"
     rm -rf "$P_FILE/train_${split}.mnli.json"
-
     # Generate a new dataset with new triplets
     source "script.sh" \
      --split $split \
@@ -114,7 +113,7 @@ run_experiment() {
      --test_bool $TEST_BOOL \
      --valid_bool $VALID_BOOL \
      --do_preprocess $DO_PREPROCESS \
-     --config_file $CONFIG_FILE \
+     --config_file $CONFIG_FILE
 
     if [ "$NO_TRAINING" == "true" ]; then
         echo "HELLO WORLD NO TRAINING!"
@@ -131,7 +130,7 @@ run_experiment() {
             --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/" \
             --save_name $save_name \
             --config_file $BASE"/configs/$CONFIG_FILE" \
-            --wandb_api_key
+            --wandb_api_key $WANK_KEY
     fi
 
     # Remove the generated datasets

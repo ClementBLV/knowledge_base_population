@@ -106,7 +106,7 @@ if [ "$TRAIN_BOOL" == "true" ]; then
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
             --both $BOTH \
             --task "$TASK" \
-            --config_name $CONFIG_FILE 
+            --config_name $CONFIG_FILE
 
         rm -rf $P_FILE"train_"$SPLIT".json"
         echo "INFO : Save : tmp file $P_FILE"train_"$SPLIT".json" was successfully removed"
@@ -121,7 +121,8 @@ if [ "$TEST_BOOL" == "true" ]; then
         --data_source $ROOT \
         --output_file $P_FILE"test.mnli.json" \
         --both $BOTH \
-        --task "$TASK"
+        --task "$TASK"\
+        --config_name $CONFIG_FILE
 fi
 
 if [ "$VALID_BOOL" == "true" ]; then
@@ -131,5 +132,6 @@ if [ "$VALID_BOOL" == "true" ]; then
         --data_source $ROOT \
         --output_file $P_FILE"valid.mnli.json" \
         --both $BOTH \
-        --task "$TASK"
+        --task "$TASK"\
+        --config_name $CONFIG_FILE
 fi
