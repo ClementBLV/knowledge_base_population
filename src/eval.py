@@ -1,7 +1,5 @@
 import argparse
 from dataclasses import dataclass
-import logging
-import os
 import pathlib
 from setup import setup_logger
 from pathlib import Path
@@ -232,7 +230,7 @@ def compute_mrr(ranked_results, element=0):
     reciprocal_ranks = []
     for ranking in ranked_results:
         try:
-            rank_position = ranking.index(element) + 1  # Rank positions are 1-based
+            rank_position = list(ranking).index(element) + 1  # Rank positions are 1-based
             reciprocal_ranks.append(1 / rank_position)
         except ValueError:
             reciprocal_ranks.append(0.0)  # Element not found in ranking
