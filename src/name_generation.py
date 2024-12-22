@@ -22,7 +22,7 @@ def generate_save_name(model, bias, both, split, version, custom_name=None):
     elif "MoritzLaurer" in model:
         prefix = "mnli"
     else:
-        prefix = f"{model.replace("/", "_")}_split{split}_v{version}"
+        prefix = f"{model.replace('/', '_')}_split{split}_v{version}"
     
     both_indicator = "2w" if both else "1w"
     bias_indicator = "biased" if bias else "unbiased"
