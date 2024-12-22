@@ -1,6 +1,8 @@
 import argparse
 from dataclasses import dataclass
 import logging
+import os
+import pathlib
 from setup import setup_logger
 from pathlib import Path
 from typing import List
@@ -251,7 +253,7 @@ def evaluate(
     """
     Main function to evaluate rankings, with an option for parallelism.
     """
-    if parallel and torch.cuda.is_available():
+    if parallel :
         logger.info("Running in parallel mode on GPU...")
         device = torch.device("cuda")
         return rank_parallel(mnli_data, tokenizer, model, device, batch_size, number_relation)
@@ -283,7 +285,10 @@ tokenizer = AutoTokenizer.from_pretrained(
         use_fast=False, 
         model_max_length=512
     ) 
-model = AutoModelForSequenceClassification.from_pretrained(path)
+assert ("~" not in path), f"HF doesn't handle relative path use exact path for the trained weights : {path} "
+assert (path[0]=="/"), f"You should give the exact path to the weights, it must start with a / : {path} "
+
+model = AutoModelForSequenceClassification.from_pretrained(pathlib.Path(path))
 model.to(device)
 
 # Compute Hit at 1 and Hit at 3 for the element across shots
