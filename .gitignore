@@ -11,6 +11,7 @@ tmp/
 *.pth
 # C extensions
 *.so
+/wandb
 
 # Distribution / packaging
 .Python

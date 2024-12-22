@@ -22,7 +22,8 @@ import shutil
 import wandb
 import transformers
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from transformers import TrainingArguments, Trainer
+from transformers import TrainingArguments, Trainer, TrainerCallback
+
 from datasets import load_dataset
 
 from datetime import datetime
@@ -279,6 +280,15 @@ train_args = TrainingArguments(
 )
 
 ################ trainer ################
+# Custom callback class to log metrics to Wandb
+class WandbCallback(TrainerCallback):
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        """Log metrics to wandb during training."""
+        if wandb.run:
+            phase = "train" if state.global_step > 0 else "eval"
+            for key, value in logs.items():
+                wandb.log({f"{phase}_{key}": value})
+
 def log_metrics(metrics, phase="train"):
     """Log metrics to wandb."""
     if wandb.run:
@@ -291,10 +301,8 @@ trainer = Trainer(
     args=train_args,
     train_dataset=encoded_dataset_train,  
     eval_dataset=encoded_dataset_test,  
-    # Add custom callback to log metrics to wandb
-    callbacks=[transformers.TrainerCallback(
-        on_log=lambda args, state, control, logs=None: log_metrics(logs, "train")
-    )],
+    callbacks=[WandbCallback],  # Use the custom WandbCallback
+
 )
 ################ train ################
 if args.do_train:
@@ -310,9 +318,8 @@ if args.do_train:
 
     # Close wandb run
     if wandb.run:
-        wandb.finish()
-    
-    wandb.config.update({"model_path": model_path})
+        wandb.config.update({"model_path": model_path})
+        wandb.finish()  
 ################ save ################
 
 
