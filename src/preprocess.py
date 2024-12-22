@@ -81,7 +81,7 @@ def _load_wn18rr_texts(path: str):
         entity_id, word, desc = fs[0], fs[1].replace("__", ""), fs[2]
         wn18rr_id2ent[entity_id] = (entity_id, word, desc)
         wn18rr_id2rels[entity_id] = set()
-    logger.info("Load {} entities from {}".format(len(wn18rr_id2ent), path))
+    logger.info("Load : {} entities from {}".format(len(wn18rr_id2ent), path))
 
 
 def _process_line_wn18rr(line: str) -> Dict:
