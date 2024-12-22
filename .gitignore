@@ -4,7 +4,8 @@ __pycache__/
 *$py.class
 
 # Data
-*.json
+#*.json
+data
 src/*.txt
 data/*.txt
 tmp/

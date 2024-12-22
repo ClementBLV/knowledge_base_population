@@ -1,0 +1,22 @@
+{
+    "model_name":"microsoft/deberta-v3-large",
+    "label2id" : {
+        "entailment": 0, 
+        "not_entailment": 1
+    },
+    "id2label" : {
+        "0": "entailment", 
+        "1": "not_entailment"
+    },
+    "max_length" : 512, 
+    "eval_batch" : 64 , 
+    "per_device_train_batch_size" : 8 , 
+    "gradient_accumulation_steps" : 4 ,
+    "warmup_ratio":0.06,
+    "weight_decay":0.01,
+    "num_train_epochs":3,
+    "learning_rate":9e-6, 
+    "lr_scheduler_type":"linear",
+    "save_strategy":"steps",
+    "save_steps":1000
+}
