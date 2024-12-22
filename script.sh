@@ -13,6 +13,7 @@ show_help() {
     echo "Options:"
     echo "  --split SPLIT_VALUES              Set the split values for the training data, should be an integer in percentage; e.g., 1 means 1% of the training data."
     echo "  --both BOOL                       Set the both parameter, it's a boolean; if true, then the direct and indirect relation will be shown; e.g., (true or false)."
+    echo "  --direct BOOL                     Set the direct parameter; if true include only direct relations else include inderect - both parameter overwrite it.  "
     echo "  --bias BOOL                       Set the bias parameter; if true, the sub-set from the training data will be unbalanced as the original one."
     echo "  --task STR                        Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
     echo "  --processed_data_directory DIR    Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
@@ -28,6 +29,7 @@ show_help() {
 # Parse command-line arguments
 declare -A args=(
     [--split]=SPLIT_VALUES
+    [--direct]=DIRECT
     [--both]=BOTH
     [--bias]=BIAS
     [--task]=TASK
@@ -104,6 +106,7 @@ if [ "$TRAIN_BOOL" == "true" ]; then
             --input_file $P_FILE"train_"$SPLIT".json" \
             --data_source $ROOT \
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
+            --direct $DIRECT \
             --both $BOTH \
             --task "$TASK" \
             --config_name $CONFIG_FILE
@@ -120,6 +123,7 @@ if [ "$TEST_BOOL" == "true" ]; then
         --input_file $TEST".json" \
         --data_source $ROOT \
         --output_file $P_FILE"test.mnli.json" \
+        --direct $DIRECT \
         --both $BOTH \
         --task "$TASK"\
         --config_name $CONFIG_FILE
@@ -131,6 +135,7 @@ if [ "$VALID_BOOL" == "true" ]; then
         --input_file $VALID".json" \
         --data_source $ROOT \
         --output_file $P_FILE"valid.mnli.json" \
+        --direct $DIRECT \
         --both $BOTH \
         --task "$TASK"\
         --config_name $CONFIG_FILE

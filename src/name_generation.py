@@ -13,7 +13,7 @@ def extract_size(sentence):
         return match.group(0).lower()
     return "unkown"
 
-def generate_save_name(model, bias, both, split, version, custom_name=None):
+def generate_save_name(model, bias, direct, both, split, version, custom_name=None):
     if custom_name:
         return custom_name
 
@@ -25,6 +25,10 @@ def generate_save_name(model, bias, both, split, version, custom_name=None):
         prefix = f"{model.replace('/', '_')}_split{split}_v{version}"
     
     both_indicator = "2w" if both else "1w"
+    if not both : 
+        direct_indicator = "direct" if direct else "indirect"
+        both_indicator = f"{both_indicator}_{direct_indicator}"
+
     bias_indicator = "biased" if bias else "unbiased"
 
     size = extract_size(model)
@@ -34,11 +38,12 @@ def generate_save_name(model, bias, both, split, version, custom_name=None):
 
 if __name__ == "__main__":
     model = sys.argv[1]
-    bias = sys.argv[2].lower() == "true"
-    both = sys.argv[3]
-    split = sys.argv[4]
-    version = sys.argv[5]
-    custom_name = sys.argv[6] if len(sys.argv) > 6 else None
+    bias = sys.argv[2].lower() in ["true", "True"]
+    direct = sys.argv[3].lower() in ["true", "True"]
+    both = sys.argv[4].lower() in ["true", "True"]
+    split = sys.argv[5]
+    version = sys.argv[6]
+    custom_name = sys.argv[7] if len(sys.argv) > 7 else None
 
-    print(generate_save_name(model, bias, both, split, version, custom_name))
+    print(generate_save_name(model, bias, direct , both, split, version, custom_name))
     

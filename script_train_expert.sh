@@ -10,6 +10,7 @@ show_help() {
     echo
     echo "Options:"
     echo "  --split SPLIT                   Set the split values for the training data, should be an integer in percentage; e.g., 1 means 1% of the training data."
+    echo "  --direct BOOL                   Set the direct parameter; if true include only direct relations else include inderect - both parameter overwrite it.  "
     echo "  --both BOOL                     Set the both parameter, it's a boolean; if true, then the direct and indirect relation will be shown; e.g., (true or false)."
     echo "  --bias BOOL                     Set the bias parameter; if true, the sub-set from the training data will be unbalanced as the original one."
     echo "  --wandb BOOL                    Set the wandb parameter; if true, wandb will be called."
@@ -22,6 +23,7 @@ show_help() {
     echo "                                  If not provided or set to None, the cache settings will not be exported."
     echo "  --no_training BOOL              If set to true, training will be skipped and 'HELLO WORLD NO TRAINING!' will be printed."
     echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
+    echo "  --custom_name STR               Custom name to save the model"
     echo "  --wandb_key STR                 The API key for wandb logging"
     echo "  --help                          Display this help message and exit."
     exit 1
@@ -30,6 +32,7 @@ show_help() {
 # Parse command-line arguments
 declare -A args=(
     [--split]=SPLIT_VALUE
+    [--direct]=DIRECT
     [--both]=BOTH
     [--bias]=BIAS
     [--wandb]=WANDB
@@ -41,6 +44,7 @@ declare -A args=(
     [--hf_cache_dir]=HF_CACHE_DIR
     [--no_training]=NO_TRAINING
     [--config_file]=CONFIG_FILE
+    [--custom_name]=CUSTOM_NAME
     [--wandb_key]=WANK_KEY
 )
 
@@ -97,8 +101,8 @@ run_experiment() {
         DO_PREPROCESS=true
     fi
     
-    
-    save_name=$(python3 src/name_generation.py "$MODEL" "$BIAS" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
+    echo $BOTH
+    save_name=$(python3 src/name_generation.py "$MODEL" "$BIAS" "$DIRECT" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
 
     # Remove old datasets
     echo "Remove old files"
@@ -106,6 +110,7 @@ run_experiment() {
     # Generate a new dataset with new triplets
     source "script.sh" \
      --split $split \
+     --direct $DIRECT \
      --both $BOTH \
      --bias $BIAS \
      --processed_data_directory $P_FILE \

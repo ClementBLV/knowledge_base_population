@@ -101,12 +101,17 @@ def create_templates(task: str, direct: bool, both: bool) -> List[Relation]:
         raise ValueError(f"Unknown task: {task}")
 
     templates = []
-    for relation in LABELS:
-        if direct and not both:
+    if direct and not both:
+        logger.info("Data: Only DIRECT relations")
+        for relation in LABELS:
             templates.append(Relation(relation, LABEL_TEMPLATES[relation][0], way=1))
-        elif not direct and not both:
+    elif not direct and not both:
+        logger.info("Data: Only INDIRECT relations")
+        for relation in LABELS:
             templates.append(Relation(relation, LABEL_TEMPLATES[relation][1], way=-1))
-        elif both:
+    elif both:
+        logger.info("Data: DIRECT and INDIRECT relations")
+        for relation in LABELS:
             templates.append(Relation(relation, LABEL_TEMPLATES[relation][0], way=1))
             templates.append(Relation(relation, LABEL_TEMPLATES[relation][1], way=-1))
 
