@@ -59,6 +59,11 @@ conda activate EntKBC
 pip install -r requirements.txt
 ```
 
+In case you encounter issues during the execution you can run : 
+```bash 
+bash executable.sh
+```
+
 ## Usage 🚀
 
 ### Datasets
@@ -106,17 +111,17 @@ source script_train_expert.sh \
 ```
 - **Step 1 :** Firstly lets do a dummy test without any training to check that the data are correctly processed and save in the folders. After starting the venv, copy and paste :  
     ```bash
-    source script_train_expert.sh --split 1   --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/  --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/WN18RR/weights   --task "wn"   --no_training true   --hf_cache_dir //users/local/c20beliv/ 
+    source script_train_expert.sh --split 1   --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/  --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/WN18RR/weights   --task "wn"   --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 2:** Now try it with Freebase dataset
     ```bash
-    source script_train_expert.sh --split 1 --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights   --task "fb"  --no_training true   --hf_cache_dir //users/local/c20beliv/ 
+    source script_train_expert.sh --split 1 --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights   --task "fb"  --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 3:** Try to train the model with hugging face
     ```bash
-    source script_train_expert.sh   --split 1 --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights --task "fb" --no_training false   --hf_cache_dir //users/local/c20beliv/ --config_file "config.json"
+    source script_train_expert.sh   --split 1 --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights --task "fb" --no_training false   --hf_cache_dir //users/local/c20beliv/ --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 4:** Evaluation 

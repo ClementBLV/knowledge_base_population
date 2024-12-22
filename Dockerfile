@@ -21,4 +21,7 @@ RUN chown -R app ./ && \
 RUN su -c 'python3 -m pip install -r requirements.txt' app
 USER app
 
+# Find and make all .sh files executable
+RUN find /app -type f -name "*.sh" -exec chmod +x {} \;
+
 ENTRYPOINT ["/bin/bash", "/usr/src/entrypoint.sh"]
