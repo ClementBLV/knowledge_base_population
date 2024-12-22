@@ -80,7 +80,8 @@ if [ "$DO_PREPROCESS" == "true" ]; then
     # generate test eval file only once
     python3 src/data2eval.py \
                 --input_file $TEST".json" \
-                --output_file $ROOT"preprocessed/test_eval.json" \
+                --direct $DIRECT \
+                --output_file $ROOT"preprocessed/test_eval_direct_$DIRECT.json" \
                 --task "$TASK"
                 #you might want to change the output path if you have limited resources but beware to adapt the eval file
                 
