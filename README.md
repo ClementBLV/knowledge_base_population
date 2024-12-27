@@ -102,7 +102,6 @@ source script_train_expert.sh \
   --both boolean \
   --bias boolean \
   --processed_data_directory "/your/directory/" #directory of the data to process usually knowledge_base_population/data/WN18RR/ but data folder can be moved in another location without an issue
-  --model "hugging face id" \ #name of the model wich will be used for training
   --output_dir "/your/directory" \ #where the training output will be stored
   --task "" \ # either wn/wordnet/wn18rr or fb/freebase/fb15k237 
   --no_training boolean \ # it the training is launched or not
@@ -111,17 +110,17 @@ source script_train_expert.sh \
 ```
 - **Step 1 :** Firstly lets do a dummy test without any training to check that the data are correctly processed and save in the folders. After starting the venv, copy and paste :  
     ```bash
-    source script_train_expert.sh --split 1 --direct true  --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/  --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/WN18RR/weights   --task "wn"   --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
+    source script_train_expert.sh --split 1 --direct true  --both false   --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/  --output_dir ~/knowledge_base_population/data/WN18RR/weights   --task "wn"   --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 2:** Now try it with Freebase dataset
     ```bash
-    source script_train_expert.sh --split 1 --direct true --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights   --task "fb"  --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
+    source script_train_expert.sh --split 1 --direct true --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/  --output_dir ~/knowledge_base_population/data/FB15k237/weights   --task "fb"  --no_training true   --hf_cache_dir //users/local/c20beliv/  --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 3:** Try to train the model with hugging face
     ```bash
-    source script_train_expert.sh   --split 1 --direct true --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --model "microsoft/deberta-v3-small"   --output_dir ~/knowledge_base_population/data/FB15k237/weights --task "fb" --no_training false   --hf_cache_dir //users/local/c20beliv/ --config_file "config.json" --wandb_key ""
+    source script_train_expert.sh   --split 1 --direct true --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/FB15k237/ --output_dir ~/knowledge_base_population/data/FB15k237/weights --task "fb" --no_training false   --hf_cache_dir //users/local/c20beliv/ --config_file "config.json" --wandb_key ""
     ```
 
 - **Step 4:** Evaluation 

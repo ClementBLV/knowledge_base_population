@@ -17,7 +17,6 @@ show_help() {
     echo "  --task STR                      Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
     echo "  --processed_data_directory DIR  Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
     echo "  --do_preprocess BOOL            Set the do_preprocess parameter; if not precise false it will be set on true, preprocessing steps will be executed."
-    echo "  --model MODEL                   Specify the model; should be a Hugging Face ID, e.g., 'MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli'."
     echo "  --output_dir DIR                Set the output directory where the trained weights will be saved."
     echo "  --hf_cache_dir DIR              Set the Hugging Face cache directory; if not set, it will be the default directory."
     echo "                                  If not provided or set to None, the cache settings will not be exported."
@@ -25,8 +24,9 @@ show_help() {
     echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
     echo "  --custom_name STR               Custom name to save the model"
     echo "  --wandb_key STR                 The API key for wandb logging"
+    echo "  --fast BOOL                     If set on true a fast training with only 1000 example will be done"
     echo "  --help                          Display this help message and exit."
-    exit 1
+    exit 0
 }
 
 # Parse command-line arguments
@@ -39,13 +39,13 @@ declare -A args=(
     [--task]=TASK
     [--processed_data_directory]=P_FILE
     [--do_preprocess]=DO_PREPROCESS
-    [--model]=MODEL
     [--output_dir]=OUTPUT_DIR
     [--hf_cache_dir]=HF_CACHE_DIR
     [--no_training]=NO_TRAINING
     [--config_file]=CONFIG_FILE
     [--custom_name]=CUSTOM_NAME
     [--wandb_key]=WANK_KEY
+    [--fast]=FAST
 )
 
 while [ $# -gt 0 ]; do
@@ -60,7 +60,8 @@ while [ $# -gt 0 ]; do
                 shift 2
             else
                 echo "Unknown option: $1"
-                exit 1
+                show_help
+                exit 0
             fi
             ;;
     esac
@@ -74,7 +75,7 @@ if [ -n "$HF_CACHE_DIR" ] && [ "$HF_CACHE_DIR" != "None" ]; then
 fi
 
 # Validate necessary variables
-if [ -z "$P_FILE" ] || [ -z "$MODEL" ] || [ -z "$OUTPUT_DIR" ] || [ -z "$CONFIG_FILE" ]; then
+if [ -z "$P_FILE" ] || [ -z "$OUTPUT_DIR" ] || [ -z "$CONFIG_FILE" ]; then
     echo "Error: Missing required parameters."
     show_help
 fi
@@ -101,8 +102,7 @@ run_experiment() {
         DO_PREPROCESS=true
     fi
     
-    echo $BOTH
-    save_name=$(python3 src/name_generation.py "$MODEL" "$BIAS" "$DIRECT" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
+    save_name=$(python3 src/name_generation.py "$CONFIG_FILE" "$BIAS" "$DIRECT" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
 
     # Remove old datasets
     echo "Remove old files"
@@ -128,14 +128,14 @@ run_experiment() {
 
         echo "=========== TRAIN ============"
         python3 "src/trainer_hf.py" \
-            --model_name "$MODEL" \
             --do_train "yes"\
             --train_file "${P_FILE}train_${split}.mnli.json" \
             --test_file "${P_FILE}test.mnli.json" \
             --output_dir "$OUTPUT_DIR/${TASK_NAME}_${TASK}/" \
             --save_name $save_name \
-            --config_file $BASE"/configs/$CONFIG_FILE" \
-            --wandb_api_key $WANK_KEY
+            --config_file $CONFIG_FILE \
+            --wandb_api_key $WANK_KEY \
+            --fast $FAST
     fi
 
     # Remove the generated datasets

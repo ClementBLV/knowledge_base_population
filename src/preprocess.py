@@ -176,7 +176,7 @@ def _load_fb15k237_wikidata(path: str):
             # those pairs were revoved in the dataset generation 
             logger.warning('No desc found for {}'.format(entity_id))
             continue
-    logger.info('Load {} entity names from {}'.format(len(fb15k_id2ent), path))
+    logger.info('Load : {} entity names from {}'.format(len(fb15k_id2ent), path))
 
 
 def _load_fb15k237_desc(path: str):
@@ -187,7 +187,7 @@ def _load_fb15k237_desc(path: str):
         assert len(fs) == 2, 'Invalid line: {}'.format(line.strip())
         entity_id, desc = fs[0], fs[1]
         fb15k_id2desc[entity_id] = _truncate(desc, 300)
-    logger.info('Load {} entity descriptions from {}'.format(len(fb15k_id2desc), path))
+    logger.info('Load : {} entity descriptions from {}'.format(len(fb15k_id2desc), path))
 
 
 def _normalize_fb15k237_relation(relation: str) -> str:

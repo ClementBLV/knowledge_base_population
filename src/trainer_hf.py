@@ -30,7 +30,6 @@ from datetime import datetime
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
-FAST = False
 
 
 
@@ -71,8 +70,6 @@ parser.add_argument('-train_file', '--train_file',type=str, required=True,
                     help='Json file with the processed training data')
 parser.add_argument('-test_file', '--test_file',type=str, required=True,
                     help='Json file with the processed testing data')
-parser.add_argument('-model_name', '--model_name',type=str, required=True,
-                    help='Model name of the model to train, must be an HF ID')
 parser.add_argument('-output_dir', '--output_dir',type=str, required=True,
                     help='Directroy to save the outputs (log - weights)')
 parser.add_argument('-save_name', '--save_name',type=str, required=True,
@@ -81,7 +78,14 @@ parser.add_argument("--config_file", type=str, required=True,
                     help="Nale if the config file of for the meta model")
 parser.add_argument('--wandb_api_key', type=str, required=True,
                     help='Weights & Biases API key for logging')
+parser.add_argument('--fast', type=str2bool, default=False,
+                    help='Use only 1000 for debug and fast test')
 args = parser.parse_args()
+
+################ setup : fast ################
+FAST = args.fast
+logger.warning("\n!!! YOU ARE USING THE FAST TRAINING MODE ONLY 1000 WILL BE USED !!! (this mode is used for debug)\n")
+
 
 ################ setup : config ################
 current_dir = os.path.dirname(__file__)
@@ -94,12 +98,12 @@ os.makedirs(args.output_dir, exist_ok=True)
 logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
 logger.info(f"Save : Checkpoint Save location : {args.output_dir}/{args.save_name}")
-logger.info(f"Save : Trained model saving Name : {args.model_name}")
 
 ################ load : model ################
-model_name = args.model_name
+model_name = config["model_name"]
+logger.warning(f"Training : You are training this model {model_name}")
 max_length = config["max_length"]
-assert (config["model_name"]==model_name) ,"The config isn't the one of the model used"
+#assert (config["model_name"]==model_name) ,"The config isn't the one of the model used"
 
 # label2id mapping
 if args.do_train:
