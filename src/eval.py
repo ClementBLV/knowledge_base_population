@@ -1,5 +1,6 @@
 import argparse
 from dataclasses import dataclass
+import os
 import pathlib
 from setup import setup_logger
 from pathlib import Path
@@ -30,9 +31,9 @@ def str2bool(v):
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", type=str, required=True,
                     help=" File with the eval json eg : data/WN18RR/valid_eval.json")
-parser.add_argument("--output_file", type=str, required=True, default="eval")
-parser.add_argument("--source_model", type=str, required=True, 
-                    help="Hugging face ID of the model used")
+parser.add_argument("--output_file", type=str, required=True)
+parser.add_argument("--config_file", type=str, required=True, 
+                    help="Name of the config file of for the meta model")
 parser.add_argument("--model", type=str, required=True, 
                     help="Path of the weight of the model")
 parser.add_argument("--saving_name", type=str, default=None, 
@@ -41,20 +42,31 @@ parser.add_argument('-parallel', '--parallel', type=str2bool, default=True,
                     help='If true the evaluation will be done in batch and parallelise on GPU')
 parser.add_argument('-batch_size', '--batch_size', type=int, default=32,
                     help='Batch size for the evaluation')
+parser.add_argument('--fast', type=str2bool, default=False,
+                    help='Use only 1000 for debug and fast test')
 args = parser.parse_args()
 
 ################ initialisation : path ################
 name = args.model.split("/")[-1] if args.saving_name is None else args.saving_name
-output_file = Path(f"{args.output_file}/eval_{name}")
-output_file.parent.mkdir(exist_ok=True, parents=True)
+output_file = os.path.dirname(__file__) if args.output_file is None else args.output_file
+output_file = Path(f"{output_file}/{name}")
+#output_file.parent.mkdir(exist_ok=True, parents=True)
 
 
 ################ Setup: Logger ################
 
 # Set up the logger
-log_file = f"{args.output_file}.log"  # Save log to `eval.log` or as specified
+log_file = f"{output_file}.log"  # Save log to `eval.log` or as specified
+print(f"INFO : Saved : Eval file saved at : {output_file}.log")
 logger = setup_logger(log_file)
 logger.info("Program: eval.py ****")
+
+################ setup : config ################
+current_dir = os.path.dirname(__file__)
+config_path = os.path.join(os.path.dirname(current_dir), "configs", args.config_file)
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
+
 
 ################ setup : device ################
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -97,6 +109,11 @@ class MNLIDataset(Dataset):
 ################ initialisation : data ################
 mnli_data = []
 lines = json.load(open(args.input_file, "rt"))
+logger.info(f"Data : Input file : {args.input_file}")
+if args.fast : 
+    logger.warning("\n!!! YOU ARE USING THE FAST TRAINING MODE ONLY 1000 WILL BE USED !!! (this mode is used for debug)\n")
+    lines = lines[0:10]
+
 for line in lines:
     mnli_data.append(
         MNLIInputFeatures(
@@ -279,7 +296,7 @@ tokenizer = AutoTokenizer.from_pretrained(args.source_model)
 model = DebertaForSequenceClassification.from_pretrained(path, ignore_mismatched_sizes=True)
 model.to(device)"""
 tokenizer = AutoTokenizer.from_pretrained(
-        args.source_model, 
+        config["model_name"], 
         use_fast=False, 
         model_max_length=512
     ) 
