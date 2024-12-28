@@ -125,9 +125,9 @@ source script_train_expert.sh \
 
 - **Step 4:** Evaluation 
     ```bash
-    source script_eval_expert.sh --task "wn" --weights_path "//users/local/c20beliv/MNLI_wn/naive_derberta_small_2w_biased_split1_v-20241120" --saving_name "eval1" --parallel "true" --batch_size 3 --hf_cache_dir "//users/local/c20beliv/" --model "microsoft/deberta-v3-small"
+    source script_eval_expert.sh --task "wn" --weights_path "//users/local/c20beliv/MNLI_wn/naive_derberta_small_2w_biased_split1_v-20241120" --hf_cache_dir "//users/local/c20beliv/" --config_file "config.json" --parallel true --batch_size 3 
     ```
-
+optionnal --indirect true/false --both true/false if you have a custom name, else the name contains enough info 
 ---- 
 
 ### Meta model: 
