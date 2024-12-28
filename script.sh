@@ -75,16 +75,7 @@ if [ "$DO_PREPROCESS" == "true" ]; then
                 --task "$TASK" \
                 --train_path $ROOT"source/train.txt" \
                 --valid_path $ROOT"source/valid.txt" \
-                --test_path $ROOT"source/test.txt"
-
-    # generate test eval file only once
-    python3 src/data2eval.py \
-                --input_file $TEST".json" \
-                --direct $DIRECT \
-                --output_file $ROOT"preprocessed/test_eval_direct_$DIRECT.json" \
-                --task "$TASK"
-                #you might want to change the output path if you have limited resources but beware to adapt the eval file
-                
+                --test_path $ROOT"source/test.txt"                             
 else
     echo "WARNING : You must have already preprocessed the data" 
 fi

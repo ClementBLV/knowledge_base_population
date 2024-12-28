@@ -26,7 +26,7 @@ show_help() {
     echo "  --wandb_key STR                 The API key for wandb logging"
     echo "  --fast BOOL                     If set on true a fast training with only 1000 example will be done"
     echo "  --help                          Display this help message and exit."
-    exit 0
+    exit 1
 }
 
 # Parse command-line arguments
@@ -61,7 +61,6 @@ while [ $# -gt 0 ]; do
             else
                 echo "Unknown option: $1"
                 show_help
-                exit 0
             fi
             ;;
     esac
