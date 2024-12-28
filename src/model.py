@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from transformers import DebertaModel
 
-from trainer_meta import MetaModelNN, VotingModel
+from meta_models import MetaModelNN, VotingModel
 
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
