@@ -75,17 +75,12 @@ parser.add_argument('-output_dir', '--output_dir',type=str, required=True,
 parser.add_argument('-save_name', '--save_name',type=str, required=True,
                     help='Name under which the model will be saved in the output dir')
 parser.add_argument("--config_file", type=str, required=True, 
-                    help="Nale if the config file of for the meta model")
+                    help="Name of the config file of for the meta model")
 parser.add_argument('--wandb_api_key', type=str, required=True,
                     help='Weights & Biases API key for logging')
 parser.add_argument('--fast', type=str2bool, default=False,
                     help='Use only 1000 for debug and fast test')
 args = parser.parse_args()
-
-################ setup : fast ################
-FAST = args.fast
-logger.warning("\n!!! YOU ARE USING THE FAST TRAINING MODE ONLY 1000 WILL BE USED !!! (this mode is used for debug)\n")
-
 
 ################ setup : config ################
 current_dir = os.path.dirname(__file__)
@@ -162,7 +157,8 @@ raw_datasets = load_dataset(
 
 dataset_train = raw_datasets["train"]
 dataset_test  = raw_datasets["test"]
-if FAST : 
+if args.fast : 
+    logger.warning("\n!!! YOU ARE USING THE FAST TRAINING MODE ONLY 1000 WILL BE USED !!! (this mode is used for debug)\n")
     dataset_train = dataset_train.select(range(1000))
     dataset_test = dataset_test.select(range(500))
 
