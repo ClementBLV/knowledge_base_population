@@ -15,13 +15,13 @@ show_help() {
     echo "  --bias BOOL                     Set the bias parameter; if true, the sub-set from the training data will be unbalanced as the original one."
     echo "  --wandb BOOL                    Set the wandb parameter; if true, wandb will be called."
     echo "  --task STR                      Set the task parameter; it indicates either the WordNet task or the Freebase one, e.g., --task 'fb' for Freebase or 'wn' for WordNet."
-    echo "  --processed_data_directory DIR  Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
+    echo "  --processed_data_directory DIR  required - Set the directory for processed data in the MNLI format (train_splitted, test, and valid); these files are removed each time."
     echo "  --do_preprocess BOOL            Set the do_preprocess parameter; if not precise false it will be set on true, preprocessing steps will be executed."
-    echo "  --output_dir DIR                Set the output directory where the trained weights will be saved."
+    echo "  --output_dir DIR                required - Set the output directory where the trained weights will be saved."
     echo "  --hf_cache_dir DIR              Set the Hugging Face cache directory; if not set, it will be the default directory."
     echo "                                  If not provided or set to None, the cache settings will not be exported."
     echo "  --no_training BOOL              If set to true, training will be skipped and 'HELLO WORLD NO TRAINING!' will be printed."
-    echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
+    echo "  --config_file PATH              required - NAME of the config.json you want to use in the config file"
     echo "  --custom_name STR               Custom name to save the model"
     echo "  --wandb_key STR                 The API key for wandb logging"
     echo "  --fast BOOL                     If set on true a fast training with only 1000 example will be done"
@@ -101,7 +101,7 @@ run_experiment() {
         DO_PREPROCESS=true
     fi
     
-    save_name=$(python3 src/name_generation.py "$CONFIG_FILE" "$BIAS" "$DIRECT" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
+    save_name=$(python3 src/utils/name_generation.py "$CONFIG_FILE" "$BIAS" "$DIRECT" "$BOTH" "$SPLIT" "$VERSION" "$CUSTOM_NAME")
 
     # Remove old datasets
     echo "Remove old files"
@@ -126,7 +126,7 @@ run_experiment() {
         touch "$BASE/log/train_${save_name}.log" 
 
         echo "=========== TRAIN ============"
-        python3 "src/trainer_hf.py" \
+        python3 "src/base/trainer_hf.py" \
             --do_train "yes"\
             --train_file "${P_FILE}train_${split}.mnli.json" \
             --test_file "${P_FILE}test.mnli.json" \

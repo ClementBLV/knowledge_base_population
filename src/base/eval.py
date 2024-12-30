@@ -2,7 +2,6 @@ import argparse
 from dataclasses import dataclass
 import os
 import pathlib
-from setup import setup_logger
 from pathlib import Path
 from typing import List
 from transformers import (
@@ -13,21 +12,14 @@ from tqdm import tqdm
 import json
 import numpy as np
 import torch
-import sys
 from torch.utils.data import DataLoader, Dataset
 import torch.nn.functional as F
+
+from src.utils.utils import setup_logger, str2bool, get_config
+
 print("=========== EVALUATION ============")
 
 ################ setup : parser ################
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", type=str, required=True,
                     help=" File with the eval json eg : data/WN18RR/valid_eval.json")
@@ -62,11 +54,7 @@ logger = setup_logger(log_file)
 logger.info("Program: eval.py ****")
 
 ################ setup : config ################
-current_dir = os.path.dirname(__file__)
-config_path = os.path.join(os.path.dirname(current_dir), "configs", args.config_file)
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
-
+config = get_config(args.config_file)
 
 ################ setup : device ################
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")

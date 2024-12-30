@@ -31,7 +31,7 @@ from collections import defaultdict
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from templates import FB_LABEL_TEMPLATES, WN_LABEL_TEMPLATES, WN_LABELS
+from utils.templates import FB_LABEL_TEMPLATES, WN_LABEL_TEMPLATES, WN_LABELS
 LABELS, LABEL_TEMPLATES = None , None
 
 def str2bool(v):

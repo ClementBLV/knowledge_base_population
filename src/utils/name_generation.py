@@ -4,6 +4,7 @@ import sys
 import warnings
 import logging 
 import re
+from src.utils.utils import get_config
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,10 +19,8 @@ def extract_size(sentence):
 
 def generate_save_name(config_file, bias, direct, both, split, version, custom_name=None):
 
-    current_dir = os.path.dirname(__file__)
-    config_path = os.path.join(os.path.dirname(current_dir), "configs", config_file)
-    with open(config_path, "r") as config_file:
-        config = json.load(config_file)
+    config = get_config(config_file)
+    
     model = config["model_name"]
 
     if custom_name:

@@ -1,6 +1,27 @@
+import argparse
+import json
 import logging
+from pathlib import Path
 import sys
-from typing import Optional
+from typing import Dict, Optional
+
+
+def get_config(config_file) -> Dict:
+    current_dir = Path(__file__).resolve().parent.parent
+    config_path = current_dir.parent / "configs" / config_file
+    with open(config_path, "r") as config_file:
+        config = json.load(config_file)
+    return config
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 def setup_logger(output_file):
     """

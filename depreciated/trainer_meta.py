@@ -10,7 +10,7 @@ import pandas as pd
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-from meta_models import MetaModelNN, VotingModel
+from meta.meta_models import MetaModelNN, VotingModel
 
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
@@ -21,8 +21,9 @@ logger.info("Progam : trainer_meta_binary.py ****")
 parser = ArgumentParser()
 parser.add_argument("--input_file", type=str, required=True,
                     help="Path to the training data, must be a csv file with the four columns p{1..4} and a label column with the ground truth")
-parser.add_argument("--num_epochs", type=int)
-parser.add_argument('-output_dir', '--output_dir',type=str, required=True,
+parser.add_argument("--num_epochs", type=int, default=3,
+                    help="Number of epochs")
+parser.add_argument('--output_dir',type=str, required=True,
                     help='Directroy to save the outputs (log - weights)')
 parser.add_argument("--config_file", type=str, required=True, 
                     help="Name if the config file of for the meta model")

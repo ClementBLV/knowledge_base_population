@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 from argparse import ArgumentParser
 from dataclasses import dataclass
-from pprint import pprint
 import shutil
 import sys
 from tqdm import tqdm

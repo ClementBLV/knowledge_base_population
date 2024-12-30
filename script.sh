@@ -71,7 +71,7 @@ VALID=$ROOT"preprocessed/valid"
 
 if [ "$DO_PREPROCESS" == "true" ]; then
     # preprocess the raw dataset
-    python3 src/data_generator.py \
+    python3 src/dataprocess/data_generator.py \
                 --task "$TASK" \
                 --train_path $ROOT"source/train.txt" \
                 --valid_path $ROOT"source/valid.txt" \
@@ -86,7 +86,7 @@ fi
 if [ "$TRAIN_BOOL" == "true" ]; then
     for SPLIT in $SPLIT_VALUES; do 
         # Split train
-        python3 src/split.py \
+        python3 src/dataprocess/split.py \
             --input_file $TRAIN".json" \
             --percentage $SPLIT \
             --bias $BIAS\
@@ -94,7 +94,7 @@ if [ "$TRAIN_BOOL" == "true" ]; then
             --output_file $P_FILE"train_"$SPLIT".json"
 
         # convert to mnli format
-        python3 src/data2mnli.py \
+        python3 src/dataprocess/data2mnli.py \
             --input_file $P_FILE"train_"$SPLIT".json" \
             --data_source $ROOT \
             --output_file $P_FILE"train_"$SPLIT".mnli.json"\
@@ -111,7 +111,7 @@ fi
 # convert to NLI format
 if [ "$TEST_BOOL" == "true" ]; then
     echo "******* TEST *******"
-    python3 src/data2mnli.py \
+    python3 src/dataprocess/data2mnli.py \
         --input_file $TEST".json" \
         --data_source $ROOT \
         --output_file $P_FILE"test.mnli.json" \
@@ -123,7 +123,7 @@ fi
 
 if [ "$VALID_BOOL" == "true" ]; then
     echo "******* VALID *******"
-    python3 src/data2mnli.py \
+    python3 src/dataprocess/data2mnli.py \
         --input_file $VALID".json" \
         --data_source $ROOT \
         --output_file $P_FILE"valid.mnli.json" \

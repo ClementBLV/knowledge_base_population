@@ -8,12 +8,13 @@ from pathlib import Path
 from dataclasses import dataclass
 from collections import Counter, defaultdict
 from typing import Dict, List
-from templates import (
+from src.utils.templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
     FORBIDDEN_MIX,
     FB_LABEL_TEMPLATES,
 )
+from src.utils.utils import str2bool
 
 LABELS, LABEL_TEMPLATES = None , None
 
@@ -52,16 +53,7 @@ class Relation:
 
 
 ################ setup : args ################
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-    
+  
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Convert data into MNLI format.")
     parser.add_argument("--input_file", type=str, required=True, help="Input file path.")
@@ -200,7 +192,7 @@ def main():
     args = parse_args()
 
     ################ setup : param ################
-    current_dir = Path(__file__).resolve().parent
+    current_dir = Path(__file__).resolve().parent.parent
     config_file = current_dir.parent / "configs" / args.config_name
     config = load_config(config_file)
     label2id = config["label2id"]

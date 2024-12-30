@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from collections import Counter
 from dataclasses import dataclass
 from typing import List
 from transformers import (

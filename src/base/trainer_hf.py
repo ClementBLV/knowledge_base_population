@@ -20,13 +20,14 @@ import gc
 from accelerate.utils import release_memory
 import shutil
 import wandb
-import transformers
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers import TrainingArguments, Trainer, TrainerCallback
 
 from datasets import load_dataset
 
 from datetime import datetime
+
+from src.utils.utils import get_config, str2bool
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
@@ -53,16 +54,6 @@ def flush():
 
 
 ################ setup : args ################
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-
 parser = argparse.ArgumentParser(description="Parser for terminal arguments")
 parser.add_argument('-train', '--do_train', type=str2bool, default=True,
                     help='Do training of flag set. Otherwise only evaluation')
@@ -83,10 +74,7 @@ parser.add_argument('--fast', type=str2bool, default=False,
 args = parser.parse_args()
 
 ################ setup : config ################
-current_dir = os.path.dirname(__file__)
-config_path = os.path.join(os.path.dirname(current_dir), "configs", args.config_file)
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
+config = get_config(args.config_file)
 
 ################ setup : dirrectories ################
 os.makedirs(args.output_dir, exist_ok=True)

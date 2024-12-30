@@ -9,8 +9,8 @@ import json
 import sys
 from pprint import pprint
 import random
-import templates
-from templates import (
+import utils.templates as templates
+from utils.templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
     FORBIDDEN_MIX,

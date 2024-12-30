@@ -1,0 +1,17 @@
+{
+    "source_model":"microsoft/deberta-v3-small",
+    "max_length":1024,
+    "label2id" : {
+        "entailment": 0,
+        "not_entailment": 1
+    },
+    "id2label" : {
+        "0": "entailment",
+        "1": "not_entailment"
+    },
+    "models_path" : {
+        "model_1way" : "//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_1w_direct_biased_split1_v-20241227",
+        "model_1way_reverse" : "//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_1w_indirect_biased_split_v-20241227",
+        "model_2ways":"//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_2w_biased_split1_v-20241227"
+    }
+}
