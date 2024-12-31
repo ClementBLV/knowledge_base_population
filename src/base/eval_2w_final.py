@@ -21,10 +21,7 @@ print("device ", device)
 parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="data/WN18RR/valid_eval.json")
-parser.add_argument(
-    "--input_file_indirect", type=str, default="data/WN18RR/valid_eval_indirect.json"
-)
-
+parser.add_argument("--input_file_indirect", type=str, default="data/WN18RR/valid_eval_indirect.json")
 parser.add_argument("--output_file", type=str, default="eval")
 parser.add_argument("--model", type=str, default="")
 parser.add_argument("--source_model", type=str, default="")

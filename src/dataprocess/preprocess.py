@@ -8,8 +8,9 @@ from multiprocessing import Pool
 import sys
 from typing import Dict, List
 
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+from src.utils.utils import setup_logger_basic
+
+logger = setup_logger_basic()
 logger.info("Progam : preprocess.py ****")
 
 """

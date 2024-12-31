@@ -8,11 +8,12 @@ from dataclasses import dataclass
 import shutil
 import sys
 from tqdm import tqdm
+
+from src.utils.utils import setup_logger_basic
 print("=========== SPLIT ============")
 
 ################ setup : logger ################
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logger_basic()
 logger.info("Progam : split.py ****")
 
 parser = ArgumentParser()

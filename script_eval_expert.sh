@@ -119,13 +119,13 @@ run_evaluation() {
     local output_file_suffix=$2
     local save_name=$3
     
-    python3 src/data2eval.py \
+    python3 src/dataprocess/data2eval.py \
         --input_file $ROOT"preprocessed/test.json" \
         --direct "$direct" \
         --output_file $ROOT"preprocessed/test_eval_${output_file_suffix}.json" \
         --task "$TASK"
 
-    python3 src/eval.py \
+    python3 src/base/eval.py \
         --input_file $ROOT"preprocessed/test_eval_${output_file_suffix}.json" \
         --output_file "${BASE}/eval" \
         --config_file $CONFIG_FILE \

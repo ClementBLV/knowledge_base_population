@@ -14,7 +14,7 @@ from src.utils.templates import (
     FORBIDDEN_MIX,
     FB_LABEL_TEMPLATES,
 )
-from src.utils.utils import str2bool
+from src.utils.utils import setup_logger_basic, str2bool
 
 LABELS, LABEL_TEMPLATES = None , None
 
@@ -68,8 +68,7 @@ def parse_args() -> argparse.Namespace:
 
 
 ################ setup : logger ################
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logger_basic()
 
 ################ setup : config ################
 def load_config(config_file: Path) -> Dict:

@@ -23,6 +23,13 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+def setup_logger_basic():
+    # Setup
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    logger = logging.getLogger(__name__)
+    return logger
+
+
 def setup_logger(output_file):
     """
     Sets up a logger to write to both the console and a file.

@@ -27,7 +27,7 @@ from datasets import load_dataset
 
 from datetime import datetime
 
-from src.utils.utils import get_config, str2bool
+from src.utils.utils import get_config, str2bool, setup_logger_basic
 
 SEED_GLOBAL = 42
 DATE =  datetime.today().strftime("%Y%m%d")
@@ -35,8 +35,7 @@ DATE =  datetime.today().strftime("%Y%m%d")
 
 
 ################ setup : logger ################
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logger_basic()
 logger.info("Progam : hf_trainer.py ****")
 
 ################ setup : seed ################

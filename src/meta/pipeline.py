@@ -15,12 +15,9 @@ warnings.filterwarnings("ignore")
 from trainer_meta import train_model
 from eval_meta import evaluate_model
 import data2_meta
-from src.utils.utils import str2bool, get_config
+from src.utils.utils import setup_logger, str2bool, get_config
 
 DATE = datetime.now().strftime("%Y%m%d")
-# Setup
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
 
 
 ################ setup : parser ################
@@ -104,9 +101,12 @@ def df2meta (data_fraction, parallel, config)-> List[Dict]:
     return data2_meta.main(custom_args)
 
 def pipeline(args):
+    output_dir = os.path.join(args.output_dir,f"meta_model_{DATE}")
+    os.makedirs( output_dir, exist_ok=True)
+    logger = setup_logger(os.path.join(output_dir, "logs.txt"))
+    
     print("=========== PIPELINE ============")
     logger.info("Program: pipeline.py ****")
-    os.makedirs(os.path.join(args.output_dir,f"meta_model_{DATE}") , exist_ok=True)
     train_fraction = args.train_fraction
     best_accuracy , best_fraction = 0, 0
     best_model = None
@@ -186,7 +186,6 @@ def pipeline(args):
 
     ############### Save ##############
     if best_model:
-        output_dir = os.path.join(args.output_dir, f"meta_model_{DATE}")
         saving_name = f"best_model_{int(best_accuracy * 10000)}.pt"
         model_path = os.path.join(output_dir, saving_name)
         torch.save(best_model.state_dict(), model_path)

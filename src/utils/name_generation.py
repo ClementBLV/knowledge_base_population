@@ -6,11 +6,6 @@ import logging
 import re
 from src.utils.utils import get_config
 
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
-
-
-
 def extract_size(sentence):
     match = re.search(r'\b(base|small|large)\b', sentence, re.IGNORECASE)
     if match:

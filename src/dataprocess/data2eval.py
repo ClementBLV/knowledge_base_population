@@ -9,6 +9,7 @@ import json
 import sys
 from pprint import pprint
 import random
+from src.utils.utils import setup_logger_basic
 import utils.templates as templates
 from utils.templates import (
     WN_LABELS,
@@ -21,8 +22,7 @@ np.random.seed(0)
 print("=========== CONVERTION ============")
 
 ################ setup : logger ################
-logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logger_basic()
 logger.info("Progam : data2eval.py ****")
 
 sys.path.append("./")
