@@ -254,7 +254,7 @@ train_args = TrainingArguments(
     #eval_steps=300,  # evaluate after n steps if evaluation_strategy!='steps'. defaults to logging_steps
     save_strategy=config["save_strategy"],  # options: "no"/"steps"/"epoch"
     save_steps=config["save_steps"],  # Number of updates steps before two checkpoint saves.
-    #save_total_limit=1,  # If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints in output_dir
+    save_total_limit=1,  # If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints in output_dir
     #logging_strategy="epoch",
     #logging_steps=100,
     #report_to="all",  # "all"
