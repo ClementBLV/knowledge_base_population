@@ -1,0 +1,34 @@
+Meeting Notes 03/01/2025
+
+TODOs ; 
+Code : TRAINING 
+-   DONE   add wandb API key agument and loss traking
+[+]         see for early stopping --> 3 epochs ? early stpping with hugging face trainer 
+-           see for LORA for faster training
+-	        see to improve its speed on expert server (new parameters + parallelization) 
+!!          see how much examples are above 1024 token
+
+Code : IMPROVEMENT 
+-   DONE  TEST Build a meta model.py : Use the newly trained models to generate a training set for the meta model
+-   DONE  in data processing and training ONLY take the en the entailment prob
+-   DONE  Parallelize data2meta_v2.py 
+-   DONE  Heuristic for training meta
+-         Build script_eval_meta_expert.sh 
+[+] DONE  Test all scripts (deberta-small)
++         Test all scripts (deberta-small + GPU : expert)
+
+[+] DONE  Full refactoring + packading
+
+[+] ABORT (Modify Entypoints)
+[+] ABORT (Test Entrypoint (expert.ai GPU ))
+-	Retrain all the model with a 100% training on WN with bigger batch size and optimized parameters 
+
+
+Code : EVALUATION 
+-	See how it is done in the literature
+-	Evaluate the models one by one and with the meta model (MRR + hit@) 
+
+
+
+source script_train_expert.sh   --split 1               --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/ --model "microsoft/deberta-v3-small"   --output_dir //users/local/c20beliv/ --task "wn" --no_training true   --hf_cache_dir //users/local/c20beliv/ --do_preprocess false
+source script_train_expert.sh   --split 1 --direct true --both false --bias true   --processed_data_directory ~/knowledge_base_population/data/WN18RR/                                         --output_dir //users/local/c20beliv/ --task "wn" --no_training false   --hf_cache_dir //users/local/c20beliv/ --config_file "config.json" --wandb_key ""

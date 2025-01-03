@@ -1,0 +1,36 @@
+23/10/2023
+
+DONE
+- verbalize the relations 
+- first process the raw wn18rr
+
+In process
+- modify the code tacred2mnli into a wn18rr2mnli (80%)
+
+TODO 
+- test wn18rr2mnli + debug + manually check the output
+- run glue on bert (baseline)
+
+Model To test 
+baseline : Bert 
+Other models :
+	- Roberta 
+	- Deberta + Deberta large
+	- LaMA-2,
+	- MPT, etc., or 
+	- GPT2 (run_glue has been uptated for this one )
+	- GPT-3.5
+
+Incoming Experiments : 
+- **DeBERTa** model, **zero-shot** eval on our entailment data
+- **DeBERTa** model, **few-shot** (5%) eval on our entailment data
+- **DeBERTa** model, **few-shot** (10%) eval on our entailment data
+- **DeBERTa** model, **few-shot** (15%) eval on our entailment data
+- **DeBERTa** model, **few-shot** (20%) eval on our entailment data
+- **DeBERTa** model, **fine-tune** & eval on our entailment data
+- **DeBERTa MNLI**, **zero-shot** eval on our entailment data
+- **DeBERTa MNLI**, **few-shot** (5%) eval on our entailment data
+- **DeBERTa MNLI**, **few-shot** (10%) eval on our entailment data
+- **DeBERTa MNLI**, **few-shot** (15%) eval on our entailment data
+- **DeBERTa MNLI**, **few-shot** (20%) eval on our entailment data
+- **DeBERTa MNLI**, **fine-tune** & eval on our entailment dat

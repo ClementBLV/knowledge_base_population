@@ -1,0 +1,23 @@
+30/10/23
+
+Done 
+- ask for GPU : obtained 1060
+- get the ssh access to GPU 
+- **wn2mnli.py** : test  + debug + manually check the output
+- few shot : **split.py** to split the training set
+- run glue on bert (baseline) CAREFULL use the git and not the pip 
+- found a Deberta Model : MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c  ([here](https://huggingface.co/MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c))
+- ppt to explain 
+
+In Progress 
+- **eval.py** : hit@1 - 3 -10
+
+TODO :
+- set up the GPU 
+- change transformer to the stable version 4.34.1
+- runglue on deberta (not sure it will be strait forward )
+- traine Deberta on TACRED using the paper ? 
+- evaluate the time needed for the experiments
+
+ISSUE : 
+- TACRED is not a public dataset, hense T-REx might be a good free alternative 
