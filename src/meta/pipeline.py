@@ -99,7 +99,7 @@ def df2meta (data_fraction, parallel, config)-> List[Dict]:
         config=config
     )
     return data2_meta.main(custom_args)
-
+"""
 def pipeline(args):
     output_dir = os.path.join(args.output_dir,f"meta_model_{DATE}")
     os.makedirs( output_dir, exist_ok=True)
@@ -111,11 +111,19 @@ def pipeline(args):
     best_accuracy , best_fraction = 0, 0
     best_model = None
 
-    train_data = read_data(args.train_file)
-    test_data = read_data(args.test_file)
+    #train_data = read_data(args.train_file)
+    #valid  --> in the loop 
+    #test_data = read_data(args.test_file) --> at the end 
 
-    total_train_size, total_test_size = get_total_size(train_data), get_total_size(test_data)
-    
+
+    # validation computing 
+    #test_data_meta =  df2meta(test_data, args.parallel, config=config)
+    #X_tensor_test, y_tensor_test = input2tensor(test_data_meta)
+
+    #total_train_size, total_test_size = get_total_size(train_data), get_total_size(test_data)
+
+
+
     cached_train_data, cached_test_data = []  , [] # Initialize empty training data
     previous_train_size, previous_test_size = 0 , 0
     
@@ -145,20 +153,6 @@ def pipeline(args):
             
             X_tensor, y_tensor = input2tensor(cached_train_data)
 
-        ############### test subset ##############
-        if  previous_test_size + step_test_size < total_test_size:
-            next_test_size = previous_test_size + step_test_size
-            test_data_fraction = get_data_fraction(
-                                    test_data, 
-                                    start_idx=previous_test_size, 
-                                    end_idx=next_test_size)
-            previous_test_size = next_test_size
-
-            cached_test_data.extend(df2meta(test_data_fraction, args.parallel, config=config))
-            current_test_fraction = 2* len(cached_test_data)/total_test_size
-
-            X_tensor_test, y_tensor_test = input2tensor(cached_test_data)
-
         ############### Train ##############
         model = train_model(X_tensor, y_tensor, num_epochs=args.num_epochs, config_file=args.config_file)
         logger.info(f"Train : training size {len(cached_train_data):.0f}, test size {len(cached_test_data):.0f}")
@@ -186,6 +180,9 @@ def pipeline(args):
 
     ############### Save ##############
     if best_model:
+
+        # evaluation on test data -- final evaluation of the perf of the meta model 
+
         saving_name = f"best_model_{int(best_accuracy * 10000)}.pt"
         model_path = os.path.join(output_dir, saving_name)
         torch.save(best_model.state_dict(), model_path)
@@ -203,7 +200,9 @@ def pipeline(args):
         shutil.copyfile(config_path, os.path.join(output_dir, args.config_file))
    
     return best_model
-
+"""
+def pipeline(args):
+    pass
 
 if __name__ == "__main__":
     pipeline(args)
