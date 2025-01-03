@@ -83,6 +83,10 @@ if [ -z "$DO_PREPROCESS" ]; then
     DO_PREPROCESS=true
 fi
 
+if [ -z "$FAST" ]; then
+    FAST=false
+fi
+
 run_experiment() {
     local i="$1"
     local split="$2"
