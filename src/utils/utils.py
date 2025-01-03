@@ -11,6 +11,7 @@ def get_config(config_file) -> Dict:
     config_path = current_dir.parent / "configs" / config_file
     with open(config_path, "r") as config_file:
         config = json.load(config_file)
+    config["config_path"]=config_path
     return config
 
 def str2bool(v):

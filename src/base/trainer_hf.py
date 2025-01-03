@@ -297,7 +297,7 @@ if args.do_train:
 
     model_path = f"{args.output_dir}/{args.save_name}-{DATE}"
     trainer.save_model(output_dir=model_path)
-    shutil.copy(config_path, f"{model_path}/config_used.json")
+    shutil.copy(config["config_path"], f"{model_path}/config_used.json")
     
     # Log final metrics
     final_metrics = train_result.metrics
