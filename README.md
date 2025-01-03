@@ -48,6 +48,7 @@ cd knowledge_base_population
 python3 -m venv ~/EntKBC
 source ~/EntKBC/bin/activate
 pip install -r requirements.txt
+pip install -e .
 ```
 
 #### Using `conda`

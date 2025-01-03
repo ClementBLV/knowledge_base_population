@@ -19,6 +19,8 @@ RUN chown -R app ./ && \
     chgrp -R app ./
 
 RUN su -c 'python3 -m pip install -r requirements.txt' app
+RUN su -c 'python3 -m pip install -e .' app
+
 USER app
 
 # Find and make all .sh files executable
