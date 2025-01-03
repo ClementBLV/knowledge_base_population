@@ -8,10 +8,10 @@
         "0": "entailment", 
         "1": "not_entailment"
     },
-    "max_length" : 512, 
+    "max_length" : 1024, 
     "eval_batch" : 64 , 
-    "per_device_train_batch_size" : 8 , 
-    "gradient_accumulation_steps" : 4 ,
+    "per_device_train_batch_size" : 4 , 
+    "gradient_accumulation_steps" : 8 ,
     "warmup_ratio":0.06,
     "weight_decay":0.01,
     "num_train_epochs":3,
