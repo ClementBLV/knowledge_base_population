@@ -90,6 +90,14 @@ run_experiment() {
             --task "$TASK" \
             --config_name $CONFIG_FILE \
 
+        python3 src/dataprocess/data2mnli.py \
+            --input_file $ROOT"/preprocessed/$INPUT_FILE" \
+            --data_source $ROOT \
+            --output_file $P_FILE"/valid.mnli.json" \
+            --both "True" \
+            --task "$TASK" \
+            --config_name $CONFIG_FILE \
+
         #python3 src/data2meta.py  \
         #    --input_file $P_FILE"/$TRAINING_FILE" \
         #    --output_folder $P_FILE \
@@ -104,6 +112,7 @@ run_experiment() {
     else
         python3 src/meta/pipeline.py   --train_file $P_FILE"/train.mnli.json" \
                                     --test_file $P_FILE"/test.mnli.json"\
+                                    --valid_file $P_FILE"/valid.mnli.json"\
                                     --output_dir $P_FILE \
                                     --num_epochs 3\
                                     --config_file $CONFIG_FILE \
