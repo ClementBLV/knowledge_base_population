@@ -113,7 +113,7 @@ def format_relation(t: Relation, obj: str , subj:str , way: int)-> str:
     if way > 0 :
         return f"{t.template.format(subj=subj, obj=obj)}."
     else : 
-        return f"{t.template.format(subj=obj, obj=obj)}."
+        return f"{t.template.format(subj=subj, obj=obj)}."
 # Generate MNLI examples with positive and negative templates
 def data2mnli_with_negative_examples(
     instance: REInputFeatures,
@@ -179,7 +179,9 @@ def data2mnli_with_negative_examples(
         )
         for t in selected_negatives
     ])
-
+    for a in mnli_instances:
+        print(a)
+    print('=======================')
     return mnli_instances
 
 
