@@ -152,7 +152,7 @@ def data2mnli_with_negative_examples(
 
     potential_negatives = [
         t for t in negative_templates[instance.relation]
-        if t.template not in forbidden_templates and t.way == way
+        if (t.template not in forbidden_templates and (t.way == way or both))
     ]
     selected_negatives = random.sample(
         potential_negatives, k=min(negn, len(potential_negatives))
