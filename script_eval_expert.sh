@@ -125,7 +125,7 @@ run_evaluation() {
         --output_file $ROOT"preprocessed/test_eval_${output_file_suffix}.json" \
         --task "$TASK"
 
-    python3 src/base/eval.py \
+    python3 src/base/compute_probabilities.py \
         --input_file $ROOT"preprocessed/test_eval_${output_file_suffix}.json" \
         --output_file "${BASE}/eval" \
         --config_file $CONFIG_FILE \
