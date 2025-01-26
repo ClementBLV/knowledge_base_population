@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import logging
 from pathlib import Path
@@ -55,3 +56,7 @@ def setup_logger(output_file):
     logger.addHandler(file_handler)
 
     return logger
+
+def sha1(text):
+    """Generate SHA-1 hash for a given text."""
+    return hashlib.sha1(text.encode('utf-8')).hexdigest()
