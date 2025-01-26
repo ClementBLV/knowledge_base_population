@@ -42,14 +42,18 @@ parser.add_argument("--threshold", type=float, default=0.01,
                     help="Minimum improvement in accuracy required to continue training.")
 parser.add_argument("--patience", type=int, default=3,
                     help="Number of iterations to wait for improvement before stopping.")
+parser.add_argument('--fast', type=str2bool, default=False,
+                    help='Use only 1000 for debug and fast test')
 args = parser.parse_args()
 
 ################ setup : config ################
 config = get_config(args.config_file)
 
-def read_data(input_file):
+def read_data(input_file : str, fast : bool):
     with open(input_file) as f:
         datas = json.load(f)
+    if fast : 
+        return datas[0:1000]
     return datas
    
 def get_total_size(total_data):

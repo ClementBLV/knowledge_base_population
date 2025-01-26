@@ -17,6 +17,7 @@ show_help() {
     echo "  --parallel BOOL                 Boolean to evaluate in parallel."
     echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
     echo "  --train_fraction FLOAT          Fraction used for training and testing"
+    echo "  --fast BOOL                     If set on true a fast training with only 1000 example will be done"
     echo "  --help                          Display this help message and exit."
     exit 1
 }
@@ -33,6 +34,8 @@ declare -A args=(
     [--parallel]=PARALLEL_BOOL
     [--config_file]=CONFIG_FILE
     [--train_fraction]=TRAIN_FRACTION
+    [--fast]=FAST
+
 )
 
 while [ $# -gt 0 ]; do
@@ -70,6 +73,9 @@ if [ -z "$DO_PREPROCESS" ]; then
     DO_PREPROCESS=true
 fi
 
+if [ -z "$FAST" ]; then
+    FAST=false
+fi
 
 run_experiment() {
     # TODO --> mettre le data2mnli avec le train is pas de do_preprocess et le save a cet endroit
@@ -117,7 +123,8 @@ run_experiment() {
                                     --num_epochs 3\
                                     --config_file $CONFIG_FILE \
                                     --parallel $PARALLEL_BOOL \
-                                    --train_fraction $TRAIN_FRACTION
+                                    --train_fraction $TRAIN_FRACTION \
+                                    --fast $FAST
         
         # TODO add an argument there for the model output
         
