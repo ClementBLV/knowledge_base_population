@@ -10,7 +10,7 @@ from src.meta.meta_models import MetaModelNN, VotingModel
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
-logger.info("Progam : hf_trainer.py ****")
+logger.info("Progam : model.py ****")
 
 
 class CombinedModel(nn.Module):
@@ -64,9 +64,6 @@ class CombinedModel(nn.Module):
 
         return final_output
 
-# Paths to your DeBERTa model checkpoints
-deberta_paths = ["path/to/deberta1", "path/to/deberta2", "path/to/deberta3", "path/to/deberta4"]
-combined_model = CombinedModel(deberta_paths=deberta_paths, meta_model=meta_model)
 
 # Example forward pass with dummy data
 # input_ids, attention_mask, and token_type_ids should be prepared for each input (h, p)
