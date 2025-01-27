@@ -44,7 +44,7 @@ WN_LABEL_TEMPLATES = {  # in the future we will add the indirect relations
     ],
     "_member_of_domain_usage": [
         "{obj} is a domain usage of {subj}",
-        "X",
+        "{obj} is a domain usage of {subj}",
     ],
     "_member_of_domain_region": [
         "{obj} is the domain region of {subj}",
@@ -118,951 +118,951 @@ template_indirect = [
 
 FB_LABEL_TEMPLATES = {
     "position_s football_historical_roster_position american_football players sports_position sports ": [
-        "{subj} and {obj} are two linked roster position ",
-        "{subj} and {obj} are two linked roster position "
+        "{obj} and {subj} are two linked roster position ",
+        "{obj} and {subj} are two linked roster position "
     ],
     "currency dated_money_value measurement_unit assets business_operation business ": [
-        "{subj} measures its assets and conducts its business operations using the {obj} currency",
-        "{obj} is the currency used by {subj} to measure its assets and conduct its business operations"
+        "{obj} measures its assets and conducts its business operations using the {subj} currency",
+        "{subj} is the currency used by {obj} to measure its assets and conduct its business operations"
     ],
     "edited_by film ": [
-        "the film {subj} was edited by {obj}",
-        "{obj} was the editor of {subj}"
+        "the film {obj} was edited by {subj}",
+        "{subj} was the editor of {obj}"
     ],
     "location place_lived places_lived person people ": [
-        "{subj} lived in {obj}",
-        "{obj} was the location where {subj} lived"
+        "{obj} lived in {subj}",
+        "{subj} was the location where {obj} lived"
     ],
-    "films film_subject film ": [
-        "{subj} is the subject of the film {obj}",
-        "{obj} depicted the subject of {subj}"
+    "films film_object film ": [
+        "{obj} is the object of the film {subj}",
+        "{subj} depicted the object of {obj}"
     ],
     "film_distribution_medium film_film_distributor_relationship distributors film ": [
-        "{subj} was distributed on the following medium {obj} ",
-        "{obj} was the medium on which {subj} was distributed"
+        "{obj} was distributed on the following medium {subj} ",
+        "{subj} was the medium on which {obj} was distributed"
     ],
     "nominated_for award_nomination nominees award_category award ": [
-        "{subj} was the award category where the movie {obj} was nominee",
-        "{obj} was nomenee in the award category {subj}"
+        "{obj} was the award category where the movie {subj} was nominee",
+        "{subj} was nomenee in the award category {obj}"
     ],
     "military_combatant_group combatants military_conflict military ": [
-        "The war of {subj} involved {obj}",
-        "Combatant group from {obj} were involved during the {subj} "
+        "The war of {obj} involved {subj}",
+        "Combatant group from {subj} were involved during the {obj} "
     ],
     "cast_members snl_season_tenure saturdaynightlive base seasons snl_cast_member saturdaynightlive base ": [
-        "{subj} and {obj} were cast of Saturday Night Live for overlapping seasons",
-        "{subj} and {obj} were cast of Saturday Night Live for overlapping seasons"
+        "{obj} and {subj} were cast of Saturday Night Live for overlapping seasons",
+        "{obj} and {subj} were cast of Saturday Night Live for overlapping seasons"
     ],
     "medal olympic_medal_honor medals_awarded olympic_games olympics ": [
-        "During {subj} the honor medal was {obj}",
-        "{obj} was the honor medal of {subj} "
+        "During {obj} the honor medal was {subj}",
+        "{subj} was the honor medal of {obj} "
     ],
     "administrative_parent administrative_area schema aareas base ": [
-        "The {subj} belongs geographically to {obj}",
-        "{obj} is the administrative parent of {subj}"
+        "The {obj} belongs geographically to {subj}",
+        "{subj} is the administrative parent of {obj}"
     ],
     "position baseball_roster_position baseball roster sports_team sports ": [
-        "team {subj} has the baseball roster position {obj} ",
-        "{obj} is a baseball roster position present in {subj} "
+        "team {obj} has the baseball roster position {subj} ",
+        "{subj} is a baseball roster position present in {obj} "
     ],
     "produced_by film ": [
-        "the film {subj} was produced by {obj}",
-        "{obj} had produced the film {subj} "
+        "the film {obj} was produced by {subj}",
+        "{subj} had produced the film {obj} "
     ],
     "film_format film ": [
-        "The film {subj} is made in the format {obj}",
-        "{obj} is the film format of {subj}"
+        "The film {obj} is made in the format {subj}",
+        "{subj} is the film format of {obj}"
     ],
     "producer_type tv_producer_term programs_produced tv_producer tv ": [
-        "{subj} was the following type of tv producer {obj}",
-        "{obj} was the tv producer type of {subj}"
+        "{obj} was the following type of tv producer {subj}",
+        "{subj} was the tv producer type of {obj}"
     ],
     "film_release_distribution_medium film_regional_release_date release_date_s film ": [
-        "{subj} was released on {obj}",
-        "{obj} is the support for {subj}"
+        "{obj} was released on {subj}",
+        "{subj} is the support for {obj}"
     ],
     "film_sets_designed film_set_designer film ": [
-        "{subj} designed the film set of {obj} ",
-        "{obj} film set were designed by {subj} "
+        "{obj} designed the film set of {subj} ",
+        "{subj} film set were designed by {obj} "
     ],
     "participant popstra base canoodled celebrity popstra base ": [
-        "{subj} and {obj} ones canoodled each others",
-        "{obj} and {subj} ones canoodled each others"
+        "{obj} and {subj} ones canoodled each others",
+        "{subj} and {obj} ones canoodled each others"
     ],
     "country_of_origin tv_program tv ": [
-        "tv program {subj} originates from {obj}",
-        "{obj} is the country from which the tv program {subj} originates"
+        "tv program {obj} originates from {subj}",
+        "{subj} is the country from which the tv program {obj} originates"
     ],
     "artist record_label music ": [
-        "{subj} is the music record label of {obj}",
-        "{obj} has {subj} as its record label"
+        "{obj} is the music record label of {subj}",
+        "{subj} has {obj} as its record label"
     ],
     "sport sports_team sports ": [
-        "{subj} is a {obj} sports team",
-        "{obj} has professional sports team like {subj} "
+        "{obj} is a {subj} sports team",
+        "{subj} has professional sports team like {obj} "
     ],
     "contact_category phone_sandbox schemastaging base phone_number organization_extra schemastaging base ": [
-        "{subj} have its organization phone sandbox in {obj}",
-        "{obj} is the contact category phone sandbox of the organization {subj}"
+        "{obj} have its organization phone sandbox in {subj}",
+        "{subj} is the contact category phone sandbox of the organization {obj}"
     ],
     "sibling sibling_relationship sibling_s person people ": [
-        "{subj} is a sibling of {obj} ",
-        "{obj} is a sibling of {subj} "
+        "{obj} is a sibling of {subj} ",
+        "{subj} is a sibling of {obj} "
     ],
     "organization organization_membership member_of organization_member organization ": [
-        "{subj} is a memeber of the organisation of the {obj}",
-        "{obj} is an organization with member like {subj}"
+        "{obj} is a memeber of the organisation of the {subj}",
+        "{subj} is an organization with member like {obj}"
     ],
     "administrative_area_type administrative_area schema aareas base ": [
-        "{subj} has the administrative area type {obj}",
-        "{obj} is the administrative area type of {subj}"
+        "{obj} has the administrative area type {subj}",
+        "{subj} is the administrative area type of {obj}"
     ],
     "actor regular_tv_appearance regular_cast tv_program tv ": [
-        "One of the cast of {subj} was {obj}",
-        "The actor {obj} made regular tv appearance in the program {subj}"
+        "One of the cast of {obj} was {subj}",
+        "The actor {subj} made regular tv appearance in the program {obj}"
     ],
     "legislative_sessions government_position_held members legislative_session government ": [
-        "Members of the legislative branch convened during the respective legislative sessions of both {subj} and {obj}",
-        "Members of the legislative branch convened during the respective legislative sessions of both {subj} and {obj}"
+        "Members of the legislative branch convened during the respective legislative sessions of both {obj} and {subj}",
+        "Members of the legislative branch convened during the respective legislative sessions of both {obj} and {subj}"
     ],
     "special_performance_type performance actor film ": [
-        "actor {subj} has the special performance {obj}",
-        "special performance {obj} was performed by the actor {subj}"
+        "actor {obj} has the special performance {subj}",
+        "special performance {subj} was performed by the actor {obj}"
     ],
     "school sports_league_draft_pick draft_picks professional_sports_team sports ": [
-        "{subj} team selected players from {obj} during the draft picks process ",
-        "during the draft picks process {obj} has players picked up for {subj} team"
+        "{obj} team selected players from {subj} during the draft picks process ",
+        "during the draft picks process {subj} has players picked up for {obj} team"
     ],
     "category webpage topic common ": [
-        "{subj} has the category webpage topic common {obj}",
-        "{obj} is the category webpage topic common {subj}"
+        "{obj} has the category webpage topic common {subj}",
+        "{subj} is the category webpage topic common {obj}"
     ],
     "school_type educational_institution education ": [
-        "{subj} is the following type of university {obj}",
-        "{obj} is the type of university like {subj}"
+        "{obj} is the following type of university {subj}",
+        "{subj} is the type of university like {obj}"
     ],
     "film_festivals film ": [
-        "{subj} was screened at {obj}",
-        "during {obj} festival, {subj} was screened"
+        "{obj} was screened at {subj}",
+        "during {subj} festival, {obj} was screened"
     ],
     "participant popstra base friendship celebrity popstra base ": [
-        "{subj} and {obj} share a friendship thanks to their pop culture implication ",
-        "{obj} and {subj} share a friendship thanks to their pop culture implication "
+        "{obj} and {subj} share a friendship thanks to their pop culture implication ",
+        "{subj} and {obj} share a friendship thanks to their pop culture implication "
     ],
     "symptom_of symptom medicine ": [
-        "{subj} is a symptom of {obj}",
-        "{obj} causes symptoms like {subj}"
+        "{obj} is a symptom of {subj}",
+        "{subj} causes symptoms like {obj}"
     ],
     "cause_of_death people ": [
-        "{subj} was the cause of death of {obj}",
-        "{obj} died of a {subj}"
+        "{obj} was the cause of death of {subj}",
+        "{subj} died of a {obj}"
     ],
     "currency dated_money_value measurement_unit local_tuition university education ": [
-        "The local tuition of the the university {subj} is in the currency {obj}",
-        "{obj} is the currency used to pay the local tuition for the university of {subj}"
+        "The local tuition of the the university {obj} is in the currency {subj}",
+        "{subj} is the currency used to pay the local tuition for the university of {obj}"
     ],
     "film_art_direction_by film ": [
-        "the art director of the film {subj} was {obj}",
-        "{obj} was the art director of the film {subj}"
+        "the art director of the film {obj} was {subj}",
+        "{subj} was the art director of the film {obj}"
     ],
     "split_to gardening_hint dataworld ": [
-        "{subj} split to gardening hint dataworld {obj} ",
-        "{obj} split to gardening hint dataworld {subj} "
+        "{obj} split to gardening hint dataworld {subj} ",
+        "{subj} split to gardening hint dataworld {obj} "
     ],
     "citytown mailing_address location headquarters organization ": [
-        "{subj} headquarters are located in {obj}",
-        "{obj} is the mailing address location of the headquarters of the organization {subj} "
+        "{obj} headquarters are located in {subj}",
+        "{subj} is the mailing address location of the headquarters of the organization {obj} "
     ],
     "director film ": [
-        "{subj} was the director of the film {obj}",
-        "{obj} was directed by {subj}"
+        "{obj} was the director of the film {subj}",
+        "{subj} was directed by {obj}"
     ],
     "person personal_film_appearance personal_appearances film ": [
-        "the film {subj} hosted the {obj} ",
-        "{obj} made an appearance in the film {subj} "
+        "the film {obj} hosted the {subj} ",
+        "{subj} made an appearance in the film {obj} "
     ],
     "student students_graduates educational_institution education ": [
-        "{subj} was the university of {obj}",
-        "{obj} was ones a student of {subj}"
+        "{obj} was the university of {subj}",
+        "{subj} was ones a student of {obj}"
     ],
     "legislative_sessions government_position_held government_positions_held politician government ": [
-        "{subj} held a government position participating in legislative sessions in {obj}",
-        "During {obj} , the politician {subj} participated to legislative sessions"
+        "{obj} held a government position participating in legislative sessions in {subj}",
+        "During {subj} , the politician {obj} participated to legislative sessions"
     ],
     "artists genre music ": [
-        "{subj} is the music genre of the artist {obj} ",
-        "{obj} is an artist playing {subj} music genre"
+        "{obj} is the music genre of the artist {subj} ",
+        "{subj} is an artist playing {obj} music genre"
     ],
     "company employment_tenure people_with_this_title job_title business ": [
-        "{subj} is a job title in {obj}",
-        "{obj} employs people with the following title job {subj}"
+        "{obj} is a job title in {subj}",
+        "{subj} employs people with the following title job {obj}"
     ],
     "production_companies film ": [
-        "{subj} was produced by {obj} company",
-        "{obj} is the production company of the film {subj}"
+        "{obj} was produced by {subj} company",
+        "{subj} is the production company of the film {obj}"
     ],
     "award_honor awards_won award_winner award ": [
-        "{subj} and {obj} are award winners",
-        "{obj} and {subj} are award winner"
+        "{obj} and {subj} are award winners",
+        "{subj} and {obj} are award winner"
     ],
     "student students_majoring field_of_study education ": [
-        "{subj} was the major field of study of {obj}",
-        "{obj} majored in the field {subj}"
+        "{obj} was the major field of study of {subj}",
+        "{subj} majored in the field {obj}"
     ],
     "participating_countries olympic_games olympics ": [
-        "during {subj} the country {obj} participated",
-        "{obj} was one of the countries which participated to {subj}"
+        "during {obj} the country {subj} participated",
+        "{subj} was one of the countries which participated to {obj}"
     ],
     "language film ": [
-        "{subj} is a film in {obj} language",
-        "{obj} is the language of the film {subj}"
+        "{obj} is a film in {subj} language",
+        "{subj} is the language of the film {obj}"
     ],
     "country mailing_address location headquarters organization ": [
-        "{subj} has its country mailing address located in {obj}",
-        "{obj} is the mailing address location of {subj} country"
+        "{obj} has its country mailing address located in {subj}",
+        "{subj} is the mailing address location of {obj} country"
     ],
     "tv_program tv_program_writer_relationship tv_programs tv_writer tv ": [
-        "{subj} is the tv program writer of {obj} ",
-        "{obj} was written by {subj}"
+        "{obj} is the tv program writer of {subj} ",
+        "{subj} was written by {obj}"
     ],
     "program tv_producer_term programs_produced tv_producer tv ": [
-        "{subj} was the tv producer of {obj}",
-        "{obj} was produced by {subj}"
+        "{obj} was the tv producer of {subj}",
+        "{subj} was produced by {obj}"
     ],
     "sports olympic_games olympics ": [
-        "{subj} had {obj} as one of its olympic sports ",
-        "{obj} was an olympic sport for the {subj}"
+        "{obj} had {subj} as one of its olympic sports ",
+        "{subj} was an olympic sport for the {obj}"
     ],
     "place_of_burial deceased_person people ": [
-        "{subj} is buried in {obj}",
-        "{obj} is the burial place of {subj}"
+        "{obj} is buried in {subj}",
+        "{subj} is the burial place of {obj}"
     ],
     "colors educational_institution education ": [
-        "the color of {subj} of the educational institution {obj}",
-        "{obj} is the color of the educational institution {subj}"
+        "the color of {obj} of the educational institution {subj}",
+        "{subj} is the color of the educational institution {obj}"
     ],
     "official_language country location ": [
-        "{subj} official language is {obj}",
-        "{obj} is the official language in {subj}"
+        "{obj} official language is {subj}",
+        "{subj} is the official language in {obj}"
     ],
-    "taxonomy taxonomy_entry random tsegaran user entry taxonomy_subject random tsegaran user ": [
-        "{subj} falls withing the taxonomy of the {obj}",
-        "{obj} has {subj} within its taxonomie"
+    "taxonomy taxonomy_entry random tsegaran user entry taxonomy_object random tsegaran user ": [
+        "{obj} falls withing the taxonomy of the {subj}",
+        "{subj} has {obj} within its taxonomie"
     ],
     "currency dated_money_value measurement_unit gdp_nominal_per_capita statistical_region location ": [
-        "{subj} uses the {obj} as a currency reference point for measuring the nominal GDP",
-        "{obj} is the currency used as a reference to measure the nominal GDP of {subj}"
+        "{obj} uses the {subj} as a currency reference point for measuring the nominal GDP",
+        "{subj} is the currency used as a reference to measure the nominal GDP of {obj}"
     ],
     "position sports_team_roster sports current_roster football_team american_football ": [
-        "{subj} has a {obj} in their current roster",
-        "{obj} is one of the roster of {subj} "
+        "{obj} has a {subj} in their current roster",
+        "{subj} is one of the roster of {obj} "
     ],
     "jurisdiction_of_office government_position_held government_positions_held politician government ": [
-        "the politician {subj} was under the jurisdiction of {obj}",
-        "{obj} had the politician {subj}"
+        "the politician {obj} was under the jurisdiction of {subj}",
+        "{subj} had the politician {obj}"
     ],
     "service_location phone_sandbox schemastaging base phone_number organization_extra schemastaging base ": [
-        "{subj} has it service base located in {obj}",
-        "{obj} is the location where {subj} has its service based"
+        "{obj} has it service base located in {subj}",
+        "{subj} is the location where {obj} has its service based"
     ],
     "person tv_regular_personal_appearance tv_regular_personal_appearances non_character_role tv ": [
-        "{obj} made regular tv appearance as a {subj} character ",
-        "{obj} made regular tv appearance as a {subj} character "
+        "{subj} made regular tv appearance as a {obj} character ",
+        "{subj} made regular tv appearance as a {obj} character "
     ],
     "jurisdiction_of_office government_position_held officeholders government_office_category government ": [
-        "{subj} is the government office category of the position held by officeholders in {obj} ",
-        "in the jurisdiction of {obj} the government office position is {subj}"
+        "{obj} is the government office category of the position held by officeholders in {subj} ",
+        "in the jurisdiction of {subj} the government office position is {obj}"
     ],
     "service_language phone_sandbox schemastaging base phone_number organization_extra schemastaging base ": [
-        "{subj} has its base phone number in {obj}",
-        "{obj} is the base phone number of {subj}"
+        "{obj} has its base phone number in {subj}",
+        "{subj} is the base phone number of {obj}"
     ],
     "place_of_death deceased_person people ": [
-        "{subj} died in {obj}",
-        "{obj} was the place of death of {subj}"
+        "{obj} died in {subj}",
+        "{subj} was the place of death of {obj}"
     ],
     "position football_roster_position current_roster football_team soccer ": [
-        "in the current roster of the {subj} football team, {obj} is one of the position",
-        "{obj} is one of the position in the roster of {subj} football team"
+        "in the current roster of the {obj} football team, {subj} is one of the position",
+        "{subj} is one of the position in the roster of {obj} football team"
     ],
     "friend friendship celebrity_friends celebrity celebrities ": [
-        "{subj} and {obj} are two celebrity friends",
-        "{obj} and {subj} are two celibrity friends"
+        "{obj} and {subj} are two celebrity friends",
+        "{subj} and {obj} are two celibrity friends"
     ],
     "exported_to imports_and_exports places_exported_to statistical_region location ": [
-        "{subj} imports goods from {obj} ",
-        "{obj} imports goods from {subj}"
+        "{obj} imports goods from {subj} ",
+        "{subj} imports goods from {obj}"
     ],
     "capital country location ": [
-        "{subj} is the country to which {obj} is the capital ",
-        "{obj} is the capital of {subj}"
+        "{obj} is the country to which {subj} is the capital ",
+        "{subj} is the capital of {obj}"
     ],
     "major_field_of_study students_majoring field_of_study education ": [
-        "{subj} is the major field of study for {obj}",
-        "{obj} is a sub field of study of {subj}"
+        "{obj} is the major field of study for {subj}",
+        "{subj} is a sub field of study of {obj}"
     ],
     "diet practicer_of_diet eating base ": [
-        "{subj} has a diet based on {obj}",
-        "{obj} is the diet eating base of {subj} "
+        "{obj} has a diet based on {subj}",
+        "{subj} is the diet eating base of {obj} "
     ],
     "contains location ": [
-        "{subj} contains the location {obj} ",
-        "{obj} is a place of {subj}"
+        "{obj} contains the location {subj} ",
+        "{subj} is a place of {obj}"
     ],
     "registering_agency non_profit_registration registered_with non_profit_organization organization ": [
-        "{subj} is register with {obj} agency as a non profit",
-        "{obj} agency has register {subj} as a non profit"
+        "{obj} is register with {subj} agency as a non profit",
+        "{subj} agency has register {obj} as a non profit"
     ],
     "instrumentalists instrument music ": [
-        "{subj} was the instrument of {obj}",
-        "{obj} was a instrumentalists of {subj}"
+        "{obj} was the instrument of {subj}",
+        "{subj} was a instrumentalists of {obj}"
     ],
     "medal olympic_medal_honor medals_won olympic_participating_country olympics ": [
-        "{subj} won the {obj} during the olympic games",
-        "{obj} was won by {subj} during the olympics games"
+        "{obj} won the {subj} during the olympic games",
+        "{subj} was won by {obj} during the olympics games"
     ],
     "state bibs_location biblioness base ": [
-        "{subj} is the state location of the biblioness base for {obj}",
-        "{obj} biblioness base has its state location in {subj}"
+        "{obj} is the state location of the biblioness base for {subj}",
+        "{subj} biblioness base has its state location in {obj}"
     ],
     "film_production_design_by film ": [
-        "In the film {subj} the production design was done by {obj} ",
-        "{obj} was the production designer in {subj} "
+        "In the film {obj} the production design was done by {subj} ",
+        "{subj} was the production designer in {obj} "
     ],
     "time_zones location ": [
-        "{subj} follow the time zone location {obj} ",
-        "{obj} is the time zone of {subj}"
+        "{obj} follow the time zone location {subj} ",
+        "{subj} is the time zone of {obj}"
     ],
-    "disciplines_or_subjects award_category award ": [
-        "{subj} is a award for {obj}",
-        "{obj} are subject to the following award {subj}"
+    "disciplines_or_objects award_category award ": [
+        "{obj} is a award for {subj}",
+        "{subj} are object to the following award {obj}"
     ],
     "month travel_destination_monthly_climate climate travel_destination travel ": [
-        "{subj} is a good destination to travel in {obj} ",
-        "{obj} is the best month to travel in {subj} "
+        "{obj} is a good destination to travel in {subj} ",
+        "{subj} is the best month to travel in {obj} "
     ],
     "notable_people_with_this_condition disease medicine ": [
-        "{subj} is a condition disease which affected famous person {obj}",
-        "{obj} was a famous person with {subj}"
+        "{obj} is a condition disease which affected famous person {subj}",
+        "{subj} was a famous person with {obj}"
     ],
     "adjoins adjoining_relationship adjoin_s location ": [
-        "{subj} adjoins {obj} ",
-        "{obj} adjoins {subj}"
+        "{obj} adjoins {subj} ",
+        "{subj} adjoins {obj}"
     ],
     "program_creator tv_program tv ": [
-        "tv program {subj} was created by {obj}",
-        "{obj} was the creator of {subj}"
+        "tv program {obj} was created by {subj}",
+        "{subj} was the creator of {obj}"
     ],
     "cinematography film ": [
-        "In the film {subj}, the cinematography was handled by {obj}",
-        "{obj} handled the cinematography for the film {subj}  "
+        "In the film {obj}, the cinematography was handled by {subj}",
+        "{subj} handled the cinematography for the film {obj}  "
     ],
     "currency dated_money_value measurement_unit net_worth person_extra schemastaging base ": [
-        "{subj}'s net worth to gauge financial success is measured in {obj}",
-        "{obj} is the currency used to gauge financial success of {subj}"
+        "{obj}'s net worth to gauge financial success is measured in {subj}",
+        "{subj} is the currency used to gauge financial success of {obj}"
     ],
     "category_of award_category award ": [
-        "{subj} is a category of the award {obj}",
-        "{obj} has the category {subj}"
+        "{obj} is a category of the award {subj}",
+        "{subj} has the category {obj}"
     ],
     "award_nomination award_nominations award_nominee award ": [
-        "Both {subj} and {obj} have been recognized as nominees",
-        "Both {obj} and {subj} have been recognized as nominees"
+        "Both {obj} and {subj} have been recognized as nominees",
+        "Both {subj} and {obj} have been recognized as nominees"
     ],
     "educational_institution educational_institution_campus education ": [
-        "{subj} is an educational institution with its campus located in {obj}",
-        "{obj} is the campus location of the educational institution {subj}"
+        "{obj} is an educational institution with its campus located in {subj}",
+        "{subj} is the campus location of the educational institution {obj}"
     ],
     "costume_design_by film ": [
-        "costumes in {subj} were designed by {obj}",
-        "{obj} designed the costumes in {subj}"
+        "costumes in {obj} were designed by {subj}",
+        "{subj} designed the costumes in {obj}"
     ],
     "team sports_league_participation teams sports_league sports ": [
-        "{subj} is a sport team group to which {obj} team belongs",
-        "the {obj} participates to the sport team league {subj}"
+        "{obj} is a sport team group to which {subj} team belongs",
+        "the {subj} participates to the sport team league {obj}"
     ],
     "student people_with_this_degree educational_degree education ": [
-        "{subj} is the type of degree {obj}",
-        "{obj} has a degree in {subj}"
+        "{obj} is the type of degree {subj}",
+        "{subj} has a degree in {obj}"
     ],
     "languages person people ": [
-        "{subj} speaks {obj}",
-        "{obj} was the language {subj} spokes"
+        "{obj} speaks {subj}",
+        "{subj} was the language {obj} spokes"
     ],
     "program tv_network_duration programs tv_network tv ": [
-        "{subj} broadcasted the tv program {obj}",
-        "{obj} was broadcasted by {subj} "
+        "{obj} broadcasted the tv program {subj}",
+        "{subj} was broadcasted by {obj} "
     ],
     "colors sports_team sports ": [
-        "{subj} color sport team is {obj}",
-        "{obj} is the color of the sport team {subj}"
+        "{obj} color sport team is {subj}",
+        "{subj} is the color of the sport team {obj}"
     ],
     "languages tv_program tv ": [
-        "TV program {subj} was aired in {obj}",
-        "{obj} was the language of the TV program {subj}"
+        "TV program {obj} was aired in {subj}",
+        "{subj} was the language of the TV program {obj}"
     ],
     "family instrument music ": [
-        "{subj} belongs to the instrument family of {obj}",
-        "{obj} is the family instrument of {subj}"
+        "{obj} belongs to the instrument family of {subj}",
+        "{subj} is the family instrument of {obj}"
     ],
     "currency dated_money_value measurement_unit international_tuition university education ": [
-        "{subj} has its international tuition in currency {obj}",
-        "{obj} is the currency for the international tuition fees in {subj}"
+        "{obj} has its international tuition in currency {subj}",
+        "{subj} is the currency for the international tuition fees in {obj}"
     ],
     "place_founded organization ": [
-        "{subj} was founded in the place {obj}",
-        "{obj} is the place where {subj} was founded "
+        "{obj} was founded in the place {subj}",
+        "{subj} is the place where {obj} was founded "
     ],
     "olympics olympic_athlete_affiliation athletes olympic_participating_country olympics ": [
-        "{subj} participated at the {obj}",
-        "during {obj} the country {subj} participated"
+        "{obj} participated at the {subj}",
+        "during {subj} the country {obj} participated"
     ],
     "capital administrative_area schema aareas base ": [
-        "{subj} has its administrative capital in {obj}",
-        "{obj} is the capital of the administrative area of {subj}"
+        "{obj} has its administrative capital in {subj}",
+        "{subj} is the capital of the administrative area of {obj}"
     ],
     "crewmember film_crew_gig other_crew film ": [
-        "{subj} had {obj} within its crew memebers",
-        "{obj} was one of the crew memeber for the film {subj} "
+        "{obj} had {subj} within its crew memebers",
+        "{subj} was one of the crew memeber for the film {obj} "
     ],
     "recording_contribution guest_performances performance_role music ": [
-        "{subj} recording contribution guest performances performance role music {obj}",
-        "{obj} recording contribution guest performances performance role music {subj}"
+        "{obj} recording contribution guest performances performance role music {subj}",
+        "{subj} recording contribution guest performances performance role music {obj}"
     ],
     "producer_type tv_producer_term tv_producer tv_program tv ": [
-        "{subj} is tv producer of the following type {obj} ",
-        "{obj} is the type of tv producer of {subj}"
+        "{obj} is tv producer of the following type {subj} ",
+        "{subj} is the type of tv producer of {obj}"
     ],
     "award award_honor awards_won award_winning_work award ": [
-        "{subj} won the award {obj}",
-        "{obj} is an award won by the {subj} "
+        "{obj} won the award {subj}",
+        "{subj} is an award won by the {obj} "
     ],
     "performance_role recording_contribution contribution artist music ": [
-        "{subj} has the performance role recording contribution of {obj}",
-        "{obj} was the recording contribution role of {subj} "
+        "{obj} has the performance role recording contribution of {subj}",
+        "{subj} was the recording contribution role of {obj} "
     ],
     "music film ": [
-        "the music film {subj} was composed by {obj}",
-        "{obj} participated in the music film {subj}"
+        "the music film {obj} was composed by {subj}",
+        "{subj} participated in the music film {obj}"
     ],
     "celebrities_impersonated celebrity_impressionist americancomedy base ": [
-        "{subj} has impersonated {obj} ",
-        "{obj} was impersonated by {subj}"
+        "{obj} has impersonated {subj} ",
+        "{subj} was impersonated by {obj}"
     ],
     "language dubbing_performance dubbing_performances actor film ": [
-        "{subj} is a dubbing actor in {obj}",
-        "{obj} is the dubbing language performed by the actor {subj}"
+        "{obj} is a dubbing actor in {subj}",
+        "{subj} is the dubbing language performed by the actor {obj}"
     ],
     "risk_factors disease medicine ": [
-        "{subj} risks is increased by the following factor {obj}",
-        "{obj} is a risk factor of {subj}"
+        "{obj} risks is increased by the following factor {subj}",
+        "{subj} is a risk factor of {obj}"
     ],
     "currency dated_money_value measurement_unit estimated_budget film ": [
-        "the budget of {subj} was estimated in {obj}",
-        "{obj} was the currency used to estimate the budget of {subj}"
+        "the budget of {obj} was estimated in {subj}",
+        "{subj} was the currency used to estimate the budget of {obj}"
     ],
     "film film_film_distributor_relationship films_distributed film_distributor film ": [
-        "{subj} is the film ditributor of {obj}",
-        "The film {obj} was distributed by {subj}"
+        "{obj} is the film ditributor of {subj}",
+        "The film {subj} was distributed by {obj}"
     ],
     "country film ": [
-        "{subj} is the country of the film {obj}",
-        "{obj} is the country of the film {subj}"
+        "{obj} is the country of the film {subj}",
+        "{subj} is the country of the film {obj}"
     ],
     "award award_nomination award_nominations award_nominee award ": [
-        "{subj} had an award nomination at the award {obj}",
-        "{obj} was the award were {subj} was a nominee"
+        "{obj} had an award nomination at the award {subj}",
+        "{subj} was the award were {obj} was a nominee"
     ],
     "team ncaa_tournament_seed marchmadness base seeds ncaa_basketball_tournament marchmadness base ": [
-        "{subj} was a basketball tornament where {obj} participated as a seeded team",
-        "{obj} basketball team participated in the {subj} as a seeded team "
+        "{obj} was a basketball tornament where {subj} participated as a seeded team",
+        "{subj} basketball team participated in the {obj} as a seeded team "
     ],
     "romantic_relationship sexual_relationships celebrity celebrities ": [
-        "{subj} was involved in a romantic and sexual relationship with the celebrity {obj}",
-        "{obj} was involved in a romantic and sexual relationship with the celebrity {subj}"
+        "{obj} was involved in a romantic and sexual relationship with the celebrity {subj}",
+        "{subj} was involved in a romantic and sexual relationship with the celebrity {obj}"
     ],
     "gender person people ": [
-        "{subj} has the gender of a {obj}",
-        "{obj} is the gender of {subj}"
+        "{obj} has the gender of a {subj}",
+        "{subj} is the gender of {obj}"
     ],
     "position sports_team_roster sports current_roster football_team soccer ": [
-        "The team {subj} has the following position {obj} ",
-        "{obj} is a football position of the {subj}"
+        "The team {obj} has the following position {subj} ",
+        "{subj} is a football position of the {obj}"
     ],
     "ceremony award_honor winners award_category award ": [
-        "{subj} is an award cathegory of {obj}",
-        "{obj} is the ceremony award for the {subj}"
+        "{obj} is an award cathegory of {subj}",
+        "{subj} is the ceremony award for the {obj}"
     ],
     "state_province_region mailing_address location headquarters organization ": [
-        "{subj} has its headquarter mailing address in the state province of {obj}",
-        "{obj} is the state province mailing address of {subj}"
+        "{obj} has its headquarter mailing address in the state province of {subj}",
+        "{subj} is the state province mailing address of {obj}"
     ],
     "adjustment_currency adjusted_money_value measurement_unit gdp_real statistical_region location ": [
-        "{subj} uses {obj} as a reference for currency adjustments",
-        "{obj} is the currency used in {subj} for its own currency adjustment"
+        "{obj} uses {subj} as a reference for currency adjustments",
+        "{subj} is the currency used in {obj} for its own currency adjustment"
     ],
     "type_of_appearance personal_film_appearance films person_or_entity_appearing_in_film film ": [
-        "{subj} had made appearance in {obj}",
-        "{obj} is the type of public appearance {subj} made "
+        "{obj} had made appearance in {subj}",
+        "{subj} is the type of public appearance {obj} made "
     ],
     "ethnicity people ": [
-        "{subj} is the ethnicity of {obj}",
-        "{obj} belong to the ethnicity of {subj}"
+        "{obj} is the ethnicity of {subj}",
+        "{subj} belong to the ethnicity of {obj}"
     ],
     "program tv_regular_personal_appearance tv_regular_appearances tv_personality tv ": [
-        "{subj} made regular tv appearance in the show {obj} ",
-        "{obj} frequently hosted the celebrity {subj} "
+        "{obj} made regular tv appearance in the show {subj} ",
+        "{subj} frequently hosted the celebrity {obj} "
     ],
     "film_release_region film_regional_release_date release_date_s film ": [
-        "the region where the film {subj} was released is {obj}",
-        "{obj} is a region where the film {subj} was released"
+        "the region where the film {obj} was released is {subj}",
+        "{subj} is a region where the film {obj} was released"
     ],
     "position basketball_roster_position basketball roster sports_team sports ": [
-        "the basketball team {subj} has the roster {obj}",
-        "{obj} is a roster in the basketball team {subj}"
+        "the basketball team {obj} has the roster {subj}",
+        "{subj} is a roster in the basketball team {obj}"
     ],
     "season baseball_team_stats team_stats baseball_team baseball ": [
-        "{subj} baseball team made major team stats during the baseball season {obj} ",
-        "during the baseball season {obj} the baseball team {subj} made major team stats "
+        "{obj} baseball team made major team stats during the baseball season {subj} ",
+        "during the baseball season {subj} the baseball team {obj} made major team stats "
     ],
     "titles netflix_genre media_common ": [
-        "{subj} is the media genre of {obj}",
-        "the netflix show {obj} is a {subj}"
+        "{obj} is the media genre of {subj}",
+        "the netflix show {subj} is a {obj}"
     ],
     "genre tv_program tv ": [
-        "The tv program {subj} has the following genre {obj}",
-        "{obj} is the genre of the tv program {subj} "
+        "The tv program {obj} has the following genre {subj}",
+        "{subj} is the genre of the tv program {obj} "
     ],
     "profession person people ": [
-        "{subj} has the profession of {obj}",
-        "{obj} is the profession of {subj}"
+        "{obj} has the profession of {subj}",
+        "{subj} is the profession of {obj}"
     ],
     "place hud_county_place location ": [
-        "{subj} is a place hud county location of {obj}",
-        "{subj} is a place hud county location of {obj}"
+        "{obj} is a place hud county location of {subj}",
+        "{obj} is a place hud county location of {subj}"
     ],
     "basic_title government_position_held government_positions_held politician government ": [
-        "{subj} has the governement position of {obj}",
-        "As a member of {obj} , {subj} held various governement positions"
+        "{obj} has the governement position of {subj}",
+        "As a member of {subj} , {obj} held various governement positions"
     ],
     "nutrient nutrition_fact nutrients food ": [
-        "{subj} contains the nutrient {obj}",
-        "{obj} is a nutrient in {subj} "
+        "{obj} contains the nutrient {subj}",
+        "{subj} is a nutrient in {obj} "
     ],
     "currency dated_money_value measurement_unit gdp_nominal statistical_region location ": [
-        "{subj} gdp is measured in {obj} ",
-        "{obj} is the currency used to measure the gdp of {subj}"
+        "{obj} gdp is measured in {subj} ",
+        "{subj} is the currency used to measure the gdp of {obj}"
     ],
     "legislative_sessions government_position_held members governmental_body government ": [
-        "{subj} was the governemental body during {obj}",
-        "{subj} was the governemental body during {obj}"
+        "{obj} was the governemental body during {subj}",
+        "{obj} was the governemental body during {subj}"
     ],
     "prequel film ": [
-        "the film {subj} has the prequel {obj}",
-        "{obj} is the prequel of {subj}"
+        "the film {obj} has the prequel {subj}",
+        "{subj} is the prequel of {obj}"
     ],
     "currency dated_money_value measurement_unit endowment endowed_organization organization ": [
-        "{subj} is paid in {obj}",
-        "{obj} is the currency used to pay {subj}"
+        "{obj} is paid in {subj}",
+        "{subj} is the currency used to pay {obj}"
     ],
     "county hud_county_place location ": [
-        "{subj} is located in the county of {obj} ",
-        "{obj} is the county were {subj} is located"
+        "{obj} is located in the county of {subj} ",
+        "{subj} is the county were {obj} is located"
     ],
     "origin artist music ": [
-        "The music artist {subj} originated from {obj} ",
-        "{obj} is the origin location of the artist {subj}"
+        "The music artist {obj} originated from {subj} ",
+        "{subj} is the origin location of the artist {obj}"
     ],
     "religion religion_percentage religions statistical_region location ": [
-        "{subj} has an important religious percentage of {obj}",
-        "{obj} is significative religions distribution in the region of {subj} "
+        "{obj} has an important religious percentage of {subj}",
+        "{subj} is significative religions distribution in the region of {obj} "
     ],
     "team sports_team_roster teams pro_athlete sports ": [
-        "{subj} was a pro athlete in {obj}",
-        "{obj} was the team of {subj}"
+        "{obj} was a pro athlete in {subj}",
+        "{subj} was the team of {obj}"
     ],
     "film performance film_performance_type special_film_performance_type film ": [
-        "{subj} is the type of actor performance for the film {obj}",
-        "the film {obj} has the type of actor performance {subj}"
+        "{obj} is the type of actor performance for the film {subj}",
+        "the film {subj} has the type of actor performance {obj}"
     ],
     "draft sports_league_draft_pick draft_picks professional_sports_team sports ": [
-        "New player for baseball league {subj} were selected during {obj}",
-        "During {obj} the sport league {subj} selected new players"
+        "New player for baseball league {obj} were selected during {subj}",
+        "During {subj} the sport league {obj} selected new players"
     ],
     "countries_spoken_in human_language language ": [
-        "{subj} is spoken in {obj}",
-        "{obj} spokes {subj}"
+        "{obj} is spoken in {subj}",
+        "{subj} spokes {obj}"
     ],
     "source dated_integer measurement_unit estimated_number_of_mortgages hud_foreclosure_area location ": [
-        "In {subj} area the source used to estimate the number of mortgages hub foreclosure is {obj} ",
-        "{obj} is the source for the measurements and estimations of the number of mortgages hub foreclosure in {subj}"
+        "In {obj} area the source used to estimate the number of mortgages hub foreclosure is {subj} ",
+        "{subj} is the source for the measurements and estimations of the number of mortgages hub foreclosure in {obj}"
     ],
     "currency dated_money_value measurement_unit revenue business_operation business ": [
-        "{subj} makes its revenue in {obj} ",
-        "{obj} is the currency used to evaluate the revenues of {subj}"
+        "{obj} makes its revenue in {subj} ",
+        "{subj} is the currency used to evaluate the revenues of {obj}"
     ],
     "peer_relationship peers influence_node influence ": [
-        "{subj} and {obj} shared a peer relationship",
-        "{obj} and {subj} shared a peer relationship"
+        "{obj} and {subj} shared a peer relationship",
+        "{subj} and {obj} shared a peer relationship"
     ],
     "instance_of_recurring_event event time ": [
-        "{subj} is a recurring event of {obj}",
-        "{obj} is the main event of {subj}"
+        "{obj} is a recurring event of {subj}",
+        "{subj} is the main event of {obj}"
     ],
     "currency dated_money_value measurement_unit rent50_2 statistical_region location ": [
-        "{subj} uses the currency {obj} ",
-        "{obj} is the currency used in {subj}"
+        "{obj} uses the currency {subj} ",
+        "{subj} is the currency used in {obj}"
     ],
     "spouse marriage spouse_s person people ": [
-        "{subj} is the spouse of {obj}",
-        "{obj} has his / her spouse named {subj}"
+        "{obj} is the spouse of {subj}",
+        "{subj} has his / her spouse named {obj}"
     ],
     "religion person people ": [
-        "{subj} practice {obj} religion",
-        "{obj} is the religion of {subj}"
+        "{obj} practice {subj} religion",
+        "{subj} is the religion of {obj}"
     ],
     "featured_film_locations film ": [
-        "The film {subj} featured {obj} location ",
-        "{obj} was the location featured in {subj} "
+        "The film {obj} featured {subj} location ",
+        "{subj} was the location featured in {obj} "
     ],
     "seasonal_months produce_availability localfood base produce_available seasonal_month localfood base ": [
-        "{subj} and {obj} are both seasonal months to produce local food ",
-        "{subj} and {obj} are both seasonal months to produce local food "
+        "{obj} and {subj} are both seasonal months to produce local food ",
+        "{obj} and {subj} are both seasonal months to produce local food "
     ],
     "group group_membership membership group_member music ": [
-        "{subj} is a memeber of the music group {obj}",
-        "{obj} is the music group of {subj}"
+        "{obj} is a memeber of the music group {subj}",
+        "{subj} is the music group of {obj}"
     ],
     "mode_of_transportation transportation how_to_get_here travel_destination travel ": [
-        "to get in {subj} the transportation mode is {obj}",
-        "{obj} is the transportation mode to get in {subj}"
+        "to get in {obj} the transportation mode is {subj}",
+        "{subj} is the transportation mode to get in {obj}"
     ],
     "story_by film ": [
-        "The film {subj} was written by {obj}",
-        "{obj} wrote the film {subj}"
+        "The film {obj} was written by {subj}",
+        "{subj} wrote the film {obj}"
     ],
     "entity_involved event culturalevent base ": [
-        "the cultural event {subj} involved {obj}",
-        "{obj} were involved in the cultural event {subj} "
+        "the cultural event {obj} involved {subj}",
+        "{subj} were involved in the cultural event {obj} "
     ],
     "written_by film ": [
-        "the film {subj} was written by {obj}",
-        "{obj} wrote the movie {subj}"
+        "the film {obj} was written by {subj}",
+        "{subj} wrote the movie {obj}"
     ],
     "fraternities_and_sororities university education ": [
-        "{subj} hosts the sorority {obj}",
-        "{obj} is a sorority of {subj}"
+        "{obj} hosts the sorority {subj}",
+        "{subj} is a sorority of {obj}"
     ],
     "second_level_divisions country location ": [
-        "{subj} has second level division such as {obj} ",
-        "{obj} belongs to the second level country division of the {subj}"
+        "{obj} has second level division such as {subj} ",
+        "{subj} belongs to the second level country division of the {obj}"
     ],
     "athlete pro_sports_played pro_athletes sport sports ": [
-        "{subj} had pro athlete like {obj} ",
-        "{obj} was a pro athlete in {subj}"
+        "{obj} had pro athlete like {subj} ",
+        "{subj} was a pro athlete in {obj}"
     ],
     "nominated_for award_nomination award_nominations award_nominee award ": [
-        "{subj} received an award nomination for the movie {obj}",
-        "the movie {obj} had {subj} nominated for an award"
+        "{obj} received an award nomination for the movie {subj}",
+        "the movie {subj} had {obj} nominated for an award"
     ],
     "country olympic_athlete_affiliation athletes olympic_sport olympics ": [
-        "{subj} olympic athlete can be affiliated to the country {obj} ",
-        "{obj} country has olympic athlete {subj}"
+        "{obj} olympic athlete can be affiliated to the country {subj} ",
+        "{subj} country has olympic athlete {obj}"
     ],
     "award_winner award_honor winners award_category award ": [
-        "{subj} is an award category won by {obj} ",
-        "{obj} won an award in the category {subj} "
+        "{obj} is an award category won by {subj} ",
+        "{subj} won an award in the category {obj} "
     ],
     "country bibs_location biblioness base ": [
-        "The biblioness of {subj} is located in the country {obj}",
-        "{obj} is the country of the biblioness of {subj}"
+        "The biblioness of {obj} is located in the country {subj}",
+        "{subj} is the country of the biblioness of {obj}"
     ],
     "honored_for award_honor awards_won award_winning_work award ": [
-        "{subj} and {obj} were both honoured by an award",
-        "{subj} and {obj} were both honoured by an award"
+        "{obj} and {subj} were both honoured by an award",
+        "{obj} and {subj} were both honoured by an award"
     ],
     "place_of_birth person people ": [
-        "{subj} was born in the place {obj} ",
-        "{obj} is the place of birth of {subj}"
+        "{obj} was born in the place {subj} ",
+        "{subj} is the place of birth of {obj}"
     ],
     "interests philosopher philosophy alexander user ": [
-        "philosopher {subj} had interests for {obj}",
-        "{obj} was one of the interests of the philosopher {subj}"
+        "philosopher {obj} had interests for {subj}",
+        "{subj} was one of the interests of the philosopher {obj}"
     ],
     "teams sports_team_location sports ": [
-        "The location {subj} host the sports team {obj} ",
-        "The team {obj} is located in {subj}"
+        "The location {obj} host the sports team {subj} ",
+        "The team {subj} is located in {obj}"
     ],
     "role track_contribution track_contributions artist music ": [
-        "{subj} had a role trak in as a music artic with a contribution track with {obj}",
-        "{obj} was an contribution of {subj} in music "
+        "{obj} had a role trak in as a music artic with a contribution track with {subj}",
+        "{subj} was an contribution of {obj} in music "
     ],
     "vacationer vacation_choice popstra base vacationers location popstra base ": [
-        "{subj} is the vacation location base of the star {obj}",
-        "The star {obj} spends his or her vacation in the location {subj}"
+        "{obj} is the vacation location base of the star {subj}",
+        "The star {subj} spends his or her vacation in the location {obj}"
     ],
     "politician political_party_tenure politicians_in_this_party political_party government ": [
-        "{subj} was the political party of {obj}",
-        "{obj} is a politician from the party {subj}"
+        "{obj} was the political party of {subj}",
+        "{subj} is a politician from the party {obj}"
     ],
     "administrative_division administrative_division_capital_relationship capital_of capital_of_administrative_division location ": [
-        "{subj} serves as the administrative division within {obj}",
-        "{obj} as its administrative division in {subj} "
+        "{obj} serves as the administrative division within {subj}",
+        "{subj} as its administrative division in {obj} "
     ],
     "nationality person people ": [
-        "the nationality of {subj} is {obj} ",
-        "{obj} is the nationality of {subj}"
+        "the nationality of {obj} is {subj} ",
+        "{subj} is the nationality of {obj}"
     ],
     "artist content broadcast ": [
-        "{subj} broadcast the artist {obj}",
-        "{obj} is broadcasted on {subj}"
+        "{obj} broadcast the artist {subj}",
+        "{subj} is broadcasted on {obj}"
     ],
     "member_states international_organization default_domain ktrueman user ": [
-        "{subj} international organization has country memebers like {obj}",
-        "{obj} is a country member of the {subj}"
+        "{obj} international organization has country memebers like {subj}",
+        "{subj} is a country member of the {obj}"
     ],
     "form_of_government country location ": [
-        "{subj} has the government form of a {obj} ",
-        "{obj} is the government form of {subj}"
+        "{obj} has the government form of a {subj} ",
+        "{subj} is the government form of {obj}"
     ],
     "performance actor film ": [
-        "{subj} made an apparition in the film {obj}",
-        "the film {obj} ones hosted {subj} as an actor"
+        "{obj} made an apparition in the film {subj}",
+        "the film {subj} ones hosted {obj} as an actor"
     ],
     "award_winner award_honor awards_won award_winning_work award ": [
-        "the work {subj} of {obj} helped him or her to win an award",
-        "{obj} won an award for his or her work in {subj} "
+        "the work {obj} of {subj} helped him or her to win an award",
+        "{subj} won an award for his or her work in {obj} "
     ],
     "first_level_division_of administrative_division location ": [
-        "{subj} is the first level administrative division within {obj} ",
-        "{obj} has first level administrative division like {subj}"
+        "{obj} is the first level administrative division within {subj} ",
+        "{subj} has first level administrative division like {obj}"
     ],
     "actor dubbing_performance dubbing_performances film ": [
-        "{subj} was dubbed by {obj}",
-        "{obj} was a dubbing actor in {subj}"
+        "{obj} was dubbed by {subj}",
+        "{subj} was a dubbing actor in {obj}"
     ],
     "currency dated_money_value measurement_unit gni_per_capita_in_ppp_dollars statistical_region location ": [
-        "the location {subj} measure its unit gmi per capita in ppp using the {obj} currency",
-        "{obj} currency is used to measure the units gmi per capita in ppp in the location {subj}"
+        "the location {obj} measure its unit gmi per capita in ppp using the {subj} currency",
+        "{subj} currency is used to measure the units gmi per capita in ppp in the location {obj}"
     ],
     "executive_produced_by film ": [
-        "The executive producer of the film {subj} was {obj}",
-        "{obj} was the executive producer of {subj}"
+        "The executive producer of the film {obj} was {subj}",
+        "{subj} was the executive producer of {obj}"
     ],
     "honored_for award_honor awards_presented award_ceremony award ": [
-        "during the award ceremony of {subj}, {obj} was honored",
-        "{obj} was honored during the award ceremony {subj} "
+        "during the award ceremony of {obj}, {subj} was honored",
+        "{subj} was honored during the award ceremony {obj} "
     ],
     "locations event time ": [
-        "{subj} took place in the location {obj} ",
-        "{subj} as one of the location were {obj} took place"
+        "{obj} took place in the location {subj} ",
+        "{obj} as one of the location were {subj} took place"
     ],
     "countries_within continents locations base ": [
-        "{subj} is the continent of {obj}",
-        "{obj} is a country of the continent {subj}"
+        "{obj} is the continent of {subj}",
+        "{subj} is a country of the continent {obj}"
     ],
     "award_winner award_honor awards_presented award_ceremony award ": [
-        "During the {subj} the artist {obj} won an award",
-        "{obj} won a award at {subj}"
+        "During the {obj} the artist {subj} won an award",
+        "{subj} won a award at {obj}"
     ],
     "major_field_of_study people_with_this_degree educational_degree education ": [
-        "{subj} is the major field for a degree in {obj} ",
-        "A degree in {obj} has a major in {subj}"
+        "{obj} is the major field for a degree in {subj} ",
+        "A degree in {subj} has a major in {obj}"
     ],
     "dog_breed dog_city_relationship petbreeds base top_breeds city_with_dogs petbreeds base ": [
-        "{subj} mostly have the pet bread {obj}",
-        "The dog bread {obj} is the top breed of {subj} "
+        "{obj} mostly have the pet bread {subj}",
+        "The dog bread {subj} is the top breed of {obj} "
     ],
     "role group_membership regular_performances performance_role music ": [
-        "{subj} can perform the music role of {obj}",
-        "{obj} sound can be performed by {subj}"
+        "{obj} can perform the music role of {subj}",
+        "{subj} sound can be performed by {obj}"
     ],
     "participant popstra base dated celebrity popstra base ": [
-        "{subj} and {obj} are participant in the popstart culture and dated",
-        "{subj} and {obj} are participant in the popstart culture and dated"
+        "{obj} and {subj} are participant in the popstart culture and dated",
+        "{obj} and {subj} are participant in the popstart culture and dated"
     ],
     "school sports_league_draft_pick picks sports_league_draft sports ": [
-        "during {subj}, {obj} produced draft picks selected by teams in the sports league",
-        "during {subj}, {obj} produced draft picks selected by teams in the sports league"
+        "during {obj}, {subj} produced draft picks selected by teams in the sports league",
+        "during {obj}, {subj} produced draft picks selected by teams in the sports league"
     ],
     "role group_membership membership group_member music ": [
-        "{subj} had the role of the {obj} in his music group ",
-        "{obj} is the role of the member {subj} in his music group"
+        "{obj} had the role of the {subj} in his music group ",
+        "{subj} is the role of the member {obj} in his music group"
     ],
     "geographic_distribution ethnicity people ": [
-        "{subj} are a ethinicity present in {obj}",
-        "{obj} is a country with a disaspora of {subj}"
+        "{obj} are a ethinicity present in {subj}",
+        "{subj} is a country with a disaspora of {obj}"
     ],
     "location_of_ceremony marriage unions_of_this_type marriage_union_type people ": [
-        "{subj} ceremony takes place in {obj}",
-        "In {obj} there are {subj} ceremonies "
+        "{obj} ceremony takes place in {subj}",
+        "In {subj} there are {obj} ceremonies "
     ],
     "sports olympic_games default_domain jg user ": [
-        "During {subj} there was the sports olympic games {obj} ",
-        "{obj} was one of the olympic sports during {subj}"
+        "During {obj} there was the sports olympic games {subj} ",
+        "{subj} was one of the olympic sports during {obj}"
     ],
     "organization_relationship child organization ": [
-        "{subj} is the parent organisation of {obj}",
-        "{obj} is the child organisation of {subj}"
+        "{obj} is the parent organisation of {subj}",
+        "{subj} is the child organisation of {obj}"
     ],
     "country administrative_division location ": [
-        "{subj} has its county administrative division in  {obj}",
-        "{obj} is the county administrative of the division of {subj} "
+        "{obj} has its county administrative division in  {subj}",
+        "{subj} is the county administrative of the division of {obj} "
     ],
     "position sports_team_roster sports current_roster hockey_team ice_hockey ": [
-        "the hockey team {subj} have {obj} i, their their roster",
-        "{obj} is present in {subj} hockey team roster"
+        "the hockey team {obj} have {subj} i, their their roster",
+        "{subj} is present in {obj} hockey team roster"
     ],
     "district_represented government_position_held members legislative_session government ": [
-        "{subj} has legislative member from {obj}",
-        "{obj} district had a member who had legislative position in {subj}"
+        "{obj} has legislative member from {subj}",
+        "{subj} district had a member who had legislative position in {obj}"
     ],
     "current_club x2010fifaworldcupsouthafrica base current_world_cup_squad world_cup_squad x2010fifaworldcupsouthafrica base ": [
-        "{subj} includes players from {obj} in its current World Cup squad for the 2010 FIFA World Cup in South Africa.",
-        "{obj} player are included in the {subj} for the World Cup for the 2010 FIFA World Cup in South Africa."
+        "{obj} includes players from {subj} in its current World Cup squad for the 2010 FIFA World Cup in South Africa.",
+        "{subj} player are included in the {obj} for the World Cup for the 2010 FIFA World Cup in South Africa."
     ],
     "team sports_team_roster sports current_team football_player soccer ": [
-        "{subj} was a football soccer player in the team {obj}",
-        "{obj} was the football team of the soccer player {subj} "
+        "{obj} was a football soccer player in the team {subj}",
+        "{subj} was the football team of the soccer player {obj} "
     ],
     "partially_contains location ": [
-        "{subj} partially contains {obj}",
-        "{obj} is partially contained in {subj}"
+        "{obj} partially contains {subj}",
+        "{subj} is partially contained in {obj}"
     ],
     "position football_roster_position american_football roster sports_team sports ": [
-        "football team {subj} had a {obj} position in its roster",
-        "{obj} is a position is the football roster of the team {subj}"
+        "football team {obj} had a {subj} position in its roster",
+        "{subj} is a position is the football roster of the team {obj}"
     ],
     "organizations_founded organization_founder organization ": [
-        "{subj} founded the organisation {obj}",
-        "{obj} was founded by {subj}"
+        "{obj} founded the organisation {subj}",
+        "{subj} was founded by {obj}"
     ],
     "position sports_team_roster players sports_position sports ": [
-        "{subj} and {obj} are both roster player positions in sports teams",
-        "{subj} and {obj} are both roster player positions in sports teams"
+        "{obj} and {subj} are both roster player positions in sports teams",
+        "{obj} and {subj} are both roster player positions in sports teams"
     ],
     "nominated_for award_nomination award_nominations award_nominated_work award ": [
-        "{subj} and {obj} were both nominated for an award for their work",
-        "{obj} and {subj} were both nominated for an award for their work"
+        "{obj} and {subj} were both nominated for an award for their work",
+        "{subj} and {obj} were both nominated for an award for their work"
     ],
     "combatants military_combatant_group military_conflicts military_combatant military ": [
-        "Combatant from {subj} were opposed to {obj} in a military conflict",
-        "Combatant from {obj} were opposed to {subj} in a military conflict"
+        "Combatant from {obj} were opposed to {subj} in a military conflict",
+        "Combatant from {subj} were opposed to {obj} in a military conflict"
     ],
     "county_seat us_county location ": [
-        "County seat of {subj} are located in {obj}",
-        "{obj} are the location for the {subj} seat"
+        "County seat of {obj} are located in {subj}",
+        "{subj} are the location for the {obj} seat"
     ],
     "industry business_operation business ": [
-        "{subj} has its industry business operations in {obj}",
-        "{obj} is the industry business operation of {subj}"
+        "{obj} has its industry business operations in {subj}",
+        "{subj} is the industry business operation of {obj}"
     ],
     "team sports_team_roster players sports_position sports ": [
-        "{subj} is a postion in the team sport roster of tge {obj}",
-        "sport team {obj} has the position {subj} in its roster"
+        "{obj} is a postion in the team sport roster of tge {subj}",
+        "sport team {subj} has the position {obj} in its roster"
     ],
     "inductee hall_of_fame_induction inductees hall_of_fame award ": [
-        "{subj} is the hall of fame for {obj}",
-        "{obj} is in the hall of fame {subj}"
+        "{obj} is the hall of fame for {subj}",
+        "{subj} is in the hall of fame {obj}"
     ],
     "parent_genre genre music ": [
-        "{subj} is a musical sub genre of {obj}",
-        "{obj} is the parent genre music of {subj}"
+        "{obj} is a musical sub genre of {subj}",
+        "{subj} is the parent genre music of {obj}"
     ],
     "influenced_by influence_node influence ": [
-        "{subj} was influence by the writter {obj}",
-        "{obj} influence the writter {subj}"
+        "{obj} was influence by the writter {subj}",
+        "{subj} influence the writter {obj}"
     ],
     "film_crew_role film_crew_gig other_crew film ": [
-        "The film {subj} has a crew of {obj}",
-        "A crew of {obj} was present for the film {subj}"
+        "The film {obj} has a crew of {subj}",
+        "A crew of {subj} was present for the film {obj}"
     ],
     "olympics olympic_athlete_affiliation athletes olympic_sport olympics ": [
-        "the olympic sport {subj} had athletes affiliated to {obj}",
-        "during {obj} , athletes from {subj} were affiliated"
+        "the olympic sport {obj} had athletes affiliated to {subj}",
+        "during {subj} , athletes from {obj} were affiliated"
     ],
     "currency dated_money_value measurement_unit domestic_tuition university education ": [
-        "{subj} has it tuiotion fees measured in {obj}",
-        "{obj} is the currency unit measurement for the tuition fees of {subj}"
+        "{obj} has it tuiotion fees measured in {subj}",
+        "{subj} is the currency unit measurement for the tuition fees of {obj}"
     ],
     "specialization_of profession people ": [
-        "{subj} is a professional specialisation of {obj}",
-        "the profession {obj} can specialise in {subj}"
+        "{obj} is a professional specialisation of {subj}",
+        "the profession {subj} can specialise in {obj}"
     ],
     "olympics olympic_medal_honor medals_won olympic_participating_country olympics ": [
-        "{subj} won the olympic participating honor medal during the {obj} ",
-        "{obj} was when {subj} recived the participating honor medal"
+        "{obj} won the olympic participating honor medal during the {subj} ",
+        "{subj} was when {obj} recived the participating honor medal"
     ],
     "type_of_union marriage spouse_s person people ": [
-        "{subj} is united to his or her spouse through a {obj} ",
-        "{obj} is the type of union between {subj} and his or her spouse"
+        "{obj} is united to his or her spouse through a {subj} ",
+        "{subj} is the type of union between {obj} and his or her spouse"
     ],
     "major_field_of_study students_graduates educational_institution education ": [
-        "{subj} gives a major in {obj}",
-        "{obj} is a major given in {subj}"
+        "{obj} gives a major in {subj}",
+        "{subj} is a major given in {obj}"
     ],
     "list ranking appears_in_ranked_lists ranked_item award ": [
-        "{subj} appeared in the ranking ward {obj} ",
-        "{subj} ranks {obj} "
+        "{obj} appeared in the ranking ward {subj} ",
+        "{obj} ranks {subj} "
     ],
     "film_release_region film_cut runtime film ": [
-        "{subj} was released in {obj} and had its runtime determined by the film cut",
-        "{obj} was the released region for the film {subj} which had its runtime determined by the film cut"
+        "{obj} was released in {subj} and had its runtime determined by the film cut",
+        "{subj} was the released region for the film {obj} which had its runtime determined by the film cut"
     ],
     "position_s football_historical_roster_position american_football roster sports_team sports ": [
-        "in the historical roster of {subj} football team, {obj} has been an important position",
-        "{obj} has been an important position in the historical roster of {subj} football team"
+        "in the historical roster of {obj} football team, {subj} has been an important position",
+        "{subj} has been an important position in the historical roster of {obj} football team"
     ],
     "role track_contribution track_performances performance_role music ": [
-        "{subj} often play with {obj} in music performances",
-        "{obj} often play with {subj} in music performances"
+        "{obj} often play with {subj} in music performances",
+        "{subj} often play with {obj} in music performances"
     ],
     "campuses educational_institution education ": [
-        "{subj} campus location of {obj}",
-        "{obj} is the campus location of {subj}"
+        "{obj} campus location of {subj}",
+        "{subj} is the campus location of {obj}"
     ],
     "film_regional_debut_venue film_regional_release_date release_date_s film ": [
-        "film {subj} mad its regional debut at {obj}",
-        "{obj} was the festival were the film {subj} made its regional debut "
+        "film {obj} mad its regional debut at {subj}",
+        "{subj} was the festival were the film {obj} made its regional debut "
     ],
     "group group_membership regular_performances performance_role music ": [
-        "{subj} is a performance role music present in the group {obj}",
-        "the music group {obj} the music role {subj} "
+        "{obj} is a performance role music present in the group {subj}",
+        "the music group {subj} the music role {obj} "
     ],
     "organization leadership leaders role organization ": [
-        "{subj} is the leader role for the organisation of {obj}",
-        "{obj} as a {subj} as leader"
+        "{obj} is the leader role for the organisation of {subj}",
+        "{subj} as a {obj} as leader"
     ],
     "location_of_ceremony marriage spouse_s person people ": [
-        "{subj} made his or her marriage ceremony in {obj}",
-        "{obj} was the location of the marriage of {subj}"
+        "{obj} made his or her marriage ceremony in {subj}",
+        "{subj} was the location of the marriage of {obj}"
     ],
     "genre film ": [
-        "The film {subj} belongs to the genre of {obj}",
-        "{obj} is the genre of the film {subj} "
+        "The film {obj} belongs to the genre of {subj}",
+        "{subj} is the genre of the film {obj} "
     ],
     "participant popstra base breakup celebrity popstra base ": [
-        "celebrity {subj} and {obj} broke up",
-        "celebrity {obj} and {subj} broke up"
+        "celebrity {obj} and {subj} broke up",
+        "celebrity {subj} and {obj} broke up"
     ],
     "company employment_tenure business employment_history person people ": [
-        "{subj} was employed by {obj}",
-        "{obj} employed {subj}"
+        "{obj} was employed by {subj}",
+        "{subj} employed {obj}"
     ],
     "languages_spoken ethnicity people ": [
-        "ethnic minority {subj} speaks {obj}",
-        "{obj} is spoken by the ethnic minority {subj}"
+        "ethnic minority {obj} speaks {subj}",
+        "{subj} is spoken by the ethnic minority {obj}"
     ],
     "region film_film_distributor_relationship distributors film ": [
-        "{subj} was distributed by a distributor from {obj}",
-        "{obj} is the country from which {subj} distributor comes from"
+        "{obj} was distributed by a distributor from {subj}",
+        "{subj} is the country from which {obj} distributor comes from"
     ],
     "institution people_with_this_degree educational_degree education ": [
-        "{subj} degree can be delivered by {obj} educational institution",
-        "{obj} educational institution delivers degrees like {subj} "
+        "{obj} degree can be delivered by {subj} educational institution",
+        "{subj} educational institution delivers degrees like {obj} "
     ],
     "currency dated_money_value measurement_unit operating_income business_operation business ": [
-        "{subj} measures its operatinf income in {obj} currency",
-        "{obj} is the currency used by {subj} to measure its operating income"
+        "{obj} measures its operatinf income in {subj} currency",
+        "{subj} is the currency used by {obj} to measure its operating income"
     ]
 }

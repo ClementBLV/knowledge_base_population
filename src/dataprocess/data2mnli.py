@@ -110,10 +110,8 @@ def create_templates(task: str, direct: bool, both: bool) -> List[Relation]:
 
 ################ function : MNLI format ################
 def format_relation(t: Relation, obj: str , subj:str , way: int)-> str:
-    if way > 0 :
-        return f"{t.template.format(subj=subj, obj=obj)}."
-    else : 
-        return f"{t.template.format(subj=subj, obj=obj)}."
+    return f"{t.template.format(subj=subj, obj=obj)}."
+
 # Generate MNLI examples with positive and negative templates
 def data2mnli_with_negative_examples(
     instance: REInputFeatures,
@@ -157,13 +155,14 @@ def data2mnli_with_negative_examples(
     selected_negatives = random.sample(
         potential_negatives, k=min(negn, len(potential_negatives))
     )
-
+    print(selected_negatives)
+    
     # If both is enabled, add reverse counterparts for the selected negatives
     if both:
         reverse_negatives = [
             Relation(
                 relation=t.relation,
-                template=LABEL_TEMPLATES[t.relation][0 if t.way > 0 else 1],
+                template=LABEL_TEMPLATES[t.relation][0 if -t.way > 0 else 1],
                 way=-t.way
             )
             for t in selected_negatives
