@@ -178,9 +178,7 @@ def data2mnli_with_negative_examples(
         )
         for t in selected_negatives
     ])
-    for a in mnli_instances:
-        print(a)
-    print('=======================')
+    
     return mnli_instances
 
 
