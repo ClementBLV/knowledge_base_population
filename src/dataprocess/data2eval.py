@@ -42,7 +42,7 @@ class REInputFeatures:
 @dataclass
 class MNLIInputFeatures:
     premise: str  # context
-    hypothesis_true: List[str]
+    hypothesis_true: str
     hypothesis_false: List[str]
     relation: str
 
@@ -139,7 +139,7 @@ def wn2mnli_eval(
     )
     return MNLIInputFeatures(
         premise=instance.context,
-        hypothesis_true=mnli_instances_true,
+        hypothesis_true=mnli_instances_true[0],
         hypothesis_false=mnli_instances_false,
         relation=instance.relation,
     )
