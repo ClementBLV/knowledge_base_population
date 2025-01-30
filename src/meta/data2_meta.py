@@ -73,7 +73,7 @@ def process_model_for_all_data(model_name, data_batch, tokenizer, config, device
     for line in data_batch:
         if ((line["way"] > 0 and model_name in ["model_1", "model_3"]) or
             line["way"] < 0 and model_name in ["model_2", "model_4"]):
-            result = process_data_line(line, model, model_name, tokenizer, config, device)
+            result = process_data_line(line, model, tokenizer, config, device)
             result["model_name"] = model_name
             results.append(result)
     return results
