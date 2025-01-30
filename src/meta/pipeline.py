@@ -49,7 +49,7 @@ args = parser.parse_args()
 ################ setup : config ################
 config = get_config(args.config_file)
 
-def read_data(input_file : str, fast : bool):
+def read_data(input_file : str, fast : bool=None):
     with open(input_file) as f:
         datas = json.load(f)
     if fast : 
