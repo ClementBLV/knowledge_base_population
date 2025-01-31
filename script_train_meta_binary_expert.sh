@@ -22,6 +22,8 @@ show_help() {
     exit 1
 }
 
+# TODO remove the input file it is useless 
+
 # Parse command-line arguments
 declare -A args=(
     [--wandb]=WANDB
@@ -81,7 +83,7 @@ run_experiment() {
     # TODO --> mettre le data2mnli avec le train is pas de do_preprocess et le save a cet endroit
     if [ "$DO_PREPROCESS" == "true" ]; then  
         python3 src/dataprocess/data2mnli.py \
-            --input_file $ROOT"/preprocessed/$INPUT_FILE" \
+            --input_file $ROOT"/preprocessed/train.json" \
             --data_source $ROOT \
             --output_file $P_FILE"/train.mnli.json" \
             --both "True" \
@@ -89,7 +91,7 @@ run_experiment() {
             --config_name $CONFIG_FILE \
 
         python3 src/dataprocess/data2mnli.py \
-            --input_file $ROOT"/preprocessed/$INPUT_FILE" \
+            --input_file $ROOT"/preprocessed/test.json" \
             --data_source $ROOT \
             --output_file $P_FILE"/test.mnli.json" \
             --both "True" \
@@ -97,7 +99,7 @@ run_experiment() {
             --config_name $CONFIG_FILE \
 
         python3 src/dataprocess/data2mnli.py \
-            --input_file $ROOT"/preprocessed/$INPUT_FILE" \
+            --input_file $ROOT"/preprocessed/valid.json" \
             --data_source $ROOT \
             --output_file $P_FILE"/valid.mnli.json" \
             --both "True" \
