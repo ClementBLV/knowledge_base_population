@@ -129,7 +129,7 @@ def wn2mnli_eval(
 
     return EvalInputFeatures(
         premise=instance.context,
-        hypothesis_true=mnli_instances_true[0],
+        hypothesis_true=mnli_instances_true,
         hypothesis_false=mnli_instances_false,
         relation=instance.relation,
     )
