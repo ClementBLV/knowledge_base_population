@@ -1,6 +1,6 @@
 
 import argparse
-from src.model import CombinedModel
+from src.combined_model import CombinedModel
 from src.utils.utils import get_config
 
 
