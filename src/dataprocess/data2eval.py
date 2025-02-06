@@ -1,24 +1,24 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from collections import defaultdict, Counter
-import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 import numpy as np
 import json
 import sys
-from pprint import pprint
-import random
 from src.utils.utils import setup_logger_basic
 import utils.templates as templates
+from base.mnli_dataclass import EvalInputFeatures
+import os
+
+
 from utils.templates import (
     WN_LABELS,
     WN_LABEL_TEMPLATES,
     FORBIDDEN_MIX,
     FB_LABEL_TEMPLATES
 )
-random.seed(0)
-np.random.seed(0)
+
 print("=========== CONVERTION ============")
 
 ################ setup : logger ################
@@ -38,13 +38,6 @@ class REInputFeatures:
     pair_type: str = None
     relation: str = None
 
-
-@dataclass
-class MNLIInputFeatures:
-    premise: str  # context
-    hypothesis_true: str
-    hypothesis_false: List[str]
-    relation: str
 
 
 parser = ArgumentParser()
@@ -101,12 +94,10 @@ for relation in LABELS:  # TACRED_LABELS:
     #    continue
     for template in templates:
         # for the moment we just look at the direct patterns
-        if (
-            template in LABEL_TEMPLATES[relation]
-        ):  # si le template correspond au label du template
-            positive_templates[relation].append(
-                template
-            )  # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
+        if (template in LABEL_TEMPLATES[relation]):  
+            # si le template correspond au label du template
+            positive_templates[relation].append(template)  
+            # on lie le label de la relation aux template dans le dictionnaire des template { label : template }
 
         else:
             negative_templates[relation].append(template)
@@ -132,20 +123,17 @@ def wn2mnli_eval(
     mnli_instances_false.extend(
         [
             f"{t.format(subj=instance.subj, obj=instance.obj)}."
-            for t in negative_templates[
-                instance.relation
-            ]  # to have all the negative ones
-        ]
+            for t in negative_templates[instance.relation]  
+        ] # to have all the negative ones always in the same order for a given true relation
     )
-    return MNLIInputFeatures(
+
+    return EvalInputFeatures(
         premise=instance.context,
         hypothesis_true=mnli_instances_true[0],
         hypothesis_false=mnli_instances_false,
         relation=instance.relation,
     )
 
-
-import os
 
 # Check if the directory exists, create if not
 path = os.path.join(os.path.dirname(os.getcwd()), args.input_file)
