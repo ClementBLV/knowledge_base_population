@@ -29,7 +29,8 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Arguments pour le pipeline
-    parser.add_argument("--direrct", type=str, help="Chemin vers les probabilités directes")
+    # TODO add them in the config_meta
+    parser.add_argument("--direct", type=str, help="Chemin vers les probabilités directes")
     parser.add_argument("--reverse", type=str, help="Chemin vers les probabilités inverses")
     parser.add_argument("--both_direct", type=str, help="Chemin vers les probabilités directes combinées")
     parser.add_argument("--both_reverse", type=str, help="Chemin vers les probabilités inverses combinées")
@@ -39,10 +40,11 @@ def main():
     parser.add_argument("--output_eval_name", type=str, help="Name of the eval file - the eval are saved in the folder eval")
 
     # Arguments pour compute_probabilities.py
+    # TODO push the eval file in git for direct and indirect
     parser.add_argument("--eval_file", type=str, help="Fichier JSON d'entrée avec les relations")
     parser.add_argument("--proba_file", type=str, help="Fichier de sortie pour les probabilités")
     parser.add_argument("--config_file", type=str, help="Fichier de configuration du modèle")
-    parser.add_argument("--model", type=str, help="Poids du modèle")
+    parser.add_argument("--model", type=str, help="Poids du modèle path")
     parser.add_argument("--batch_size", type=int, default=32, help="Taille de batch")
     parser.add_argument("--parallel", type=str2bool, default=True, help="Exécution parallèle sur GPU")
     parser.add_argument("--fast", type=str2bool, default=False, help="Mode rapide")
@@ -73,11 +75,11 @@ def main():
             predictions = load_predictions(args.proba_file, type_=PredictionInputFeatures, logger=logger )
 
     ### Meta config ###
-    if args.config_meta or (args.direrct and args.reverse and args.both_direct and args.both_reverse):
-        if not all([args.direrct, args.reverse, args.both_direct, args.both_reverse]):
+    if args.config_meta or (args.direct and args.reverse and args.both_direct and args.both_reverse):
+        if not all([args.direct, args.reverse, args.both_direct, args.both_reverse]):
             parser.error("You should either give ONE probability file - FOUR probability file - ONE config_meta.json file")
 
-        direct_probs = load_predictions(args.direrct, logger)
+        direct_probs = load_predictions(args.direct, logger)
         reverse_probs = load_predictions(args.reverse, logger)
         both_direct_probs = load_predictions(args.both_direct, logger)
         both_reverse_probs = load_predictions(args.both_reverse, logger)

@@ -86,7 +86,6 @@ def run_probability_computation(eval_file, output_file, config_file, model_path,
     config = get_config(config_file)
 
     tokenizer = AutoTokenizer.from_pretrained(config["model_name"], use_fast=False, model_max_length=512)
-    tokenizer = AutoTokenizer.from_pretrained(config["model_name"], use_fast=False, model_max_length=512)
 
     if DUMMY:
         logger.info("Using Dummy Model")
