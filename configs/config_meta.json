@@ -1,6 +1,9 @@
 {
     "source_model":"microsoft/deberta-v3-small",
+    "meta_model_path": "", 
     "max_length":1024,
+    "num_models":4,
+    "num_classes":1,
     "label2id" : {
         "entailment": 0,
         "not_entailment": 1
@@ -15,9 +18,9 @@
         "model_2ways":"//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_2w_biased_split1_v-20241227"
     }, 
     "probability_path" : {
-        "": "",
-        "":"",
-        "":"",
-        "":""
+        "p1":"",
+        "p2":"",
+        "p3":"",
+        "p4":""
     }
 }
