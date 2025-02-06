@@ -10,7 +10,7 @@ from src.meta.meta_models import MetaModelNN, VotingModel
 ################ setup : logger ################
 logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
-logger.info("Progam : model.py ****")
+logger.info("Progam : combined_model.py ****")
 
 
 class CombinedModel(nn.Module):
