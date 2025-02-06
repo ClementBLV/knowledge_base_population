@@ -58,3 +58,70 @@ class MetaModelNN(nn.Module):
         x = self.relu(self.fc2(x))
         x = self.sigmoid(self.fc3(x))
         return x
+
+
+    @staticmethod
+    def load_meta_model(config_meta, device="cpu"):
+        """
+        Load a trained meta model.
+
+        Args:
+            config_meta: Object containing model parameters and path.
+            device (str): Device to load the model on ("cpu" or "cuda").
+
+        Returns:
+            MetaModelNN: Loaded model.
+        """
+        model = MetaModelNN(num_models=config_meta["num_models"], num_classes=config_meta["num_classes"])
+        model.load_state_dict(torch.load(config_meta.model_path, map_location=torch.device(device)))
+        model.to(device)  # Move model to the specified device
+        model.eval()  # Set model to evaluation mode
+        return model
+    
+
+
+class DummyModel:
+    """A dummy model that generates random probabilities."""
+    def __init__(self, num_labels=3):  # Assume 3 classes (entailment, neutral, contradiction)
+        self.num_labels = num_labels
+
+    def to(self, device):
+        pass  # No-op for dummy model
+
+    def eval(self):
+        pass  # No-op for dummy model
+
+    def __call__(self, input_ids):
+        batch_size = input_ids.shape[0]
+        random_probs = torch.rand((batch_size, self.num_labels))  # Random probabilities
+        return {"logits": random_probs}
+    
+
+
+class DummyMetaModelNN(nn.Module):
+    """A dummy version of MetaModelNN that outputs random probabilities."""
+    def __init__(self, num_models, num_classes):
+        super(DummyMetaModelNN, self).__init__()
+        self.num_models = num_models
+        self.num_classes = num_classes
+
+    def forward(self, x, flattened=True):
+        batch_size = x.size(0)
+        # Random binary probabilities
+        random_probs = torch.rand(batch_size, 1)
+        return random_probs
+    
+    @staticmethod
+    def load_meta_model(config_meta, device="cpu"):
+        """
+        Load a trained meta model.
+
+        Args:
+            config_meta: Object containing model parameters and path.
+            device (str): Device to load the model on ("cpu" or "cuda").
+
+        Returns:
+            MetaModelNN: Loaded model.
+        """
+        model = DummyMetaModelNN(num_models=config_meta["num_models"], num_classes=config_meta["num_classes"])
+        return model
