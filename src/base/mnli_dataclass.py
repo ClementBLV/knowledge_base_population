@@ -3,6 +3,7 @@ import json
 from logging import Logger
 from typing import Dict, List, Type, Union
 from dataclasses import dataclass
+import torch
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 from src.utils.utils import sha1
@@ -18,7 +19,7 @@ class EvalInputFeatures:
 @dataclass
 class PredictionInputFeatures (EvalInputFeatures):
     id: str
-    probabilities: List[float]
+    probabilities: torch.Tensor
     predictions: List[int]
 
     def to_dict(self) -> Dict:
@@ -29,7 +30,7 @@ class PredictionInputFeatures (EvalInputFeatures):
             "hypothesis_true": self.hypothesis_true,
             "hypothesis_false": self.hypothesis_false,
             "relation": self.relation,
-            "probabilities": self.probabilities,
+            "probabilities": self.probabilities.tolist(),
             "predictions":self.predictions
         }
 
@@ -46,7 +47,7 @@ class MetaPredictionInputFeatures (PredictionInputFeatures):
             "hypothesis_false": self.hypothesis_false,
             "relation": self.relation,
             "fused_probability": self.fused_probability,
-            "probabilities": self.probabilities,
+            "probabilities": self.probabilities.tolist(),
             "predictions":self.predictions
         }
 
