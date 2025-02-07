@@ -17,10 +17,30 @@
         "model_1way_reverse" : "//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_1w_indirect_biased_split_v-20241227",
         "model_2ways":"//home/clement/Documents/Stage/processed_dir/data/WN18RR/weights/MNLI_wn/naive_derberta_small_2w_biased_split1_v-20241227"
     }, 
+    "model_path": {
+        "p1": "model_1way", 
+        "p2": "model_2ways",
+        "p3": "model_1way_reverse",
+        "p4": "model_2ways"
+    }, 
+    
+    "model2prob" : {
+        "model_1": "p1",
+        "model_3": "p2",
+        "model_2": "p3",
+        "model_4": "p4"
+    },
+    
+    "probability_model" : {
+        "p1":"direct_probs",
+        "p2":"both_direct_probs",
+        "p3":"reverse_probs",
+        "p4":"both_reverse_probs"
+    }, 
     "probability_path" : {
         "p1":"",
         "p2":"",
         "p3":"",
         "p4":""
-    }
+    } 
 }
