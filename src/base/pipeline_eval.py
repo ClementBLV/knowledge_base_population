@@ -15,9 +15,9 @@ def compute_probabilities(args):
     command = [
         "python", "compute_probabilities.py",
         "--eval_file", args.eval_file,
-        "--output_file", args.output_file,
+        "--proba_file", args.proba_file,
         "--config_file", args.config_file,
-        "--model", args.model,
+        "--model_weight_path", args.model_weight_path,
         "--batch_size", str(args.batch_size),
         "--parallel", str(args.parallel),
         "--fast", str(args.fast)
@@ -30,24 +30,26 @@ def main():
 
     # Arguments pour le pipeline
     # TODO add them in the config_meta
-    parser.add_argument("--direct", type=str, help="Chemin vers les probabilités directes")
-    parser.add_argument("--reverse", type=str, help="Chemin vers les probabilités inverses")
-    parser.add_argument("--both_direct", type=str, help="Chemin vers les probabilités directes combinées")
-    parser.add_argument("--both_reverse", type=str, help="Chemin vers les probabilités inverses combinées")
-    parser.add_argument("--compute", action="store_true", help="Forcer le calcul des probabilités pour le modèle donné en entrée")
-    parser.add_argument("--config_meta", type=str, help="Fichier de configuration méta")
-    parser.add_argument("--meta_proba_file", type=str, help="Fichier de sortie pour les probabilités")
-    parser.add_argument("--output_eval_name", type=str, help="Name of the eval file - the eval are saved in the folder eval")
+    parser.add_argument("--direct", type=str, help="Path to direct probabilities")
+    parser.add_argument("--reverse", type=str, help="Path to reverse probabilities")
+    parser.add_argument("--both_direct", type=str, help="Path to combined direct probabilities")
+    parser.add_argument("--both_reverse", type=str, help="Path to combined reverse probabilities")
+    parser.add_argument("--compute", action="store_true", help="Force probability computation for the given input model")
+    parser.add_argument("--config_meta", type=str, help="Meta configuration file")
+    parser.add_argument("--meta_proba_file", type=str, help="Output file for probabilities")
+    parser.add_argument("--output_eval_name", type=str, help="Name of the eval file - the evals are saved in the eval folder")
 
-    # Arguments pour compute_probabilities.py
+    # Arguments for compute_probabilities.py
+    # 
+    parser.add_argument("--eval_file", type=str, help="Input JSON file with relations")
+    parser.add_argument("--proba_file", type=str, help="Output file for probabilities")
+    parser.add_argument("--config_file", type=str, help="Model configuration file")
+    parser.add_argument("--model_weight_path", type=str, help="Model weight path")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
+    parser.add_argument("--parallel", type=str2bool, default=True, help="Parallel execution on GPU")
+    parser.add_argument("--fast", type=str2bool, default=False, help="Fast mode")
+
     # TODO push the eval file in git for direct and indirect
-    parser.add_argument("--eval_file", type=str, help="Fichier JSON d'entrée avec les relations")
-    parser.add_argument("--proba_file", type=str, help="Fichier de sortie pour les probabilités")
-    parser.add_argument("--config_file", type=str, help="Fichier de configuration du modèle")
-    parser.add_argument("--model", type=str, help="Poids du modèle path")
-    parser.add_argument("--batch_size", type=int, default=32, help="Taille de batch")
-    parser.add_argument("--parallel", type=str2bool, default=True, help="Exécution parallèle sur GPU")
-    parser.add_argument("--fast", type=str2bool, default=False, help="Mode rapide")
 
     args = parser.parse_args()
 
