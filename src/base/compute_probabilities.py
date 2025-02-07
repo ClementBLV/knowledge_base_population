@@ -21,7 +21,7 @@ def parse_args():
     """Parse command-line arguments and return them as a Namespace."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--eval_file", type=str, required=True, help="Input JSON file")
-    parser.add_argument("--output_file", type=str, required=True, help="File to save computed probabilities")
+    parser.add_argument("--proba_file", type=str, required=True, help="File to save computed probabilities")
     parser.add_argument("--config_file", type=str, required=True, help="Config file for the model")
     parser.add_argument("--model", type=str, required=True, help="Path to the model weights")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for probability computation")
@@ -67,12 +67,17 @@ def compute_probabilities(
         inputs = tokenizer(premises, hypotheses, padding=True, truncation=True, return_tensors="pt").to(device)
         with torch.no_grad():
             outputs = model(inputs["input_ids"])
-            batch_probs = F.softmax(outputs["logits"], dim=-1)[:, 0].cpu().tolist()
+            batch_probs = F.softmax(outputs["logits"], dim=-1)[:, 0].cpu()
 
         for i, relation in enumerate(relations):
             data_item = mnli_data[idx]
-            num_hypotheses = len(data_item.hypothesis_false) + 1
-            data_item.probabilities = batch_probs[i * num_hypotheses: (i + 1) * num_hypotheses]
+            num_hypotheses = len(data_item.hypothesis_false) + 1  
+            start, end = i * num_hypotheses, (i + 1) * num_hypotheses
+
+            if end > len(batch_probs):  
+                raise ValueError(f"Indexing error: {end} exceeds batch_probs size {len(batch_probs)}")
+
+            data_item.probabilities = batch_probs[start:end] 
             data_item.predictions = compute_prediction(data_item)
 
             idx += 1
@@ -80,7 +85,7 @@ def compute_probabilities(
     return mnli_data
 
 
-def run_probability_computation(eval_file, output_file, config_file, model_path, batch_size, parallel, fast) -> List[Dict]:
+def run_probability_computation(eval_file, proba_file, config_file, model_weight_path, batch_size, parallel, fast) -> List[Dict]:
     """Run the full pipeline: load data, compute probabilities, and return JSON."""
     global config
     config = get_config(config_file)
@@ -91,7 +96,7 @@ def run_probability_computation(eval_file, output_file, config_file, model_path,
         logger.info("Using Dummy Model")
         model = DummyModel(num_labels=config.get("num_labels", 3))  # Use dummy model
     else:
-        model = AutoModelForSequenceClassification.from_pretrained(pathlib.Path(model_path))
+        model = AutoModelForSequenceClassification.from_pretrained(pathlib.Path(model_weight_path))
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     logger.info(f"Using device: {device}")
@@ -105,10 +110,10 @@ def run_probability_computation(eval_file, output_file, config_file, model_path,
 
     mnli_data_serializable = [item.to_dict() for item in mnli_data]
 
-    with open(output_file, "w") as f:
+    with open(proba_file, "w") as f:
         json.dump(mnli_data_serializable, f, indent=2)
     
-    logger.info(f"Probabilities saved to {output_file}")
+    logger.info(f"Probabilities saved to {proba_file}")
     return mnli_data_serializable
 
 
@@ -116,9 +121,9 @@ if __name__ == "__main__":
     args = parse_args()
     run_probability_computation(
         args.eval_file,
-        args.output_file,
+        args.proba_file,
         args.config_file,
-        args.model,
+        args.model_weight_path,
         args.batch_size,
         args.parallel,
         args.fast,
