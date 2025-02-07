@@ -43,7 +43,7 @@ def compute_meta_probabilities(
 
         # Forward pass through the model
         with torch.no_grad():  # No need for gradients during inference
-            probabilities = meta_model(input_tensor).squeeze().tolist()  # Convert back to list
+            probabilities = meta_model(input_tensor).squeeze()  # Convert back to list
         
         # Assign probabilities to the object
         data_item.probabilities = probabilities
@@ -72,8 +72,8 @@ def aggregate_probabilities(
         if len({p_direct.id, p_reverse.id, p_both_direct.id, p_both_reverse.id}) == 1:
             fused_probabilities = list(zip(
                 p_direct.probabilities,
-                p_reverse.probabilities,
                 p_both_direct.probabilities,
+                p_reverse.probabilities,
                 p_both_reverse.probabilities
             ))  # [[p11, p12, p13, p14], [p21, p22, p23, p24], ...]
 
