@@ -38,17 +38,20 @@ def worker_init(config, device):
     models = {
         "model_1": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_1way"]).to(device),
         "model_3": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_2ways"]).to(device),
+        
         "model_2": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_1way_reverse"]).to(device),
         "model_4": AutoModelForSequenceClassification.from_pretrained(config["models_path"]["model_2ways"]).to(device),
     }
     model2prob = {
         "model_1": "p1",
-        "model_3": "p2",
-        "model_2": "p3",
+        "model_2": "p2",
+        "model_3": "p3",
         "model_4": "p4",
     }
-
-
+    # initialy for the mapping at the end of the last training the model 2 :p3 and model 3:p2 were inversed in the final mapping not for the inference 
+    # here is the new modify version were th emapping is correclty done and there is a new order for the meta 
+    # the old meta version was trained on [direct , 2w_direct , reverse , 2w_reverse]
+    # now with this new one it will be [direct , reverse , 2w_direct , 2w_direct ]
 def process_data_line(line, model, tokenizer, config, device):
     """Process a single data point to get predictions using a specific model."""
     id = sha1(line["premise"])
