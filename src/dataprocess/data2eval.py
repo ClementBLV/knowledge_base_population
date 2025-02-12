@@ -12,13 +12,6 @@ from src.base.mnli_dataclass import EvalInputFeatures
 import os
 
 
-from utils.templates import (
-    WN_LABELS,
-    WN_LABEL_TEMPLATES,
-    FORBIDDEN_MIX,
-    FB_LABEL_TEMPLATES
-)
-
 print("=========== CONVERTION ============")
 
 ################ setup : logger ################
@@ -57,16 +50,16 @@ indirect_templates = []
 
 # choose the right label 
 if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
-    LABELS = WN_LABELS
-    LABEL_TEMPLATES = WN_LABEL_TEMPLATES
+    LABELS = templates.WN_LABELS
+    LABEL_TEMPLATES = templates.WN_LABEL_TEMPLATES
     direct_templates = templates.templates_direct
     indirect_templates = templates.template_indirect
 if args.task.lower() in ["freebase", "fb", "fb15k237"]:
-    LABELS = list(FB_LABEL_TEMPLATES.keys())
-    LABEL_TEMPLATES = FB_LABEL_TEMPLATES
+    LABELS = list(templates.FB_LABEL_TEMPLATES.keys())
+    LABEL_TEMPLATES = templates.FB_LABEL_TEMPLATES
     # Loop through the dictionary and separate the templates
 
-    for key, templates in FB_LABEL_TEMPLATES.items():
+    for key, templates in templates.FB_LABEL_TEMPLATES.items():
         if len(templates) >= 2:
             direct_templates.append(templates[0])
             indirect_templates.append(templates[1])
