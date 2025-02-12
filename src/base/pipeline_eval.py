@@ -64,7 +64,7 @@ def main():
     ### Simple config ###
     # We want to compute the probability for a given eval_file
     if args.compute :
-        if not args.eval_file or not args.proba_file or not args.config_file or not args.model:
+        if not args.eval_file or not args.proba_file or not args.config_file or not args.model_weight_path:
             parser.error("--compute nécessite --eval_file, --proba_file, --config_file et --model")
         
         compute_probabilities(args)
