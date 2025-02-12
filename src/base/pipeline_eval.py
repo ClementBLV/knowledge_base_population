@@ -12,8 +12,10 @@ from src.utils.utils import str2bool, setup_logger
 
 def compute_probabilities(args):
     """ Appelle compute_probabilities.py avec les arguments fournis. """
+    script_path = os.path.join("src", "base", "compute_probabilities.py")  # Correct path
+
     command = [
-        "python", "compute_probabilities.py",
+        "python", script_path  ,
         "--eval_file", args.eval_file,
         "--proba_file", args.proba_file,
         "--config_file", args.config_file,
