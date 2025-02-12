@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("--eval_file", type=str, required=True, help="Input JSON file")
     parser.add_argument("--proba_file", type=str, required=True, help="File to save computed probabilities")
     parser.add_argument("--config_file", type=str, required=True, help="Config file for the model")
-    parser.add_argument("--model", type=str, required=True, help="Path to the model weights")
+    parser.add_argument("--model_weight_path", type=str, required=True, help="Path to the model weights")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for probability computation")
     parser.add_argument("--parallel", type=str2bool, default=True, help="Parallel execution on GPU")
     parser.add_argument("--fast", type=str2bool, default=False, help="Use only 1000 examples for fast testing")
