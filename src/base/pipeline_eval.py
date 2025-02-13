@@ -7,7 +7,7 @@ import warnings
 from src.base.compute_meta_probabilities import aggregate_probabilities, compute_meta_probabilities
 from src.base.mnli_dataclass import MetaPredictionInputFeatures, PredictionInputFeatures, load_predictions
 from src.base.compute_metrics import *
-from src.utils.utils import str2bool, setup_logger
+from src.utils.utils import get_config, str2bool, setup_logger
 
 
 def compute_probabilities(args):
@@ -83,17 +83,18 @@ def main():
         if not all([args.direct, args.reverse, args.both_direct, args.both_reverse]):
             parser.error("You should either give ONE probability file - FOUR probability file - ONE config_meta.json file")
 
-        direct_probs = load_predictions(args.direct, logger)
-        reverse_probs = load_predictions(args.reverse, logger)
-        both_direct_probs = load_predictions(args.both_direct, logger)
-        both_reverse_probs = load_predictions(args.both_reverse, logger)
+        direct_probs = load_predictions(args.direct,type_=PredictionInputFeatures, logger=logger)
+        reverse_probs = load_predictions(args.reverse,type_=PredictionInputFeatures, logger=logger)
+        both_direct_probs = load_predictions(args.both_direct, type_=PredictionInputFeatures,logger=logger)
+        both_reverse_probs = load_predictions(args.both_reverse,type_=PredictionInputFeatures, logger=logger)
 
         # Appel à la fonction d’agrégation (à implémenter)
         aggregated_probs = aggregate_probabilities(direct_probs, reverse_probs, both_direct_probs, both_reverse_probs)
         print("Probabilités agrégées :", aggregated_probs[0])
 
         # Compute the probabilities and predictions
-        compute_meta_probabilities(aggregated_probs, config_meta=args.config_meta ,meta_proba_file=args.meta_proba_file)
+        config_meta = get_config(args.config_meta)
+        compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger)
         predictions = load_predictions(args.proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 
     # map the relation to their prediction 
@@ -101,9 +102,9 @@ def main():
     for prediction in predictions : 
         relations2predictions["Global"].append(prediction.predictions)
         if prediction.relation not in relations2predictions.keys(): 
-            relations2predictions[prediction.relation] = prediction.predictions
+            relations2predictions[prediction.relation] = [prediction.predictions]
         else : 
-            relations2predictions[prediction.relation].extend(prediction.predictions)
+            relations2predictions[prediction.relation].append(prediction.predictions)
     
     # Display the results for each relation
     for relation in relations2predictions.keys():
