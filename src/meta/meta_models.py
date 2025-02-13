@@ -82,8 +82,9 @@ class MetaModelNN(nn.Module):
 
 class DummyModel:
     """A dummy model that generates random probabilities."""
-    def __init__(self, num_labels=3):  # Assume 3 classes (entailment, neutral, contradiction)
+    def __init__(self, num_labels=3, num_classes=11):  # Assume 3 classes (entailment, neutral, contradiction)
         self.num_labels = num_labels
+        self.num_classes = num_classes
 
     def to(self, device):
         pass  # No-op for dummy model
@@ -93,7 +94,7 @@ class DummyModel:
 
     def __call__(self, input_ids):
         batch_size = input_ids.shape[0]
-        random_probs = torch.rand((batch_size, self.num_labels))  # Random probabilities
+        random_probs = torch.randperm(self.num_classes) # Random probabilities / permutatations
         return {"logits": random_probs}
     
 
