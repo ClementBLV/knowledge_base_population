@@ -74,7 +74,8 @@ class MNLIDataset(Dataset):
 
 
 def load_data(input_file: str, fast: bool, logger) -> List[PredictionInputFeatures]:
-    """Load JSON raw data from the input file and convert it to MNLIInputFeatures."""
+    """Load JSON raw data from the input file of the evaluation 
+    and convert it to MNLIInputFeatures for either direct or indirect eval."""
     with open(input_file, "r") as f:
         data = json.load(f)
 
@@ -86,12 +87,13 @@ def load_data(input_file: str, fast: bool, logger) -> List[PredictionInputFeatur
 
     mnli_data = [
         PredictionInputFeatures(
-            id=sha1(line["premise"] + line["hypothesis_true"]),
+            id=sha1(line["premise"] + line["hypothesis_true"][0]),
             premise=line["premise"],
-            hypothesis_true=line["hypothesis_true"],
+            hypothesis_true=line["hypothesis_true"][0],
             hypothesis_false=line["hypothesis_false"],
             relation=line["relation"],
-            probabilities=[],
+            probabilities=torch.tensor([], dtype=torch.float),
+            predictions=[]
         )
         for line in data
     ]
