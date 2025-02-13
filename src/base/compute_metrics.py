@@ -25,7 +25,10 @@ def compute_mrr(shots:List[List[int]], element=0):
     Compute the Mean Reciprocal Rank (MRR) for a set of ranked results.
     
     Args:
-        ranked_results: List of ranked indices for each evaluation example.
+        shots : list of ranked index (the position correspond to the index) - 
+                ex : probabilities [0.9, 0.1, 0.8, 0.7] generate shots [0, 2, 3, 1] 
+                - with 0 the élément we are interested in prosotion of the real probability 
+                ~ list of list of predictions 
         element: The target element (e.g., the correct index) for which to compute the rank.
 
     Returns:
