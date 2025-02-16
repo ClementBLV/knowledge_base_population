@@ -79,7 +79,7 @@ config = get_config(args.config_file)
 os.makedirs(args.output_dir, exist_ok=True)
 logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
-logger.info(f"Save : Checkpoint Save location : {args.output_dir}/{args.save_name}")
+logger.info(f"Save : Checkpoint Save location : {args.output_dir}/{args.save_name}-{DATE}")
 
 ################ load : model ################
 model_name = config["model_name"]
