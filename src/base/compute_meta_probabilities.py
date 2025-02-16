@@ -71,14 +71,12 @@ def aggregate_probabilities(
                 **{k: v for k, v in p_direct.__dict__.items() if k not in {"probabilities", "predictions"}},  
                 probabilities=torch.tensor([], dtype=torch.float),  # Reset probabilities
                 predictions=[],  # Reset predictions
-                fused_probability=[
-                    [p1, p2, p3, p4] for p1, p2, p3, p4 in zip(
-                        p_direct.probabilities.tolist(),
-                        p_both_direct.probabilities.tolist(),
-                        p_reverse.probabilities.tolist(),
-                        p_both_reverse.probabilities.tolist()
-                    )
-                ]   # [[p11, p12, p13, p14], [p21, p22, p23, p24], ...]
+                fused_probability = list(zip(
+                    p_direct.probabilities,
+                    p_both_direct.probabilities,
+                    p_reverse.probabilities,
+                    p_both_reverse.probabilities
+                ))    # [[p11, p12, p13, p14], [p21, p22, p23, p24], ...]
             )
             for p_direct, p_reverse, p_both_direct, p_both_reverse in zip(direct, reverse, both_direct, both_reverse)
             if {p_direct.id, p_reverse.id, p_both_direct.id, p_both_reverse.id} == {p_direct.id}

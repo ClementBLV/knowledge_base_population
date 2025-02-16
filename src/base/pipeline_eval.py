@@ -95,7 +95,7 @@ def main():
         # Compute the probabilities and predictions
         config_meta = get_config(args.config_meta)
         compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger)
-        predictions = load_predictions(args.proba_file,type_=MetaPredictionInputFeatures , logger=logger)
+        predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 
     # map the relation to their prediction 
     relations2predictions = {"Global":[]}
