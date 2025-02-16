@@ -155,7 +155,6 @@ def data2mnli_with_negative_examples(
     selected_negatives = random.sample(
         potential_negatives, k=min(negn, len(potential_negatives))
     )
-    print(selected_negatives)
     
     # If both is enabled, add reverse counterparts for the selected negatives
     if both:
