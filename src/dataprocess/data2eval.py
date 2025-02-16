@@ -38,7 +38,7 @@ parser = ArgumentParser()
 parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
 parser.add_argument("--direct", type=bool, default=True)
-parser.add_argument("--task", type=str, default="fb")
+parser.add_argument("--task", type=str)
 
 args = parser.parse_args()
 logger.info(f"convert {args.input_file} into NLI dataset")
@@ -54,7 +54,7 @@ if args.task.lower() in ["wordnet", "wn", "wn18rr"]:
     LABEL_TEMPLATES = templates.WN_LABEL_TEMPLATES
     direct_templates = templates.templates_direct
     indirect_templates = templates.template_indirect
-if args.task.lower() in ["freebase", "fb", "fb15k237"]:
+elif args.task.lower() in ["freebase", "fb", "fb15k237"]:
     LABELS = list(templates.FB_LABEL_TEMPLATES.keys())
     LABEL_TEMPLATES = templates.FB_LABEL_TEMPLATES
     # Loop through the dictionary and separate the templates
@@ -63,7 +63,8 @@ if args.task.lower() in ["freebase", "fb", "fb15k237"]:
         if len(templates) >= 2:
             direct_templates.append(templates[0])
             indirect_templates.append(templates[1])
-
+else:
+    raise ValueError(f"Unknown task: {args.task.lower()}")
 
 # labels2id = {"entailment": 2, "neutral": 1, "contradiction": 0}
 labels2id = {'entailment':0, 'not_entailment':1} # for deberta small which take the labels : ['entailment', 'not_entailment'] 
