@@ -94,10 +94,9 @@ class DummyModel:
 
     def __call__(self, input_ids):
         batch_size = input_ids.shape[0]
-        random_probs = torch.randperm(self.num_classes) # Random probabilities / permutatations
+        random_probs = torch.randperm(self.num_classes/self.num_classes) # Random probabilities / permutatations
         return {"logits": random_probs}
     
-
 
 class DummyMetaModelNN(nn.Module):
     """A dummy version of MetaModelNN that outputs random probabilities."""
@@ -126,3 +125,4 @@ class DummyMetaModelNN(nn.Module):
         """
         model = DummyMetaModelNN(num_models=config_meta["num_models"], num_classes=config_meta["num_classes"])
         return model
+# %%
