@@ -22,7 +22,8 @@ def compute_probabilities(args):
         "--model_weight_path", args.model_weight_path,
         "--batch_size", str(args.batch_size),
         "--parallel", str(args.parallel),
-        "--fast", str(args.fast)
+        "--fast", str(args.fast),
+        "--dummy", str(args.dummy)
     ]
     subprocess.run(command, check=True)
 
@@ -50,6 +51,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument("--parallel", type=str2bool, default=True, help="Parallel execution on GPU")
     parser.add_argument("--fast", type=str2bool, default=False, help="Fast mode")
+    parser.add_argument("--dummy", type=str2bool, default=False, help="Use the dummy model for test")
 
     # TODO push the eval file in git for direct and indirect
 
@@ -94,7 +96,7 @@ def main():
 
         # Compute the probabilities and predictions
         config_meta = get_config(args.config_meta)
-        compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger)
+        compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger, use_meta_dummy=args.dummy)
         predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 
     # map the relation to their prediction 

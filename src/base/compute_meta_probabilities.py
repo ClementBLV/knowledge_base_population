@@ -7,14 +7,13 @@ from src.base.compute_probabilities import compute_prediction
 from src.base.mnli_dataclass import MetaPredictionInputFeatures, PredictionInputFeatures
 from src.meta.meta_models import DummyMetaModelNN, MetaModelNN
 
-USE_META_DUMMY = True  # Set to True to use the dummy meta model
 
-def load_meta_model(config_meta: Dict, device, logger: Logger):
+def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = False):
     """Loads either the real or dummy meta model based on the flag."""
     num_models = config_meta["num_models"]
     num_classes = config_meta["num_classes"]
     
-    if USE_META_DUMMY:
+    if use_meta_dumy:
         logger.info("Using Dummy Meta Model")
         return DummyMetaModelNN(num_models=num_models, num_classes=num_classes)
     else:
@@ -27,11 +26,12 @@ def compute_meta_probabilities(
         config_meta: Dict,
         meta_proba_file: str, 
         logger: Logger,
+        use_meta_dummy : bool
     )-> List[MetaPredictionInputFeatures]: 
     
     # Load the meta model
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    meta_model = load_meta_model(config_meta, device=device, logger=logger)
+    meta_model = load_meta_model(config_meta, device=device, logger=logger, use_meta_dumy=use_meta_dummy)
     
     for data_item in aggregated_prob:
         # Convert fused probabilities to a tensor

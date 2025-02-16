@@ -1,4 +1,5 @@
 import argparse
+import os
 import pathlib
 from typing import List, Dict, Union
 import json
@@ -15,7 +16,6 @@ from src.base.mnli_dataclass import *
 logger = setup_logger_basic()
 logger.info("Program: compute_probabilities.py ****")
 
-DUMMY = True 
 
 def parse_args():
     """Parse command-line arguments and return them as a Namespace."""
@@ -27,6 +27,7 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for probability computation")
     parser.add_argument("--parallel", type=str2bool, default=True, help="Parallel execution on GPU")
     parser.add_argument("--fast", type=str2bool, default=False, help="Use only 1000 examples for fast testing")
+    parser.add_argument("--dummy", type=str2bool, default=False, help="Use the dummy model for testing testing")
     return parser.parse_args()
 
 
@@ -85,14 +86,14 @@ def compute_probabilities(
     return mnli_data
 
 
-def run_probability_computation(eval_file, proba_file, config_file, model_weight_path, batch_size, parallel, fast) -> List[Dict]:
+def run_probability_computation(eval_file, proba_file, config_file, model_weight_path, batch_size, parallel, fast, dummy) -> List[Dict]:
     """Run the full pipeline: load data, compute probabilities, and return JSON."""
     global config
     config = get_config(config_file)
 
     tokenizer = AutoTokenizer.from_pretrained(config["model_name"], use_fast=False, model_max_length=512)
 
-    if DUMMY:
+    if dummy:
         logger.info("Using Dummy Model")
         model = DummyModel(num_labels=config.get("num_labels", 3))  # Use dummy model
     else:
@@ -109,6 +110,8 @@ def run_probability_computation(eval_file, proba_file, config_file, model_weight
     mnli_data = compute_probabilities(mnli_data, tokenizer, model, device, config, batch_size)
 
     mnli_data_serializable = [item.to_dict() for item in mnli_data]
+    
+    os.makedirs(os.path.dirname(proba_file), exist_ok=True)
 
     with open(proba_file, "w") as f:
         json.dump(mnli_data_serializable, f, indent=2)
@@ -127,4 +130,5 @@ if __name__ == "__main__":
         args.batch_size,
         args.parallel,
         args.fast,
+        args.dummy
     )
