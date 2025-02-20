@@ -38,6 +38,7 @@ parser = ArgumentParser()
 parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
 parser.add_argument("--direct", type=bool, default=True)
+parser.add_argument("--direct", action="store_true", help="To use the direct template")
 parser.add_argument("--task", type=str)
 
 args = parser.parse_args()
@@ -76,6 +77,7 @@ negative_templates: Dict[str, list] = defaultdict(list)
 if args.direct:
     templates = direct_templates
 else:
+    logger.warning("You are generating the indirect dataset - if you want the direct dataset use --direct")
     templates = indirect_templates
 
 # generate a two dict,

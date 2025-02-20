@@ -50,8 +50,8 @@ def main():
     parser.add_argument("--model_weight_path", type=str, help="Model weight path")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument("--parallel", type=str2bool, default=True, help="Parallel execution on GPU")
-    parser.add_argument("--fast", type=str2bool, default=False, help="Fast mode")
-    parser.add_argument("--dummy", type=str2bool, default=False, help="Use the dummy model for test")
+    parser.add_argument("--fast", action="store_true", help="Fast mode")
+    parser.add_argument("--dummy", action="store_true", help="Use the dummy model for test")
 
     # TODO push the eval file in git for direct and indirect
 
