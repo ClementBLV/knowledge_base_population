@@ -44,7 +44,7 @@ WN_LABEL_TEMPLATES = {  # in the future we will add the indirect relations
     ],
     "_member_of_domain_usage": [
         "{obj} is a domain usage of {subj}",
-        "{obj} is a domain usage of {subj}",
+        "{subj} is used in the context of {obj}",
     ],
     "_member_of_domain_region": [
         "{obj} is the domain region of {subj}",
@@ -110,7 +110,7 @@ template_indirect = [
     "{subj} is a member of {obj}",
     "{subj} is the context of {obj}",
     "{subj} is a part of {obj}",
-    "{subj} is a domain usage of {obj}",
+    "{subj} is used in the context of {obj}",
     "{subj} belong to the regieon of {obj}",
     "{subj} is synonym to {obj}",
     "{subj} similar to {obj}",
