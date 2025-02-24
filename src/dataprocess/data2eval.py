@@ -37,7 +37,6 @@ parser = ArgumentParser()
 
 parser.add_argument("--input_file", type=str, default="data/WN18RR/source/valid.json")
 parser.add_argument("--output_file", type=str, default="data/WN18RR/valid_eval.json")
-parser.add_argument("--direct", type=bool, default=True)
 parser.add_argument("--direct", action="store_true", help="To use the direct template")
 parser.add_argument("--task", type=str)
 
