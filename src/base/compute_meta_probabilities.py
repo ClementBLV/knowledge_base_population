@@ -35,7 +35,7 @@ def compute_meta_probabilities(
     
     for data_item in aggregated_prob:
         # Convert fused probabilities to a tensor
-        input_tensor = torch.tensor(data_item.fused_probability, dtype=torch.float32)
+        input_tensor = torch.tensor(data_item.fused_probability, dtype=torch.float32).to(device)
 
         # Ensure correct shape: (batch_size, num_models * num_classes)
         if input_tensor.dim() == 1:
