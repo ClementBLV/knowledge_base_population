@@ -61,7 +61,7 @@ class MetaModelNN(nn.Module):
 
 
     @staticmethod
-    def load_meta_model(config_meta, device="cpu"):
+    def load_meta_model(config_meta, device):
         """
         Load a trained meta model.
 
