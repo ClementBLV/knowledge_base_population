@@ -73,7 +73,7 @@ class MetaModelNN(nn.Module):
             MetaModelNN: Loaded model.
         """
         model = MetaModelNN(num_models=config_meta["num_models"], num_classes=config_meta["num_classes"])
-        model.load_state_dict(torch.load(config_meta.model_path, map_location=torch.device(device)))
+        model.load_state_dict(torch.load(config_meta["meta_model_path"], map_location=torch.device(device)))
         model.to(device)  # Move model to the specified device
         model.eval()  # Set model to evaluation mode
         return model
