@@ -161,9 +161,7 @@ def main(args):
     if args.parallel:
         for result in results :  #tqdm(results, desc="Merging Results Paraalel"):
             merged_results[result["id"]][result["real_label"]][model2prob[result["model_name"]]] = result['logits']
-        
-        pprint(merged_results, indent=4)
-        
+                
     else:
         # Update merged_results with probabilities
         for result in results : #tqdm(results, desc="Merging Probabilities Sequential"):

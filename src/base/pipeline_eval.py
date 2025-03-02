@@ -72,7 +72,8 @@ def main():
         compute_probabilities(args)
         predictions = load_predictions(args.proba_file, type_=PredictionInputFeatures, logger=logger )
     
-    else:
+    if not( args.config_meta or (args.direct and args.reverse and args.both_direct and args.both_reverse)):
+
         if args.proba_file and os.path.exists(args.proba_file):
             predictions = load_predictions(args.proba_file, type_=PredictionInputFeatures, logger=logger )
         else:
@@ -81,7 +82,7 @@ def main():
             predictions = load_predictions(args.proba_file, type_=PredictionInputFeatures, logger=logger )
 
     ### Meta config ###
-    if args.config_meta or (args.direct and args.reverse and args.both_direct and args.both_reverse):
+    else:
         if not all([args.direct, args.reverse, args.both_direct, args.both_reverse]):
             parser.error("You should either give ONE probability file - FOUR probability file - ONE config_meta.json file")
 
