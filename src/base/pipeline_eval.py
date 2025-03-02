@@ -93,12 +93,16 @@ def main():
 
         # Appel à la fonction d’agrégation (à implémenter)
         aggregated_probs = aggregate_probabilities(direct_probs, reverse_probs, both_direct_probs, both_reverse_probs)
-        print("Probabilités agrégées :", aggregated_probs[0])
+        if len(aggregated_probs) == 0 : 
+            raise ValueError("The aggretated probibabilities are empty")
+        
+        else : 
+            print("Probabilités agrégées :", aggregated_probs[0])
 
-        # Compute the probabilities and predictions
-        config_meta = get_config(args.config_meta)
-        compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger, use_meta_dummy=args.dummy)
-        predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
+            # Compute the probabilities and predictions
+            config_meta = get_config(args.config_meta)
+            compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger, use_meta_dummy=args.dummy)
+            predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 
     # map the relation to their prediction 
     relations2predictions = {"Global":[]}
