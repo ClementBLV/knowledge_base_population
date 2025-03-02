@@ -53,9 +53,9 @@ def read_data(input_file : str, fast : bool, logger : logging.Logger):
     with open(input_file) as f:
         datas = json.load(f)
     if fast : 
-        logger.warning("DATA : Your are using the FAST mode ! Only 10000 will be taken")
+        logger.warning("Data : Your are using the FAST mode ! Only 1000 will be taken")
         return datas[0:1000]
-    logger.info(f"DATA : {get_total_size(datas)} lines read in the file {input_file}")
+    logger.info(f"Data : {get_total_size(datas)} lines read in the file {input_file}")
     return datas
    
 def get_total_size(total_data):
@@ -115,7 +115,8 @@ def pipeline(args):
     
     print("=========== PIPELINE ============")
     logger.info("Program: pipeline.py ****")
-    train_fraction = args.train_fraction
+    #train_fraction = args.train_fraction
+    current_train_fraction = args.train_fraction
     best_accuracy , best_fraction = 0, 0
     best_model = None
 
@@ -134,8 +135,8 @@ def pipeline(args):
     previous_train_size = 0 
     
 
-    while train_fraction <= 1.0:
-        step_train_size = int(total_train_size * train_fraction)
+    while current_train_fraction <= 1.0:
+        step_train_size = int(total_train_size * current_train_fraction)
 
         logger.info("******")
         logger.info(f"Data : training step {step_train_size}")

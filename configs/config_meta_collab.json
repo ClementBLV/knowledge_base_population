@@ -1,6 +1,6 @@
 {
     "source_model":"microsoft/deberta-v3-small",
-    "meta_model_path": "", 
+    "meta_model_path": "/data/WN18RR/meta_model_20250302/best_model_5000.pt", 
     "max_length":1024,
     "num_models":4,
     "num_classes":1,
