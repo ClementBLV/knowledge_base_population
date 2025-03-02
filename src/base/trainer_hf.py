@@ -25,12 +25,11 @@ from transformers import TrainingArguments, Trainer, TrainerCallback
 
 from datasets import load_dataset
 
-from datetime import datetime
 
 from src.utils.utils import get_config, str2bool, setup_logger_basic
 
 SEED_GLOBAL = 42
-DATE =  datetime.today().strftime("%Y%m%d")
+
 
 
 
@@ -79,7 +78,7 @@ config = get_config(args.config_file)
 os.makedirs(args.output_dir, exist_ok=True)
 logging_directory = os.path.join(args.output_dir, "logs")
 os.makedirs(logging_directory, exist_ok=True)
-logger.info(f"Save : Checkpoint Save location : {args.output_dir}/{args.save_name}-{DATE}")
+logger.info(f"Save : Checkpoint Save location : {args.output_dir}/{args.save_name}")
 
 ################ load : model ################
 model_name = config["model_name"]
@@ -127,7 +126,7 @@ if args.do_train :
             "model_name": model_name,
             "seed": SEED_GLOBAL,
         },
-        name=f"run_{args.save_name}_{DATE}",
+        name=f"run_{args.save_name}",
     )
     logger.info("wandb initialized.")
 
@@ -295,7 +294,7 @@ trainer = Trainer(
 if args.do_train:
     train_result = trainer.train()
 
-    model_path = f"{args.output_dir}/{args.save_name}-{DATE}"
+    model_path = f"{args.output_dir}/{args.save_name}"
     trainer.save_model(output_dir=model_path)
     shutil.copy(config["config_path"], f"{model_path}/config_used.json")
     

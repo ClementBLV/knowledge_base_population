@@ -5,6 +5,10 @@ import warnings
 import logging 
 import re
 from src.utils.utils import get_config
+from datetime import datetime
+
+
+DATE =  datetime.today().strftime("%Y%m%d")
 
 def extract_size(sentence):
     match = re.search(r'\b(base|small|large)\b', sentence, re.IGNORECASE)
@@ -37,7 +41,7 @@ def generate_save_name(config_file, bias, direct, both, split, version, custom_n
 
     size = extract_size(model)
 
-    save_name = f"{prefix}_derberta_{size}_{both_indicator}_{bias_indicator}_split{split}_v{version}"
+    save_name = f"{prefix}_derberta_{size}_{both_indicator}_{bias_indicator}_split{split}_v{version}-{DATE}"
     return save_name
 
 if __name__ == "__main__":
