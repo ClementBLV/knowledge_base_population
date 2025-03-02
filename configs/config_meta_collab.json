@@ -1,0 +1,46 @@
+{
+    "source_model":"microsoft/deberta-v3-small",
+    "meta_model_path": "", 
+    "max_length":1024,
+    "num_models":4,
+    "num_classes":1,
+    "label2id" : {
+        "entailment": 0,
+        "not_entailment": 1
+    },
+    "id2label" : {
+        "0": "entailment",
+        "1": "not_entailment"
+    },
+    "models_path" : {
+        "model_1way" : "/content/knowledge_base_population/weights/WN18RR/MNLI_wn/naive_deberta_small_1w_direct_biased_split_collab", 
+        "model_1way_reverse" : "/content/knowledge_base_population/weights/WN18RR/MNLI_wn/naive_deberta_small_1w_indirect_biased_split_collab",
+        "model_2ways": "/content/knowledge_base_population/weights/WN18RR/MNLI_wn/naive_deberta_small_1w_indirect_biased_split_collab"
+    }, 
+    "model_path": {
+        "p1": "model_1way", 
+        "p2": "model_2ways",
+        "p3": "model_1way_reverse",
+        "p4": "model_2ways"
+    }, 
+    
+    "model2prob" : {
+        "model_1": "p1",
+        "model_3": "p2",
+        "model_2": "p3",
+        "model_4": "p4"
+    },
+    
+    "probability_model" : {
+        "p1":"direct_probs",
+        "p2":"both_direct_probs",
+        "p3":"reverse_probs",
+        "p4":"both_reverse_probs"
+    }, 
+    "probability_path" : {
+        "p1":"",
+        "p2":"",
+        "p3":"",
+        "p4":""
+    } 
+}

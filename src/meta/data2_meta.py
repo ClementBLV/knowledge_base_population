@@ -145,9 +145,10 @@ def main(args):
 
     ################ Process data ################
     if args.parallel:
+        logger.info(f"Data : processing in parallel")
         results = process_data_concurrently(args.datas, tokenizer, config, device)
-        print("results", results)
     else:
+        logger.info(f"Data : processing in sequential")
         results = process_data(args.datas, tokenizer, config, device)
 
     

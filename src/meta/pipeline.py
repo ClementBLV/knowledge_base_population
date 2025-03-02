@@ -49,11 +49,13 @@ args = parser.parse_args()
 ################ setup : config ################
 config = get_config(args.config_file)
 
-def read_data(input_file : str, fast : bool=False):
+def read_data(input_file : str, fast : bool, logger : logging.Logger):
     with open(input_file) as f:
         datas = json.load(f)
     if fast : 
+        logger.warning("DATA : Your are using the FAST mode ! Only 10000 will be taken")
         return datas[0:1000]
+    logger.info(f"DATA : {get_total_size(datas)} lines read in the file {input_file}")
     return datas
    
 def get_total_size(total_data):
@@ -117,9 +119,9 @@ def pipeline(args):
     best_accuracy , best_fraction = 0, 0
     best_model = None
 
-    train_data = read_data(args.train_file)
-    valid_data = read_data(args.valid_file) # --> in the loop 
-    test_data = read_data(args.test_file) # --> at the end 
+    train_data = read_data(args.train_file, args.fast, logger)
+    valid_data = read_data(args.valid_file, args.fast, logger) # --> in the loop 
+    test_data = read_data(args.test_file, args.fast, logger) # --> at the end 
 
 
     # validation computing 
@@ -141,7 +143,7 @@ def pipeline(args):
         logger.info(f"Data : Processing {(previous_train_size+step_train_size)/total_train_size * 100:.0f}% of the data...\n")
 
         ############## training subset ##############
-        if previous_train_size + step_train_size < total_train_size : 
+        if previous_train_size + step_train_size <= total_train_size : 
             next_train_size = previous_train_size + step_train_size
             train_data_fraction = get_data_fraction(
                                         train_data, 
