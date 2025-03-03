@@ -44,6 +44,8 @@ parser.add_argument("--patience", type=int, default=3,
                     help="Number of iterations to wait for improvement before stopping.")
 parser.add_argument('--fast', type=str2bool, default=False,
                     help='Use only 1000 for debug and fast test')
+parser.add_argument('--custom_meta_name', type=str,
+                    help='Custom name for the meta model')
 args = parser.parse_args()
 
 ################ setup : config ################
@@ -53,8 +55,8 @@ def read_data(input_file : str, fast : bool, logger : logging.Logger):
     with open(input_file) as f:
         datas = json.load(f)
     if fast : 
-        logger.warning("Data : Your are using the FAST mode ! Only 1000 will be taken")
-        return datas[0:1000]
+        logger.warning("Data : Your are using the FAST mode ! Only 100 will be taken")
+        return datas[0:100]
     logger.info(f"Data : {get_total_size(datas)} lines read in the file {input_file}")
     return datas
    
@@ -109,7 +111,11 @@ def df2meta (data_fraction, parallel, config)-> List[Dict]:
     return data2_meta.main(custom_args)
 
 def pipeline(args):
-    output_dir = os.path.join(args.output_dir,f"meta_model_{DATE}")
+    if  args.custom_meta_name :
+        output_dir = os.path.join(args.output_dir,f"meta_model")
+
+    else : 
+        output_dir = os.path.join(args.output_dir,f"meta_model_{DATE}")
     os.makedirs( output_dir, exist_ok=True)
     logger = setup_logger(os.path.join(output_dir, "logs.txt"))
     
@@ -193,7 +199,11 @@ def pipeline(args):
         logger.info(f"Metric : Accuracy with {current_train_fraction * 100:.0f}% data and Test data: {last_accuracy:.4f} \n")
 
         # Save the model
-        saving_name = f"best_model_{int(last_accuracy * 10000)}.pt"
+        if not args.custom_meta_name: 
+            saving_name = f"best_model_{int(last_accuracy * 10000)}.pt"
+        else : 
+            saving_name = args.custom_meta_name if args.custom_meta_name.endswith(".pt") else f"{args.custom_meta_name}.pt"
+        
         model_path = os.path.join(output_dir, saving_name)
         torch.save(best_model.state_dict(), model_path)
         logger.info(f"Data : Best model saved at {model_path} with accuracy {best_accuracy:.4f}")

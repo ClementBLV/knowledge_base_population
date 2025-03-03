@@ -41,7 +41,7 @@ def generate_save_name(config_file, bias, direct, both, split, version, custom_n
 
     size = extract_size(model)
 
-    save_name = f"{prefix}_derberta_{size}_{both_indicator}_{bias_indicator}_split{split}_v{version}-{DATE}"
+    save_name = f"{prefix}_deberta_{size}_{both_indicator}_{bias_indicator}_split{split}_v{version}-{DATE}"
     return save_name
 
 if __name__ == "__main__":
