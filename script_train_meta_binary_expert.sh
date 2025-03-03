@@ -18,6 +18,8 @@ show_help() {
     echo "  --config_file PATH              NAME of the config.json you want to use in the config file"
     echo "  --train_fraction FLOAT          Fraction used for training and testing"
     echo "  --fast BOOL                     If set on true a fast training with only 1000 example will be done"
+    echo "  --custom_meta_name STR          Custom name of the meta model" 
+    echo "  --output_dir DIR                Custom output dir if not proceised will be the same as processed_data_directory"
     echo "  --help                          Display this help message and exit."
     exit 1
 }
@@ -37,7 +39,8 @@ declare -A args=(
     [--config_file]=CONFIG_FILE
     [--train_fraction]=TRAIN_FRACTION
     [--fast]=FAST
-
+    [--custom_meta_name]=CUSTOM_META_NAME
+    [--output_dir]=OUTPUT_DIR
 )
 
 while [ $# -gt 0 ]; do
@@ -77,6 +80,10 @@ fi
 
 if [ -z "$FAST" ]; then
     FAST=false
+fi
+
+if [ -z "OUTPUT_DIR"]; then
+    OUTPUT_DIR=$P_FILE
 fi
 
 run_experiment() {
@@ -121,12 +128,13 @@ run_experiment() {
         python3 src/meta/pipeline.py   --train_file $P_FILE"/train.mnli.json" \
                                     --test_file $P_FILE"/test.mnli.json"\
                                     --valid_file $P_FILE"/valid.mnli.json"\
-                                    --output_dir $P_FILE \
+                                    --output_dir $OUTPUT_DIR \
                                     --num_epochs 3\
                                     --config_file $CONFIG_FILE \
                                     --parallel $PARALLEL_BOOL \
                                     --train_fraction $TRAIN_FRACTION \
-                                    --fast $FAST
+                                    --fast $FAST \
+                                    --custom_meta_name $CUSTOM_META_NAME
         
         # TODO add an argument there for the model output
         
