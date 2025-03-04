@@ -87,7 +87,7 @@ def load_data(input_file: str, fast: bool, logger) -> List[PredictionInputFeatur
 
     mnli_data = [
         PredictionInputFeatures(
-            id=sha1(line["relation"] + line["hypothesis_true"][0]),
+            id=sha1(line["relation"] + line["premise"]),
             premise=line["premise"],
             hypothesis_true=line["hypothesis_true"][0],
             hypothesis_false=line["hypothesis_false"],
