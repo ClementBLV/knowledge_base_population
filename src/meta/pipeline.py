@@ -79,8 +79,14 @@ def save_results(final_results, output_dir, saving_name):
     df.to_json(output_file, orient="records", lines=True)
     return output_file
 
+def label2proba(label : int , config : Dict): 
+    """Return a proba of 1 if the label is the entailement """
+    if config["label2id"]["entailment"] == label: 
+        return 1
+    else : 
+        return 0
 
-def input2tensor(final_result : List[Dict]): 
+def input2tensor(final_result : List[Dict], config : Dict): 
     """ Convert the data obtwined with data2_meta.py into usable 
     tensors for training and evaluation"""
     df = pd.DataFrame(final_result)
@@ -95,7 +101,8 @@ def input2tensor(final_result : List[Dict]):
                 l.extend([df.iloc[i][p][0][ent_indx]])
         if l:
             X.append(l)
-            filtered_y.append(y[i])
+            # y c'est le label donc 0 si ent et 1 sinon or nous on veur le convertir en proba donc si label = entailement probal = 1 sinon proba = 0 
+            filtered_y.append(label2proba(y[i], config))
     assert len(X) == len(filtered_y), f"Mismatch: {len(X)} != {len(filtered_y)}"
     X_tensor = torch.tensor(X, dtype=torch.float32)
     y_tensor = torch.tensor(filtered_y, dtype=torch.float32)
@@ -133,7 +140,7 @@ def pipeline(args):
 
     # validation computing 
     valid_data_meta =  df2meta(valid_data, args.parallel, config=config)
-    X_tensor_valid, y_tensor_valid = input2tensor(valid_data_meta)
+    X_tensor_valid, y_tensor_valid = input2tensor(valid_data_meta, config=config)
 
     total_train_size = get_total_size(train_data)
 
