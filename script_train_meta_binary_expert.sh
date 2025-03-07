@@ -125,17 +125,28 @@ run_experiment() {
     if [ "$NO_TRAINING" == "true" ]; then
         echo "HELLO WORLD NO TRAINING!"
     else
-        python3 src/meta/pipeline.py   --train_file $P_FILE"/train.mnli.json" \
-                                    --test_file $P_FILE"/test.mnli.json"\
-                                    --valid_file $P_FILE"/valid.mnli.json"\
-                                    --output_dir $OUTPUT_DIR \
-                                    --num_epochs 3\
-                                    --config_file $CONFIG_FILE \
-                                    --parallel $PARALLEL_BOOL \
-                                    --train_fraction $TRAIN_FRACTION \
-                                    --fast $FAST \
-                                    --custom_meta_name $CUSTOM_META_NAME
-        
+        if [ -n "$CUSTOM_META_NAME" ]; then
+            python3 src/meta/pipeline.py   --train_file $P_FILE"/train.mnli.json" \
+                                          --test_file $P_FILE"/test.mnli.json" \
+                                          --valid_file $P_FILE"/valid.mnli.json" \
+                                          --output_dir $OUTPUT_DIR \
+                                          --num_epochs 3 \
+                                          --config_file $CONFIG_FILE \
+                                          --parallel $PARALLEL_BOOL \
+                                          --train_fraction $TRAIN_FRACTION \
+                                          --fast $FAST \
+                                          --custom_meta_name $CUSTOM_META_NAME
+        else
+            python3 src/meta/pipeline.py   --train_file $P_FILE"/train.mnli.json" \
+                                          --test_file $P_FILE"/test.mnli.json" \
+                                          --valid_file $P_FILE"/valid.mnli.json" \
+                                          --output_dir $OUTPUT_DIR \
+                                          --num_epochs 3 \
+                                          --config_file $CONFIG_FILE \
+                                          --parallel $PARALLEL_BOOL \
+                                          --train_fraction $TRAIN_FRACTION \
+                                          --fast $FAST
+        fi
         # TODO add an argument there for the model output
         
         #echo "=========== TRAIN ============"
