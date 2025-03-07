@@ -44,7 +44,7 @@ parser.add_argument("--patience", type=int, default=3,
                     help="Number of iterations to wait for improvement before stopping.")
 parser.add_argument('--fast', type=str2bool, default=False,
                     help='Use only 1000 for debug and fast test')
-parser.add_argument('--custom_meta_name', type=str,
+parser.add_argument('--custom_meta_name', type=str, default=None,
                     help='Custom name for the meta model')
 args = parser.parse_args()
 
