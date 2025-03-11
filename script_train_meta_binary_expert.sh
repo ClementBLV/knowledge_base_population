@@ -82,7 +82,7 @@ if [ -z "$FAST" ]; then
     FAST=false
 fi
 
-if [ -z "OUTPUT_DIR"]; then
+if [ -z "OUTPUT_DIR" ]; then
     OUTPUT_DIR=$P_FILE
 fi
 

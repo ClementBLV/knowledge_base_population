@@ -169,7 +169,7 @@ def pipeline(args):
             cached_train_data.extend(df2meta(train_data_fraction, args.parallel, config=config))
             current_train_fraction = 2*len(cached_train_data)/total_train_size # (2 because reverse and direct)
             
-            X_tensor, y_tensor = input2tensor(cached_train_data)
+            X_tensor, y_tensor = input2tensor(cached_train_data, config=config)
 
         ############### Train ##############
         model = train_model(X_tensor, y_tensor, num_epochs=args.num_epochs, config_file=args.config_file)
@@ -201,7 +201,7 @@ def pipeline(args):
 
         # evaluation on test data -- final evaluation of the perf of the meta model 
         test_data_meta =  df2meta(test_data, args.parallel, config=config)
-        X_tensor_test, y_tensor_test = input2tensor(test_data_meta)
+        X_tensor_test, y_tensor_test = input2tensor(test_data_meta, config=config)
         last_accuracy = evaluate_model(best_model, X_tensor_test, y_tensor_test)
         logger.info(f"Metric : Accuracy with {current_train_fraction * 100:.0f}% data and Test data: {last_accuracy:.4f} \n")
 
