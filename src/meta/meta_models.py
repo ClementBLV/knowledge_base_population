@@ -2,27 +2,69 @@ import torch
 import torch.nn as nn
 
 ################ setup : models ################
+import torch
+import torch.nn as nn
+
+# Helper functions
+def row_means(tensor):
+    return tensor.mean(dim=1)
+
+def max_row(tensor):
+    return tensor.max(dim=1).values  # Extract max values per row
+
+def one_hot_max(tensor):
+    max_indices = tensor.argmax(dim=0, keepdim=True)
+    
+    # Create a tensor of zeros with the same shape
+    one_hot = torch.zeros_like(tensor)
+    # Scatter 1s at the max indices
+    one_hot[max_indices]+=1
+    return one_hot
+
+
+def max_column(tensor):
+    c0 = one_hot_max(tensor[:, 0:1])  # Keep as (batch_size, 1) shape
+    c1 = one_hot_max(tensor[:, 1:2])
+    c2 = one_hot_max(tensor[:, 2:3])
+    c3 = one_hot_max(tensor[:, 3:4])
+    return c0 + c1 + c2 + c3
+
+
+# Updated VotingModel
 class VotingModel(nn.Module):
-    def __init__(self, num_models, num_classes):
+    def __init__(self, num_models, num_classes, strategy="max_row"):
         """
         Args:
             num_models (int): Number of sub-models (e.g., p1, p2, p3, p4).
             num_classes (int): Number of classes for each sub-model (e.g., 2 for entail and contradict).
+            strategy (str): Voting strategy - "average", "max_row", or "max_column".
         """
         super(VotingModel, self).__init__()
         self.num_models = num_models
         self.num_classes = num_classes
+        self.strategy = strategy  # Store the strategy
 
     def forward(self, x):
         # x is expected to have shape (batch_size, num_models * num_classes), flattened probabilities
         batch_size = x.size(0)
         x = x.view(batch_size, self.num_models, self.num_classes)  # Reshape to (batch_size, num_models, num_classes)
-        
-        # Perform voting
-        votes = torch.argmax(x, dim=-1)  # Get the index of the max probability (0 for entail, 1 for contradict)
-        # Find the most common label (entail or contradict) in each batch
-        majority, _ = torch.mode(votes, dim=1)  # Mode gives the most frequent element
-        return majority.unsqueeze(-1)  
+
+        if self.strategy == "average":
+            X = row_means(x).t()[0]  # Average probabilities per class
+            votes = one_hot_max(X) 
+
+        elif self.strategy == "max_row":
+            x = max_row(x)  # Get max probability per row
+            votes = one_hot_max(x)
+
+        elif self.strategy == "max_column":
+            x = max_column(x)  # Apply column-wise max voting
+            votes = one_hot_max(x)
+
+        else:
+            raise ValueError(f"Invalid strategy: {self.strategy}. Choose from 'average', 'max_row', or 'max_column'.")
+
+        return votes.unsqueeze(-1)  # Keep shape (batch_size, 1)
 
 class MetaModelNN(nn.Module):
     def __init__(self, num_models, num_classes, hidden_scale=2):
