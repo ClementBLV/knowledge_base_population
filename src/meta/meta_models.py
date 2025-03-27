@@ -1,36 +1,8 @@
 import torch
 import torch.nn as nn
+from utils.helper_functions import *
 
 ################ setup : models ################
-import torch
-import torch.nn as nn
-
-# Helper functions
-def row_means(tensor):
-    return tensor.mean(dim=1)
-
-def max_row(tensor):
-    return tensor.max(dim=1).values  # Extract max values per row
-
-def one_hot_max(tensor):
-    max_indices = tensor.argmax(dim=0, keepdim=True)
-    
-    # Create a tensor of zeros with the same shape
-    one_hot = torch.zeros_like(tensor)
-    # Scatter 1s at the max indices
-    one_hot[max_indices]+=1
-    return one_hot
-
-
-def max_column(tensor):
-    c0 = one_hot_max(tensor[:, 0:1])  # Keep as (batch_size, 1) shape
-    c1 = one_hot_max(tensor[:, 1:2])
-    c2 = one_hot_max(tensor[:, 2:3])
-    c3 = one_hot_max(tensor[:, 3:4])
-    return c0 + c1 + c2 + c3
-
-
-# Updated VotingModel
 class VotingModel(nn.Module):
     def __init__(self, num_models, num_classes, strategy="max_row"):
         """
@@ -50,20 +22,25 @@ class VotingModel(nn.Module):
         x = x.view(batch_size, self.num_models, self.num_classes)  # Reshape to (batch_size, num_models, num_classes)
 
         if self.strategy == "average":
-            X = row_means(x).t()[0]  # Average probabilities per class
-            votes = one_hot_max(X) 
+            x = row_means(x).t()[0]  # Average probabilities per class
+            if edge_case(x):
+              x = max_row(x).t()[0]
+            votes = one_hot_max(x)
 
         elif self.strategy == "max_row":
-            x = max_row(x)  # Get max probability per row
+            x = max_row(x).t()[0]  # Get max probability per row
             votes = one_hot_max(x)
 
         elif self.strategy == "max_column":
-            x = max_column(x)  # Apply column-wise max voting
-            votes = one_hot_max(x)
+            t = max_column(x)  # Apply column-wise max voting
+            if edge_case(t):
+              t = row_means(x)
+              if edge_case(t):
+                t = max_row(x).t()[0]
+            votes = one_hot_max(t)
 
         else:
             raise ValueError(f"Invalid strategy: {self.strategy}. Choose from 'average', 'max_row', or 'max_column'.")
-
         return votes.unsqueeze(-1)  # Keep shape (batch_size, 1)
 
 class MetaModelNN(nn.Module):

@@ -5,10 +5,10 @@ from typing import Dict, List
 import torch
 from src.base.compute_probabilities import compute_prediction
 from src.base.mnli_dataclass import MetaPredictionInputFeatures, PredictionInputFeatures
-from src.meta.meta_models import DummyMetaModelNN, MetaModelNN
+from src.meta.meta_models import DummyMetaModelNN, MetaModelNN, VotingModel
 
 
-def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = False):
+def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = False, voting_strategy="max_row"):
     """Loads either the real or dummy meta model based on the flag."""
     num_models = config_meta["num_models"]
     num_classes = config_meta["num_classes"]
@@ -16,6 +16,9 @@ def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = F
     if use_meta_dumy:
         logger.info("Using Dummy Meta Model")
         return DummyMetaModelNN(num_models=num_models, num_classes=num_classes)
+    elif voting_strategy:
+        logger.info(f"Using Voting Model - with the strategy {voting_strategy}")
+        return VotingModel(num_models=num_models, num_classes=num_classes,strategy=voting_strategy)
     else:
         logger.info("Using Real Meta Model")
         return  MetaModelNN.load_meta_model(config_meta, device=device)    
@@ -26,12 +29,13 @@ def compute_meta_probabilities(
         config_meta: Dict,
         meta_proba_file: str, 
         logger: Logger,
-        use_meta_dummy : bool
+        use_meta_dummy : bool,
+        voting_strategy : str
     )-> List[MetaPredictionInputFeatures]: 
     
     # Load the meta model
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    meta_model = load_meta_model(config_meta, device=device, logger=logger, use_meta_dumy=use_meta_dummy)
+    meta_model = load_meta_model(config_meta, device=device, logger=logger, use_meta_dumy=use_meta_dummy, voting_strategy=voting_strategy)
     
     for data_item in aggregated_prob:
         # Convert fused probabilities to a tensor

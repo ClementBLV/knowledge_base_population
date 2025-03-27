@@ -41,6 +41,7 @@ def main():
     parser.add_argument("--config_meta", type=str, help="Meta configuration file")
     parser.add_argument("--meta_proba_file", type=str, help="Output file for probabilities")
     parser.add_argument("--output_eval_name", type=str, help="Name of the eval file - the evals are saved in the eval folder")
+    parser.add_argument("--voting_strategy", type=str, help="Voting strategy to use :  average, max_row, or max_column.")
 
     # Arguments for compute_probabilities.py
     # 
@@ -86,8 +87,8 @@ def main():
         if not all([args.direct, args.reverse, args.both_direct, args.both_reverse]):
             parser.error("You should either give ONE probability file - FOUR probability file - ONE config_meta.json file")
 
-        direct_probs = load_predictions(args.direct,type_=PredictionInputFeatures, logger=logger)
-        reverse_probs = load_predictions(args.reverse,type_=PredictionInputFeatures, logger=logger)
+        direct_probs = load_predictions(args.direct, type_=PredictionInputFeatures, logger=logger)
+        reverse_probs = load_predictions(args.reverse, type_=PredictionInputFeatures, logger=logger)
         both_direct_probs = load_predictions(args.both_direct, type_=PredictionInputFeatures,logger=logger)
         both_reverse_probs = load_predictions(args.both_reverse,type_=PredictionInputFeatures, logger=logger)
 
@@ -101,7 +102,14 @@ def main():
 
             # Compute the probabilities and predictions
             config_meta = get_config(args.config_meta)
-            compute_meta_probabilities(aggregated_probs, config_meta=config_meta,meta_proba_file=args.meta_proba_file, logger=logger, use_meta_dummy=args.dummy)
+            compute_meta_probabilities(
+                aggregated_probs,
+                config_meta=config_meta,
+                meta_proba_file=args.meta_proba_file, 
+                logger=logger, 
+                use_meta_dummy=args.dummy,
+                use_voting=args.voting_strategy
+                )
             predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 
     # map the relation to their prediction 
