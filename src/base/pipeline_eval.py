@@ -42,6 +42,7 @@ def main():
     parser.add_argument("--meta_proba_file", type=str, help="Output file for probabilities")
     parser.add_argument("--output_eval_name", type=str, help="Name of the eval file - the evals are saved in the eval folder")
     parser.add_argument("--voting_strategy", type=str, help="Voting strategy to use :  average, max_row, or max_column.")
+    parser.add_argument("--use_meta_global", action="store_true", help="Use the Global meta model")
 
     # Arguments for compute_probabilities.py
     # 
@@ -108,7 +109,8 @@ def main():
                 meta_proba_file=args.meta_proba_file, 
                 logger=logger, 
                 use_meta_dummy=args.dummy,
-                use_voting=args.voting_strategy
+                voting_strategy=args.voting_strategy,
+                use_meta_global=args.use_meta_global
                 )
             predictions = load_predictions(args.meta_proba_file,type_=MetaPredictionInputFeatures , logger=logger)
 

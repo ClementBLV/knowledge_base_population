@@ -5,10 +5,10 @@ from typing import Dict, List
 import torch
 from src.base.compute_probabilities import compute_prediction
 from src.base.mnli_dataclass import MetaPredictionInputFeatures, PredictionInputFeatures
-from src.meta.meta_models import DummyMetaModelNN, MetaModelNN, VotingModel
+from src.meta.meta_models import DummyMetaModelNN, MetaModelNN, VotingModel, GlobalRelationMetaModelNN
 
 
-def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = False, voting_strategy="max_row"):
+def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = False, voting_strategy="max_row", use_meta_global=False ):
     """Loads either the real or dummy meta model based on the flag."""
     num_models = config_meta["num_models"]
     num_classes = config_meta["num_classes"]
@@ -16,11 +16,14 @@ def load_meta_model(config_meta: Dict, device, logger: Logger, use_meta_dumy = F
     if use_meta_dumy:
         logger.info("Using Dummy Meta Model")
         return DummyMetaModelNN(num_models=num_models, num_classes=num_classes)
+    elif use_meta_global: 
+        logger.info("Using Global Meta Model")
+        return  GlobalRelationMetaModelNN.load_meta_model(config_meta, device=device)    
     elif voting_strategy:
         logger.info(f"Using Voting Model - with the strategy {voting_strategy}")
         return VotingModel(num_models=num_models, num_classes=num_classes,strategy=voting_strategy)
     else:
-        logger.info("Using Real Meta Model")
+        logger.info("Using Meta Model - row inference")
         return  MetaModelNN.load_meta_model(config_meta, device=device)    
 
 
