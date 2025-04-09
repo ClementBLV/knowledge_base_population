@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from meta_models import MetaModelNN, VotingModel
+from meta_models import MetaModelNN, VotingModel, GlobalRelationMetaModelNN
 
-def train_model(X_tensor , y_tensor, num_epochs, config_file):
+def train_model(X_tensor , y_tensor, num_epochs, config_file, type_model):
 
     # Setup
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -18,7 +18,10 @@ def train_model(X_tensor , y_tensor, num_epochs, config_file):
 
     ################ training ################
     # Initialize models and training tools
-    meta_model = MetaModelNN(num_models=4, num_classes=1)
+    if type_model=="global":
+        meta_model = GlobalRelationMetaModelNN(num_relations=11, num_models=4, num_classes=1)
+    else :
+        meta_model = MetaModelNN(num_models=4, num_classes=1)
     criterion = nn.BCELoss()
     optimizer = optim.Adam(meta_model.parameters(), lr=0.001)
 

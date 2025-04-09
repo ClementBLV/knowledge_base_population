@@ -172,7 +172,7 @@ def pipeline(args):
             X_tensor, y_tensor = input2tensor(cached_train_data, config=config)
 
         ############### Train ##############
-        model = train_model(X_tensor, y_tensor, num_epochs=args.num_epochs, config_file=args.config_file)
+        model = train_model(X_tensor, y_tensor, num_epochs=args.num_epochs, config_file=args.config_file, type_model="global")
         logger.info(f"Train : training size {len(cached_train_data):.0f}, valid size {len(valid_data):.0f}")
 
         ############### Evaluate ##############
