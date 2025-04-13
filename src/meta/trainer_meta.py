@@ -29,6 +29,9 @@ def train_model(X_tensor , y_tensor, num_epochs, config_file, type_model):
     for epoch in range(num_epochs):
         running_loss = 0.0
         for inputs, labels in dataloader:
+            print(inputs, labels)
+            print(len(dataset))
+            print(a)
             outputs = meta_model(inputs).squeeze()
             loss = criterion(outputs, labels)
             optimizer.zero_grad()

@@ -22,10 +22,10 @@ class VotingModel(nn.Module):
         x = x.view(batch_size, self.num_models, self.num_classes)  # Reshape to (batch_size, num_models, num_classes)
 
         if self.strategy == "average":
-            x = row_means(x).t()[0]  # Average probabilities per class
+            t = row_means(x).t()[0]  # Average probabilities per class
             if edge_case(x):
-              x = max_row(x).t()[0]
-            votes = one_hot_max(x)
+              t = max_row(x).t()[0]
+            votes = one_hot_max(t)
 
         elif self.strategy == "max_row":
             x = max_row(x).t()[0]  # Get max probability per row

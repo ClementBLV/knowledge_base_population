@@ -33,12 +33,12 @@ def compute_meta_probabilities(
         meta_proba_file: str, 
         logger: Logger,
         use_meta_dummy : bool,
-        voting_strategy : str
+        voting_strategy : str="max_row",
+        use_meta_global=False
     )-> List[MetaPredictionInputFeatures]: 
-    
     # Load the meta model
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    meta_model = load_meta_model(config_meta, device=device, logger=logger, use_meta_dumy=use_meta_dummy, voting_strategy=voting_strategy)
+    meta_model = load_meta_model(config_meta, device=device, logger=logger, use_meta_dumy=use_meta_dummy, voting_strategy=voting_strategy, use_meta_global=use_meta_global)
     
     for data_item in aggregated_prob:
         # Convert fused probabilities to a tensor
