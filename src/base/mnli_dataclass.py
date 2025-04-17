@@ -95,7 +95,7 @@ def load_data(input_file: str, fast: bool, logger) -> List[PredictionInputFeatur
             probabilities=torch.tensor([], dtype=torch.float),
             predictions=[]
         )
-        for line in data
+        for line in data if len(line["hypothesis_true"])>0
     ]
 
     if not mnli_data:
