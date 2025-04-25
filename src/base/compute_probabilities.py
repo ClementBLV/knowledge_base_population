@@ -91,8 +91,13 @@ def run_probability_computation(eval_file, proba_file, config_file, model_weight
     global config
     config = get_config(config_file)
 
-    tokenizer = AutoTokenizer.from_pretrained(config["model_name"], use_fast=False, model_max_length=512)
-
+    tokenizer = AutoTokenizer.from_pretrained(
+        config["model_name"], 
+        use_fast=False,
+        max_length=config["max_length"],
+        padding="max_length"
+    ) 
+    
     if dummy:
         logger.info("Using Dummy Model")
         model = DummyModel(num_labels=config.get("num_labels", 3))  # Use dummy model
