@@ -58,14 +58,27 @@ def compute_probabilities(
 ) -> List[PredictionInputFeatures]:
     """Compute probabilities for MNLI data using the given model."""
     dataset = MNLIDataset(mnli_data, tokenizer, config)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn, num_workers=4)
+    dataloader = DataLoader(
+                                dataset, 
+                                batch_size=batch_size, 
+                                shuffle=False, 
+                                collate_fn=collate_fn, 
+                                num_workers=4
+                            )
 
     model.to(device)
     model.eval()
 
     idx = 0
     for premises, hypotheses, _, relations in tqdm(dataloader, desc="Computing Probabilities"):
-        inputs = tokenizer(premises, hypotheses, padding=True, truncation=True, return_tensors="pt").to(device)
+        print("SIZE PREMISSES", len(premises))
+        inputs = tokenizer(
+                            premises,
+                            hypotheses, 
+                            padding=True, 
+                            truncation='only_first', 
+                            max_length=config["max_length"],
+                            return_tensors="pt").to(device)
         with torch.no_grad():
             outputs = model(inputs["input_ids"])
             batch_probs = F.softmax(outputs["logits"], dim=-1)[:, 0].cpu()
@@ -85,8 +98,55 @@ def compute_probabilities(
 
     return mnli_data
 
+## TODO here put compute without parralélisation 
+def compute_probabilities_fully_sequential(
+    mnli_data: List[PredictionInputFeatures],
+    tokenizer: AutoTokenizer,
+    model,
+    device,
+    config,
+) -> List[PredictionInputFeatures]:
+    """Compute probabilities for MNLI data using the given model, processing hypotheses one by one."""
 
-def run_probability_computation(eval_file, proba_file, config_file, model_weight_path, batch_size, parallel, fast, dummy) -> List[Dict]:
+    model.to(device)
+    model.eval()
+
+    for data_item in tqdm(mnli_data, desc="Computing Probabilities (Fully Sequential)"):
+        premise = data_item.premise
+        all_hypotheses = [data_item.hypothesis_true] + data_item.hypothesis_false
+
+        probs = []
+
+        for hypothesis in all_hypotheses:
+            inputs = tokenizer(
+                premise,
+                hypothesis,
+                padding=True,
+                truncation="only_first",
+                max_length=config["max_length"],
+                return_tensors="pt"
+            ).to(device)
+
+            with torch.no_grad():
+                outputs = model(inputs["input_ids"])
+                prob = F.softmax(outputs["logits"], dim=-1)[0, 0].item()  # Scalar: P(entailment)
+
+            probs.append(prob)
+
+        data_item.probabilities = torch.tensor(probs)
+        data_item.predictions = compute_prediction(data_item)
+
+    return mnli_data
+
+def run_probability_computation(
+        eval_file, 
+        proba_file, 
+        config_file, 
+        model_weight_path, 
+        batch_size, 
+        parallel, 
+        fast, 
+        dummy) -> List[Dict]:
     """Run the full pipeline: load data, compute probabilities, and return JSON."""
     global config
     config = get_config(config_file)
@@ -111,8 +171,14 @@ def run_probability_computation(eval_file, proba_file, config_file, model_weight
         parallel = False
         logger.warning("Parallel execution disabled: No GPU detected, running sequentially.")
 
+    if not parallel: 
+        compute_probabilities_fn = compute_probabilities_fully_sequential
+    else : 
+        compute_probabilities_fn = compute_probabilities
+
+
     mnli_data = load_data(eval_file, fast, logger)
-    mnli_data = compute_probabilities(mnli_data, tokenizer, model, device, config, batch_size)
+    mnli_data = compute_probabilities_fn(mnli_data, tokenizer, model, device, config, batch_size)
 
     mnli_data_serializable = [item.to_dict() for item in mnli_data]
     
