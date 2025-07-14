@@ -105,6 +105,7 @@ def compute_probabilities_fully_sequential(
     model,
     device,
     config,
+    batch_size=0,
 ) -> List[PredictionInputFeatures]:
     """Compute probabilities for MNLI data using the given model, processing hypotheses one by one."""
 
